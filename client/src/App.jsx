@@ -12,18 +12,21 @@ import Dictionary from './Dictionary.jsx';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import Card from 'react-bootstrap/Card';
+import strings from './Strings.js';
 
 function App() {
   const [userState, updateUserState] = useState(null);
   const [page, setPage] = useState(0);
   const verStr = "0.1.5";
   const [toast, setToast] = useState(false);
+  // 0 logged in, 1 logged out, 2 created set, 3 update username
   const [toastType, setToastType] = useState(0);
+  // language 0 = english; 1 = spanish
+  const [lang, setLang] = useState(0);
   // dummy userState
   const testUser = {username:"admin", date:"May 30, 2025", sets:[]};
 
   function showToast(type) {
-    //0 logged in, 1 logged out, 2 created set, 3 update username
     setToastType(type);
     setToast(true);
   }
@@ -59,7 +62,7 @@ function App() {
   function DisplayContent() {
     switch(page) {
       case 0:
-        return <Home user={userState} logIn={logIn} logOut={logOut} requestUser={requestUserState} />;
+        return <Home lang={lang} user={userState} logIn={logIn} logOut={logOut} requestUser={requestUserState} />;
       break;
       case 1:
         return <Dictionary />;
@@ -74,16 +77,12 @@ function App() {
     return null;
   }
 
-  function NavAccount({user, text}) {
+  function NavAccount({user, sets}) {
     if (user) {
-      switch(text) {
-        case "Collecciones":
-          return <Nav.Link onClick={() => setPage(2)}>{text}</Nav.Link>;
-        break;
-        default:
-          return <Nav.Link onClick={() => setPage(3)}>{text}</Nav.Link>;
-        break;
-      }
+      if (sets)
+          return <Nav.Link onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>;
+      else
+          return <Nav.Link onClick={() => setPage(3)}>{strings.account_title[lang]}</Nav.Link>;
     }
     return null;
   }
@@ -95,13 +94,13 @@ function App() {
           <Navbar.Brand>Memorichuelas</Navbar.Brand>
           <Dropdown>
             <Dropdown.Toggle id="lang-dropdown">
-                Language
+                {strings.language[lang]}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-                <Dropdown.Item>
+                <Dropdown.Item onClick={() => setLang(1)}>
                     Espanol
                 </Dropdown.Item>
-                <Dropdown.Item>
+                <Dropdown.Item onClick={() => setLang(0)}>
                     English
                 </Dropdown.Item>
             </Dropdown.Menu>
@@ -109,10 +108,10 @@ function App() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link onClick={() => setPage(0)}>Inicio</Nav.Link>
-              <Nav.Link onClick={() => setPage(1)}>Diccionario</Nav.Link>
-              <NavAccount user={userState} text="Collecciones" />
-              <NavAccount user={userState} text="Configuracion" />
+              <Nav.Link onClick={() => setPage(0)}>{strings.about_title[lang]}</Nav.Link>
+              <Nav.Link onClick={() => setPage(1)}>{strings.dictionary_title[lang]}</Nav.Link>
+              <NavAccount user={userState} sets={true} />
+              <NavAccount user={userState} sets={false} />
             </Nav>
           </Navbar.Collapse>
         </Container>

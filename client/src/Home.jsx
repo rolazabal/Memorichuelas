@@ -6,11 +6,12 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
+import strings from './Strings.js';
 
 //import * as formik from 'formik';
 //import * as yup from 'yup';
 
-function Home({user, logIn, logOut, requestUser}) {
+function Home({lang, user, logIn, logOut, requestUser}) {
     const [createModal, setCreateModal] = useState(false);
     //const { formik } = formik;
     /*const schema = yup.object().shape({
@@ -20,10 +21,8 @@ function Home({user, logIn, logOut, requestUser}) {
 
     return (
         <Card.Body>
-            <Card.Title>About</Card.Title>
-            <Card.Text>
-                Aprendizaje personalizado de vocabulario utilizando colecciones de palabras; Como usuario podras crear y seleccionar collectiones y palabras de nuestro vocabulario para aprender de forma interactiva.
-            </Card.Text>
+            <Card.Title>{strings.about_title[lang]}</Card.Title>
+            <Card.Text>{strings.about_blurb[lang]}</Card.Text>
             <Modal
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
@@ -33,42 +32,42 @@ function Home({user, logIn, logOut, requestUser}) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Crea tu perfil
+                        {strings.account_create_text[lang]}
                     </Modal.Title>
                 </Modal.Header>
                 <Form>
                     <Modal.Body>
                         <Form.Group className="mb-3" controlId="formUsername">
-                            <Form.Label>Username</Form.Label>
-                            <Form.Control type="username" placeholder="Enter username" />
+                            <Form.Label>{strings.username[lang]}</Form.Label>
+                            <Form.Control type="username" placeholder={strings.username_text[lang]} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formPass">
-                            <Form.Label>Passkey</Form.Label>
-                            <Form.Control type="password" placeholder="Enter passkey" />
+                            <Form.Label>{strings.passkey[lang]}</Form.Label>
+                            <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={() => {setCreateModal(false)}}>Crear</Button>
+                        <Button onClick={() => {setCreateModal(false)}}>{strings.account_create[lang]}</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>
             <ListGroup>
                 <ListGroup.Item>
-                    <Button onClick={() => {setCreateModal(true)}}>Crea tu perfil</Button>
+                    <Button onClick={() => {setCreateModal(true)}}>{strings.account_create_text[lang]}</Button>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                <Card.Text>O inicia una sesion para continuar:</Card.Text>
+                <Card.Text>{strings.account_login_text[lang]}</Card.Text>
                     {/* <Formik noValidate> */}
                         <Form>
                             <Form.Group className="mb-3" controlId="formUsername">
-                                <Form.Label>Username</Form.Label>
-                                <Form.Control type="username" placeholder="Enter username" />
+                                <Form.Label>{strings.username[lang]}</Form.Label>
+                                <Form.Control type="username" placeholder={strings.username_text[lang]} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="formPass">
-                                <Form.Label>Passkey</Form.Label>
-                                <Form.Control type="password" placeholder="Enter passkey" />
+                                <Form.Label>{strings.passkey[lang]}</Form.Label>
+                                <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
                             </Form.Group>
-                            <Button onClick={user ? logOut : logIn}>{user ? "Salir" : "Entrar"}</Button>
+                            <Button onClick={user ? logOut : logIn}>{user ? strings.account_login[lang] : strings.account_logout[lang]}</Button>
                         </Form>
                     {/* </Formik> */}
                 </ListGroup.Item>
