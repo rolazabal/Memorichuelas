@@ -13,11 +13,13 @@ import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import Card from 'react-bootstrap/Card';
 import strings from './Strings.js';
+import Button from 'react-bootstrap/Button';
 
 function App() {
   const [userState, updateUserState] = useState(null);
+  // 0 home, 1 dictionary, 2 sets, 3 settings
   const [page, setPage] = useState(0);
-  const verStr = "0.1.5";
+  const verStr = "0.1.6";
   const [toast, setToast] = useState(false);
   // 0 logged in, 1 logged out, 2 created set, 3 update username
   const [toastType, setToastType] = useState(0);
@@ -26,17 +28,46 @@ function App() {
   // dummy userState
   const testUser = {username:"admin", date:"May 30, 2025", sets:[]};
 
+  const fetchUserState = async() => {
+    try {
+      let response = await fetch('http://localhost:5050/api/state');
+      let newState = await response.json();
+      if (newState) return newState.state;
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
+  const createSet =  async (newSet) => {
+    try {
+      const response = await fetch('https://localhost:5050/api/state', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({set: newSet})
+      });
+      const newState = await response.json();
+      if (newState) updateUserState(newState.state);
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
   function showToast(type) {
     setToastType(type);
     setToast(true);
   }
   
-  function logIn() {
-    updateUserState(testUser);
-    showToast(0);
+  const logIn = async() => {
+    let newState = await fetchUserState();
+    if (newState) {
+      updateUserState(newState);
+      showToast(0);
+      setPage(2);
+    } else showToast(3);
   }
 
   function logOut() {
+    setPage(0);
     updateUserState(null);
     showToast(1);
   }
@@ -55,41 +86,35 @@ function App() {
     showToast(3);
   }
 
-  function requestUserState() {
-    return userState;
-  }
-
   function DisplayContent() {
     switch(page) {
       case 0:
-        return <Home lang={lang} user={userState} logIn={logIn} logOut={logOut} requestUser={requestUserState} />;
+        return <Home lang={lang} strings={strings} user={userState} logIn={logIn} logOut={logOut} />;
       break;
       case 1:
-        return <Dictionary />;
+        return <Dictionary lang={lang} strings={strings} />;
       break;
       case 2:
-        return <Sets sets={userState.sets} updateSets={updateSets}/>;
+        return <Sets lang={lang} strings={strings} sets={userState != null ? userState.sets : []} updateSets={updateSets} />;
       break;
       case 3:
-        return <Account user={userState} updateUsername={updateUserState} />;
+        return <Account lang={lang} strings={strings} user={userState} updateUsername={updateUserState} />;
       break;
     }
-    return null;
+    return;
   }
 
-  function NavAccount({user, sets}) {
-    if (user) {
-      if (sets)
-          return <Nav.Link onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>;
-      else
-          return <Nav.Link onClick={() => setPage(3)}>{strings.account_title[lang]}</Nav.Link>;
-    }
-    return null;
+  function NavAccount({user}) {
+    if (!user) return;
+    return(<>
+      <Nav.Link onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
+      <Nav.Link onClick={() => setPage(3)}>{strings.user_title[lang]}</Nav.Link>
+    </>);
   }
 
   return (
     <div>
-      <Navbar expand="lg" className="bg-body-tertiary">
+      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
         <Container fluid>
           <Navbar.Brand>Memorichuelas</Navbar.Brand>
           <Dropdown>
@@ -105,13 +130,13 @@ function App() {
                 </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+          {userState ? <Button onClick={() => logOut()}>{strings.logout[lang]}</Button> : <></>}
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link onClick={() => setPage(0)}>{strings.about_title[lang]}</Nav.Link>
               <Nav.Link onClick={() => setPage(1)}>{strings.dictionary_title[lang]}</Nav.Link>
-              <NavAccount user={userState} sets={true} />
-              <NavAccount user={userState} sets={false} />
+              <NavAccount user={userState} />
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -181,7 +206,7 @@ function App() {
       </Card>
       <br />
       <div>
-        Ricardo Olazabal @ 2025 Version {verStr}
+        Ricardo Olazabal @ 2025 // app version {verStr}
       </div>
     </div>
   )

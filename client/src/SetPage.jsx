@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 
-function SetPage({set}) {
+function SetPage({lang, strings, set}) {
     
     return (
         <Card.Body>

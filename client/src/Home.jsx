@@ -6,18 +6,43 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
-import strings from './Strings.js';
 
 //import * as formik from 'formik';
 //import * as yup from 'yup';
 
-function Home({lang, user, logIn, logOut, requestUser}) {
+function Home({lang, strings, user, logIn}) {
     const [createModal, setCreateModal] = useState(false);
     //const { formik } = formik;
     /*const schema = yup.object().shape({
         username: yup.string().required(),
         passkey: yup.number().required()
     });*/
+    function AccountForm() {
+        if (user) return;
+        return(
+            <ListGroup>
+                <ListGroup.Item>
+                    <Button onClick={() => {setCreateModal(true)}}>{strings.user_create_text[lang]}</Button>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                <Card.Text>{strings.login_text[lang]}</Card.Text>
+                    {/* <Formik noValidate> */}
+                        <Form>
+                            <Form.Group className="mb-3" controlId="formUsername">
+                                <Form.Label>{strings.username[lang]}</Form.Label>
+                                <Form.Control type="username" placeholder={strings.username_text[lang]} />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="formPass">
+                                <Form.Label>{strings.passkey[lang]}</Form.Label>
+                                <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
+                            </Form.Group>
+                            <Button onClick={logIn}>{strings.login[lang]}</Button>
+                        </Form>
+                    {/* </Formik> */}
+                </ListGroup.Item>
+            </ListGroup>
+        );
+    }
 
     return (
         <Card.Body>
@@ -32,7 +57,7 @@ function Home({lang, user, logIn, logOut, requestUser}) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        {strings.account_create_text[lang]}
+                        {strings.user_create_text[lang]}
                     </Modal.Title>
                 </Modal.Header>
                 <Form>
@@ -47,31 +72,11 @@ function Home({lang, user, logIn, logOut, requestUser}) {
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={() => {setCreateModal(false)}}>{strings.account_create[lang]}</Button>
+                        <Button onClick={() => {setCreateModal(false)}}>{strings.create[lang]}</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>
-            <ListGroup>
-                <ListGroup.Item>
-                    <Button onClick={() => {setCreateModal(true)}}>{strings.account_create_text[lang]}</Button>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                <Card.Text>{strings.account_login_text[lang]}</Card.Text>
-                    {/* <Formik noValidate> */}
-                        <Form>
-                            <Form.Group className="mb-3" controlId="formUsername">
-                                <Form.Label>{strings.username[lang]}</Form.Label>
-                                <Form.Control type="username" placeholder={strings.username_text[lang]} />
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="formPass">
-                                <Form.Label>{strings.passkey[lang]}</Form.Label>
-                                <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
-                            </Form.Group>
-                            <Button onClick={user ? logOut : logIn}>{user ? strings.account_login[lang] : strings.account_logout[lang]}</Button>
-                        </Form>
-                    {/* </Formik> */}
-                </ListGroup.Item>
-            </ListGroup>
+            <AccountForm />
         </Card.Body>
     )
 }

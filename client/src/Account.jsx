@@ -4,23 +4,29 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 
-function Account({user, updateUsername}) {
+function Account({lang, strings, user, updateUsername}) {
 
     return (
         <Card.Body>
-            <Card.Title>Account settings</Card.Title>
-            <Card.Subtitle>Change username</Card.Subtitle>
-            <Form controlId="changeUsername">
-                <Form.Control type="username" placeholder="Enter new username" />
-                <Button>Update</Button>
-            </Form>
-            <Card.Subtitle>Account info</Card.Subtitle>
-            <Card.Text>
-                Username: {user.username}
-                <br />
-                Date created: {user.date}
-            </Card.Text>
-            <Button>Delete account</Button>
+            <Card.Title>{strings.user_title[lang]}</Card.Title>
+            <ListGroup>
+                <ListGroup.Item>
+                    <Card.Text>{strings.change_name[lang]}</Card.Text>
+                    <Form controlId="changeUsername">
+                        <Form.Control type="username" placeholder={strings.change_name_text[lang]} />
+                        <Button>{strings.update[lang]}</Button>
+                    </Form>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                    <Card.Text>{strings.user_information[lang]}</Card.Text>
+                    <Card.Text>
+                        {strings.username[lang]}: {user.username}
+                        <br />
+                        {strings.user_date[lang]}: {user.date}
+                    </Card.Text>
+                    <Button>{strings.user_delete[lang]}</Button>
+                </ListGroup.Item>
+            </ListGroup>
         </Card.Body>
     )
 }

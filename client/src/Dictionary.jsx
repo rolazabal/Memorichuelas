@@ -12,9 +12,10 @@ import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
 
 
-function Dictionary() {
+function Dictionary({lang, strings}) {
     const dict = [
         {word:"a",def:["def1","def2","def3"],ex:["ex1","ex2"]},
         {word:"b",def:["def1","def2"],ex:["ex1"]},
@@ -32,10 +33,8 @@ function Dictionary() {
         let rows = [];
         let row = [];
         for (let i = 0; i < dict.length; i ++) {
-            //alert("index " + i);
+            // for each word, add to row until row is full, then add full row to rows array
             row.push(dict[i]);
-            //alert("pushed " + dict[i].word);
-            //alert("check " + ((i + 1) % columns));
             if ((i + 1) % columns == 0) {
                 rows.push(row)
                 row = [];
@@ -56,9 +55,11 @@ function Dictionary() {
 
     return (
         <Card.Body>
+            <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
             <Table>
                 <DictTable />
             </Table>
+            <Button>Nav buttons</Button>
         </Card.Body>
     );
 }

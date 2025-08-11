@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import SetPage from './SetPage.jsx';
 
-function Sets({sets, updateSets}) {
+function Sets({lang, strings, sets, updateSets}) {
 
     const [index, setIndex] = useState(0);
     const [viewSet, setViewSet] = useState(-1);
@@ -19,48 +19,48 @@ function Sets({sets, updateSets}) {
     function SetDisplay() {
         if (viewSet == -1) {
             return (
-                <ListGroup>
-                    {sets.map((item) => (
-                        <ListGroup.Item action onClick={() => setViewSet(sets.indexOf(item))}>
-                            {item.name} : {item.score}
-                            {/* <Button onClick={() => {updateSets(sets.filter(a => a != item));}}>Delete</Button> */}
-                        </ListGroup.Item>
-                    ))}
-                </ListGroup>
+                <Card.Body>
+                    <Card.Title>
+                        {strings.sets_title[lang]}
+                        <Button onClick={addSet}>{strings.set_create[lang]}</Button>
+                        <Dropdown>
+                            <Dropdown.Toggle id="sort-dropdown">
+                                {strings.sort[lang]}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item>
+                                    {strings.sort_alphi[lang]}
+                                </Dropdown.Item>
+                                <Dropdown.Item>
+                                    {strings.sort_alphd[lang]}
+                                </Dropdown.Item>
+                                <Dropdown.Item>
+                                    {strings.sort_scorei[lang]}
+                                </Dropdown.Item>
+                                <Dropdown.Item>
+                                    {strings.sort_scored[lang]}
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </Card.Title>
+                    <ListGroup>
+                        {sets.map((item) => (
+                            <ListGroup.Item action onClick={() => setViewSet(sets.indexOf(item))}>
+                                {item.name} : {item.score}
+                                {/* <Button onClick={() => {updateSets(sets.filter(a => a != item));}}>Delete</Button> */}
+                            </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                </Card.Body>
             );
         }
         return (
-            <SetPage set={sets[viewSet]} />
+            <SetPage lang={lang} strings={strings} set={sets[viewSet]} />
         );
     }
 
     return (
-        <Card.Body>
-            <Card.Title>
-                Sets
-                <Button onClick={addSet}>Create set</Button>
-                <Dropdown>
-                    <Dropdown.Toggle id="sort-dropdown">
-                        Sort
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        <Dropdown.Item>
-                            Name A-Z
-                        </Dropdown.Item>
-                        <Dropdown.Item>
-                            Name Z-A
-                        </Dropdown.Item>
-                        <Dropdown.Item>
-                            Score increasing
-                        </Dropdown.Item>
-                        <Dropdown.Item>
-                            Score decreasing
-                        </Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-            </Card.Title>
-            <SetDisplay />
-        </Card.Body>
+        <SetDisplay />
     )
 }
 
