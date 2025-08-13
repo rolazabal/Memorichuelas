@@ -13,11 +13,12 @@ app.get('/api/state', (req, res) => {
     console.log("Sent dummy user!");
 })
 
-
 app.post('/api/state', (req, res) => {
-    let {set} = req.body;
-    console.log(set);
+    let {sets} = req.body;
+    console.log(sets);
+    dummyState.sets = sets;
     res.json({state: dummyState});
+    console.log("Sent dummy user!");
 })
 
 app.listen(PORT, () => {

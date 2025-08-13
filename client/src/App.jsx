@@ -25,27 +25,29 @@ function App() {
   const [toastType, setToastType] = useState(0);
   // language 0 = english; 1 = spanish
   const [lang, setLang] = useState(0);
-  // dummy userState
-  const testUser = {username:"admin", date:"May 30, 2025", sets:[]};
 
   const fetchUserState = async() => {
     try {
       let response = await fetch('http://localhost:5050/api/state');
       let newState = await response.json();
-      if (newState) return newState.state;
+      if (newState) {
+        updateUserState(newState.state);
+        return true;
+      }
     } catch(error) {
       console.log(error);
+      return false;
     }
   };
 
-  const createSet =  async (newSet) => {
+  const updateSets = async (sets) => {
     try {
       const response = await fetch('https://localhost:5050/api/state', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({set: newSet})
+        body: JSON.stringify({sets: sets})
       });
-      const newState = await response.json();
+      let newState = await response.json();
       if (newState) updateUserState(newState.state);
     } catch(error) {
       console.log(error);
@@ -58,9 +60,8 @@ function App() {
   }
   
   const logIn = async() => {
-    let newState = await fetchUserState();
-    if (newState) {
-      updateUserState(newState);
+    let login = await fetchUserState();
+    if (login) {
       showToast(0);
       setPage(2);
     } else showToast(3);
@@ -70,13 +71,6 @@ function App() {
     setPage(0);
     updateUserState(null);
     showToast(1);
-  }
-
-  function updateSets(nSets) {
-    let newState = userState;
-    newState.sets = nSets;
-    updateUserState(newState);
-    showToast(2);
   }
 
   function updateUsername(name) {
@@ -206,7 +200,7 @@ function App() {
       </Card>
       <br />
       <div>
-        Ricardo Olazabal @ 2025 // app version {verStr}
+        Ricardo Olazabal @ 2026 // app version {verStr}
       </div>
     </div>
   )
