@@ -1,7 +1,11 @@
 #root {
   width: 100%;
-  height: 580px;
-  margin: 0 auto;
+  height: 100%;
+  margin: auto;
+}
+
+#app {
+  height: 600px;
 }
 
 .logo {
@@ -10,6 +14,7 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }

@@ -107,7 +107,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div id="app">
       <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
         <Container fluid>
           <Navbar.Brand>Memorichuelas</Navbar.Brand>
@@ -195,7 +195,7 @@ function App() {
           </Toast.Body>
         </Toast>
       </ToastContainer>
-      <Card>
+      <Card style={{width: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}>
         <DisplayContent />
       </Card>
       <br />
