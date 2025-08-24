@@ -11,6 +11,7 @@ const fetch_word = 'SELECT (name) FROM "Memorichuelas"."Words" WHERE "wordID" = 
 const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions" WHERE "wordID" = $1';
 const fetch_examples = 'SELECT (example) FROM "Memorichuelas"."Examples" WHERE "wordID" = $1';
 const fetch_word_ids = 'SELECT ("wordID") FROM "Memorichuelas"."Words"';
+const fetch_dict_page = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" ORDER BY "wordID" ASC LIMIT $1';
 
 //pool
 const pool = new Pool({
@@ -88,19 +89,15 @@ async function wordById(id) {
     return word;
 }
 
-async function createDictionary() {
-    let res = await client.query(fetch_word_ids);
-    let dict = [];
+async function dictionaryPage(page) {
+    //TODO: implement page logic
+    let res = await client.query(fetch_dict_page, [page]);
+    let list = [];
     for (let x of res.rows) {
-        dict.push(await wordById(x.wordID));
+        list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
     }
-    //console.log(dict);
-    return dict;
+    return list;
 }
-
-//store dictionary
-//TODO: query the database for each user
-const dictionary = await createDictionary();
 
 //server
 const app = express();
@@ -113,6 +110,12 @@ app.get('/api/state', async (req, res) => {
     let user = await requestUserState("admin", 12345678);
     res.json({state: user});
     console.log(user);
+});
+
+app.get('/api/dictionary', async (req, res) => {
+    let pageList = await dictionaryPage(10);
+    res.json({page: pageList});
+    console.log(pageList);
 });
 
 app.post('/api/state', (req, res) => {

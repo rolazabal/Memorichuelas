@@ -16,25 +16,34 @@ import Button from 'react-bootstrap/Button';
 
 
 function Dictionary({lang, strings}) {
-    const dict = [
-        {word:"a",def:["def1","def2","def3"],ex:["ex1","ex2"]},
-        {word:"b",def:["def1","def2"],ex:["ex1"]},
-        {word:"c",def:["def1"],ex:["ex1"]},
-        {word:"d",def:["def1","def2","def3","def4"],ex:["ex1"]},
-        {word:"e",def:["def1","def2"],ex:["ex1"]},
-        {word:"f",def:["def1","def2"],ex:["ex1"]}
-    ];
+    const [dictPage, updateDictPage] = useState([]);
     const entryHeight = 20;
     const boxHeight = 100;
     const columns = 2;
+
+    const fetchDictPage = async() => {
+        try {
+            let response = await fetch('http://localhost:5050/api/dictionary');
+            let newPage = await response.json();
+        if (newPage) {
+            updateDictPage(newPage.page);
+            return true;
+        }
+        } catch(error) {
+        console.log(error);
+        return false;
+        }
+    };
+
+    fetchDictPage();
 
     function DictTable() {
         //compute rows
         let rows = [];
         let row = [];
-        for (let i = 0; i < dict.length; i ++) {
+        for (let i = 0; i < dictPage.length; i ++) {
             // for each word, add to row until row is full, then add full row to rows array
-            row.push(dict[i]);
+            row.push(dictPage[i]);
             if ((i + 1) % columns == 0) {
                 rows.push(row)
                 row = [];
@@ -45,7 +54,7 @@ function Dictionary({lang, strings}) {
                 {rows.map((row) => 
                     <tr>
                         {row.map((entry) => 
-                            <th>{entry.word}</th>
+                            <th>{entry[1]}</th>
                         )}
                     </tr>
                 )}
