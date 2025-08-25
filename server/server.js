@@ -106,18 +106,21 @@ app.use(cors());
 app.use(express.json());
 
 //methods
+//log in
 app.get('/api/state', async (req, res) => {
     let user = await requestUserState("admin", 12345678);
     res.json({state: user});
     console.log(user);
 });
 
+//get page
 app.get('/api/dictionary', async (req, res) => {
     let pageList = await dictionaryPage(10);
     res.json({page: pageList});
     console.log(pageList);
 });
 
+//TODO: remove this
 app.post('/api/state', (req, res) => {
     let {sets} = req.body;
     console.log(sets);
