@@ -107,7 +107,8 @@ app.use(express.json());
 
 //methods
 //log in
-app.get('/api/state', async (req, res) => {
+app.get('/api/login', async (req, res) => {
+    console.log(req.body);
     let user = await requestUserState("admin", 12345678);
     res.json({state: user});
     console.log(user);
@@ -118,15 +119,6 @@ app.get('/api/dictionary', async (req, res) => {
     let pageList = await dictionaryPage(10);
     res.json({page: pageList});
     console.log(pageList);
-});
-
-//TODO: remove this
-app.post('/api/state', (req, res) => {
-    let {sets} = req.body;
-    console.log(sets);
-    dummyState.sets = sets;
-    res.json({state: dummyState});
-    console.log("Sent dummy user!");
 });
 
 app.post('/api/create', async (req, res) => {

@@ -28,7 +28,7 @@ function App() {
 
   const fetchUserState = async() => {
     try {
-      let response = await fetch('http://localhost:5050/api/state');
+      let response = await fetch('http://localhost:5050/api/login');
       let newState = await response.json();
       if (newState) {
         updateUserState(newState.state);
@@ -41,6 +41,7 @@ function App() {
   };
 
   const updateSets = async (sets) => {
+    /*
     try {
       const response = await fetch('https://localhost:5050/api/state', {
         method: 'POST',
@@ -51,7 +52,7 @@ function App() {
       if (newState) updateUserState(newState.state);
     } catch(error) {
       console.log(error);
-    }
+    }*/
   };
 
   function showToast(type) {
