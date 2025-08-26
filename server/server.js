@@ -108,7 +108,6 @@ app.use(express.json());
 //methods
 //log in
 app.get('/api/login', async (req, res) => {
-    console.log(req.body);
     let user = await requestUserState("admin", 12345678);
     res.json({state: user});
     console.log(user);
@@ -121,6 +120,13 @@ app.get('/api/dictionary', async (req, res) => {
     console.log(pageList);
 });
 
+app.post('/api/dictionary', async (req, res) => {
+    let obj = await wordById(req.body.word);
+    res.json({word: obj});
+    console.log(obj);
+});
+
+//create account
 app.post('/api/create', async (req, res) => {
     //TODO: check req formatting
     let {username, passkey} = req.body;

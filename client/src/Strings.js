@@ -28,7 +28,10 @@ const strings = {
     user_information: ["Account info", "Informacion sobre la cuenta"],
     user_date: ["Date created", "Fecha creada"],
     user_delete: ["Delete account", "Borrar cuenta"],
-    update: ["Update", "Actualizar"]
+    update: ["Update", "Actualizar"],
+    back: ["Back", "Regresar"],
+    definition: ["Definition(s):", "Definicion(es):"],
+    example: ["Example sentence(s):", "Ejemplo(s) de uso:"]
 };
 
 export default strings

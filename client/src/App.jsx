@@ -95,8 +95,10 @@ function App() {
       case 3:
         return <Account lang={lang} strings={strings} user={userState} updateUsername={updateUserState} />;
       break;
+      default:
+        return;
+      break;
     }
-    return;
   }
 
   function NavAccount({user}) {
