@@ -31,7 +31,11 @@ const strings = {
     update: ["Update", "Actualizar"],
     back: ["Back", "Regresar"],
     definition: ["Definition(s):", "Definicion(es):"],
-    example: ["Example sentence(s):", "Ejemplo(s) de uso:"]
+    example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
+    t_login_success: [],
+    t_login_fail: [],
+    t_logout_success: [],
+    t_logout_fail: []
 };
 
 export default strings

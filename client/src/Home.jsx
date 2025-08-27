@@ -36,7 +36,7 @@ function Home({lang, strings, user, logIn}) {
                                 <Form.Label>{strings.passkey[lang]}</Form.Label>
                                 <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
                             </Form.Group>
-                            <Button onClick={logIn}>{strings.login[lang]}</Button>
+                            <Button onClick={() => {logIn("admin", 12345678)}}>{strings.login[lang]}</Button>
                         </Form>
                     {/* </Formik> */}
                 </ListGroup.Item>

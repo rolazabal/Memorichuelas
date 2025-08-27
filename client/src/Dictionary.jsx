@@ -15,7 +15,7 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 
 
-function Dictionary({lang, strings}) {
+function Dictionary({lang, strings, getPage, getWord}) {
     const [dictPage, updateDictPage] = useState([]);
     const entryHeight = 20;
     const boxHeight = 100;
@@ -24,33 +24,9 @@ function Dictionary({lang, strings}) {
     //TODO: make displayWord a variable of App.jsx passed down to dictionary?
     const [displayWord, updateDisplayWord] = useState({});
 
-    const fetchDictPage = async() => {
-        try {
-            let res = await fetch('http://localhost:5050/api/dictionary');
-            let newPage = await res.json();
-            if (newPage) {
-                updateDictPage(newPage.page);
-                return true;
-            }
-        } catch(error) {
-            console.log(error);
-        }
-        return false;
-    };
-
-    async function fetchWordInfo(wID) {
-        try {
-            let res = await fetch('http://localhost:5050/api/dictionary', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({word: wID})
-            });
-            let display = await res.json();
-            if (display) updateDisplayWord(display.word);
-        } catch(error) {
-            console.log(error);
-        }
-        return false;
+    async function fetchPage(page) {
+        let list = await getPage(page);
+        updateDictPage(list);
     }
 
     function Display() {
@@ -75,7 +51,8 @@ function Dictionary({lang, strings}) {
             );
         } else { 
             //fetch page words
-            if (dictPage.length == 0) fetchDictPage();
+            console.log(dictPage);
+            if (dictPage.length == 0) fetchPage(10);
             //compute rows
             let rows = [];
             let row = [];
@@ -88,18 +65,22 @@ function Dictionary({lang, strings}) {
                 }
             }
             return (
-                <Table>
-                    <tbody>
-                        {rows.map((row) => 
-                            <tr>
-                                {row.map((entry) => 
-                                    <th key={entry[0]} onClick={() => {fetchWordInfo(entry[0])}}>{entry[1]}</th>
-                                )}
-                            </tr>
-                        )}
-                    </tbody>
-                    <Button>Nav</Button>
-                </Table>
+                <>
+                    <Table>
+                        <tbody>
+                            {rows.map((row) => 
+                                <tr>
+                                    {row.map((entry) => 
+                                        <th key={entry[0]} onClick={() => {updateDisplayWord(getWord(entry[0]))}}>{entry[1]}</th>
+                                    )}
+                                </tr>
+                            )}
+                        </tbody>
+                    </Table>
+                    <Button>{"<"}</Button>
+                    {"0"}
+                    <Button>{">"}</Button>
+                </>
             );
         }
     }

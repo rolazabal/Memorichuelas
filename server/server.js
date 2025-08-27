@@ -2,16 +2,19 @@ import express from 'express';
 import cors from 'cors';
 import { Pool } from 'pg';
 
+///variables
 //queries
-const fetch_user = 'SELECT * FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
+const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; //get all user's set's ids as array
 const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
-const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
+const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE) RETURNING "userID"';
 const fetch_word = 'SELECT (name) FROM "Memorichuelas"."Words" WHERE "wordID" = $1';
 const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions" WHERE "wordID" = $1';
 const fetch_examples = 'SELECT (example) FROM "Memorichuelas"."Examples" WHERE "wordID" = $1';
-const fetch_word_ids = 'SELECT ("wordID") FROM "Memorichuelas"."Words"';
 const fetch_dict_page = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" ORDER BY "wordID" ASC LIMIT $1';
+const fetch_active_users = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE active = true';
+const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timestamp = CURRENT_DATE WHERE "userID" = $1';
+const timeout_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
 
 //pool
 const pool = new Pool({
@@ -22,13 +25,22 @@ const pool = new Pool({
 });
 const client = await pool.connect();
 
-//functions
-async function requestUserState(username, passkey) {
+//server
+const app = express();
+const PORT = process.env.PORT;
+app.use(cors());
+app.use(express.json());
+
+///functions
+async function logIn(username, passkey) {
+    //get user id
     let res = await client.query(fetch_user, [username, passkey]);
-    if (res.rows.length == 0) return false;
-    let name = res.rows[0].name;
-    let date = res.rows[0].date;
-    let id = res.rows[0].userID;
+    if (res.rows.length == 0) return -1;
+    let id = res.rows;
+    //activate user
+    await client.query(activate_user, [id]);
+    return id;
+    /*
     res = await client.query(fetch_set_ids, [id]);
     let setIds = res.rows;
     let sets = [];
@@ -50,24 +62,27 @@ async function requestUserState(username, passkey) {
             set = [];
         }
     }
-    let state = {
-        username: name,
-        date: date,
-        sets: sets
-    };
-    return state;
+    */
+}
+
+async function logOut(userID) {
+    //deactivate user
+    await client.query()
 }
 
 async function createUser(username, passkey) {
-    //validate inputs just in case
+    //validate inputs
     if (username.length < 1 || username.length > 10 || username.replace(/\s/g, "") == "") return false;
     if (passkey > 99999999 || passkey == 0) return false;
-    //check existing username
+    //check for existing username
     let res = await client.query(username_total, [username]);
     if (res.rows[0].count != 0) return false;
     //create user
     res = await client.query(create_user, [username, passkey]);
-    return res;
+    let id = res.rows;
+    //activate user
+    await client.query(activate_user, [id]);
+    return id;
 }
 
 async function wordById(id) {
@@ -99,31 +114,46 @@ async function dictionaryPage(page) {
     return list;
 }
 
-//server
-const app = express();
-const PORT = process.env.PORT;
-app.use(cors());
-app.use(express.json());
+//http methods
+app.post('/api/account', async (req, res) => {
+    switch(req.body.action) {
+        case 'logIn':
+            let id = await logIn(req.body.username, req.body.passkey);
+            res.json({id});
+            console.log(id);
+        break;
+        case 'logOut':
+            id = req.body.userID;
+            logOut(id);
+            console.log("user " + id + " logged out!");
+        break;
+        case 'create':
 
-//methods
-//log in
-app.get('/api/login', async (req, res) => {
-    let user = await requestUserState("admin", 12345678);
-    res.json({state: user});
-    console.log(user);
+        break;
+        default:
+            console.log("account access error!");
+        break;
+    }
 });
 
 //get page
-app.get('/api/dictionary', async (req, res) => {
-    let pageList = await dictionaryPage(10);
-    res.json({page: pageList});
-    console.log(pageList);
-});
-
 app.post('/api/dictionary', async (req, res) => {
-    let obj = await wordById(req.body.word);
-    res.json({word: obj});
-    console.log(obj);
+    switch(req.body.action) {
+        case 'page':
+            //TODO: add page logic
+            let list = await dictionaryPage(req.body.page);
+            res.json({words: list});
+            console.log(list);
+        break;
+        case 'word':
+            let obj = await wordById(req.body.word);
+            res.json({word: obj});
+            console.log(obj);
+        break;
+        default:
+            console.log("dictionary access error!");
+        break;
+    }
 });
 
 //create account

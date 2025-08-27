@@ -5,8 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import SetPage from './SetPage.jsx';
 
-function Sets({lang, strings, sets, updateSets}) {
+function Sets({lang, strings}) {
 
+    const [sets, setSets] = useState([]);
     const [index, setIndex] = useState(0);
     const [viewSet, setViewSet] = useState(-1);
 
