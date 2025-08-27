@@ -1,17 +1,6 @@
 class Waitor {
-    ///variables
-    userID = -1;
 
     ///functions
-    setUserID(id) {
-        this.userID = id;
-    }
-
-    hasLoggedIn() {
-        return (this.userID != -1);
-    }
-
-    //http functions
     async fetchUserID(user, pass) {
         try {
             let res = await fetch('http://localhost:5050/api/account', {
@@ -21,61 +10,67 @@ class Waitor {
             });
             res = await res.json();
             let id = res.id;
-            this.setUserID(id);
+            return id;
         } catch(error) {
             console.log(error);
+            return -1;
         }
     }
 
-    async logOutUser() {
+    async logOutUser(uID) {
         try {
             await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'logOut', userID: this.userID})
+                body: JSON.stringify({action: 'logOut', userID: uID})
             });
-            this.setUserID(-1);
+            return true;
         } catch(error) {
             console.log(error);
+            return false;
         }
     }
 
-    async fetchDictPage(page) {
+    async fetchDictPage(uID, page) {
         try {
             let res = await fetch('http://localhost:5050/api/dictionary', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'page', page: page, userID: this.userID})
+                body: JSON.stringify({action: 'page', page: page, userID: uID})
             });
-            return await res.json().words;
+            res = await res.json();
+            return res.words;
         } catch(error) {
             console.log(error);
             return [];
         }
     };
 
-    async fetchWordObj(id) {
+    async fetchWordObj(uID, wID) {
         try {
             let res = await fetch('http://localhost:5050/api/dictionary', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'word', wordID: id, userID: this.userID})
+                body: JSON.stringify({action: 'word', wordID: wID, userID: uID})
             });
-            return await res.json().word;
+            res = await res.json();
+            console.log(res);
+            return res.word;
         } catch(error) {
             console.log(error);
             return {};
         }
     }
 
-    async fetchUserInfo() {
+    async fetchUserInfo(uID) {
         try {
             let res = await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'info', userID: this.userID})
+                body: JSON.stringify({action: 'info', userID: uID})
             });
-            return await res.json().info;
+            res = await res.json();
+            return res.info;
         } catch(error) {
             console.log(error);
             return {};

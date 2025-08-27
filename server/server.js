@@ -33,7 +33,16 @@ app.use(cors());
 app.use(express.json());
 
 ///functions
-//TODO: activate user function that checks if user is active before activating, return false if not
+async function logAction(userID) {
+    //check if user is active
+    let res = await client.query(fetch_active_users);
+    let isActive = false;
+    for (let x of res.rows) if (userID == x.userID) isActive = true;
+    if (!isActive) return false;
+    res = await client.query(activate_user, [userID]);
+    return true;
+}
+
 async function logIn(username, passkey) {
     //get user id
     let res = await client.query(fetch_user, [username, passkey]);
@@ -89,6 +98,7 @@ async function createUser(username, passkey) {
 
 async function wordById(wordID) {
     let res = await client.query(fetch_word, [wordID]);
+    console.log(wordID);
     let name = res.rows[0].name;
     res = await client.query(fetch_definitions, [wordID]);
     let defs = [];
@@ -142,7 +152,7 @@ app.post('/api/account', async (req, res) => {
         break;
         case 'info':
             id = req.body.userID;
-            let info = await userInfo();
+            let info = await userInfo(id);
             res.json({info});
             console.log(info);
         break;

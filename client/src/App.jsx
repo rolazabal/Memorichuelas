@@ -26,11 +26,13 @@ function App() {
   const [toastType, setToastType] = useState(0);
   //language 0 = english; 1 = spanish
   const [lang, setLang] = useState(0);
-  const [loggedIn, setLoggedIn] = useState(false);
-  //info
+  //user variables
+  const [userID, setUserID] = useState(-1);
   const [info, setInfo] = useState(null);
+  const [pageWords, setPageWords] = useState([]);
+  const [wordObj, setWordObj] = useState(null);
   //server communicator
-  const waitor = useState(new Waitor());
+  const waitor = new Waitor();
 
   ///functions
   function showToast(type) {
@@ -39,39 +41,37 @@ function App() {
   }
   
   async function logIn(user, pass) {
-    await waitor.fetchUserID(user, pass);
-    if (waitor.hasLoggedIn()) {
+    let id = await waitor.fetchUserID(user, pass);
+    if (id != -1) {
       //successful log in toast
-      setLoggedIn(true);
+      setUserID(id);
       showToast(0);
       setPage(2);
-      console.log(waitor.userID);
     } else showToast(3); //failure to log in toast
   }
 
   async function logOut() {
-    await waitor.logOutUser();
-    if (!waitor.hasLoggedIn) {
+    let op = await waitor.logOutUser(userID);
+    if (op) {
       //successful log out toast
-      setLoggedIn(false);
+      setUserID(-1);
       showToast(0);
       setPage(0);
     } else showToast(3); //failure to log out toast?
   }
 
   async function getPage(page) {
-    let list = await waitor.fetchDictPage(page);
-    return list;
+    let list = await waitor.fetchDictPage(userID, page);
+    setPageWords(list);
   }
 
   async function getWord(id) {
-      let word = await waitor.fetchWordObj(id);
-      return word;
+      let word = await waitor.fetchWordObj(userID, id);
+      setWordObj(word);
   }
 
-  async function fetchInfo() {
-    console.log(waitor.userID);
-    let newInfo = await waitor.fetchUserInfo();
+  async function getInfo() {
+    let newInfo = await waitor.fetchUserInfo(userID);
     setInfo(newInfo);
     setPage(3);
   }
@@ -79,10 +79,10 @@ function App() {
   function DisplayContent() {
     switch(page) {
       case 0:
-        return <Home lang={lang} strings={strings} logIn={logIn} loggedIn={loggedIn} />;
+        return <Home lang={lang} strings={strings} logIn={logIn} loggedIn={userID == -1 ? false : true} />;
       break;
       case 1:
-        return <Dictionary lang={lang} strings={strings} getPage={getPage} getWord={getWord} />;
+        return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} />;
       break;
       case 2:
         return <Sets lang={lang} strings={strings} />;
@@ -97,11 +97,11 @@ function App() {
   }
 
   function NavAccount() {
-    if (!loggedIn) return;
+    if (userID == -1) return;
     return(
       <>
         <Nav.Link onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
-        <Nav.Link onClick={async () => await fetchInfo()}>{strings.user_title[lang]}</Nav.Link>
+        <Nav.Link onClick={async () => await getInfo()}>{strings.user_title[lang]}</Nav.Link>
       </>
     );
   }

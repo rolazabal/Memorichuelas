@@ -24,6 +24,7 @@ function Account({lang, strings, info}) {
                         <br />
                         {strings.user_date[lang]}: {info != null ? info.date : ''}
                     </Card.Text>
+                    <Button>{strings.logout[lang]}</Button>
                     <Button>{strings.user_delete[lang]}</Button>
                 </ListGroup.Item>
             </ListGroup>

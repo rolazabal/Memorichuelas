@@ -15,50 +15,39 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 
 
-function Dictionary({lang, strings, getPage, getWord}) {
-    const [dictPage, updateDictPage] = useState([]);
-    const entryHeight = 20;
-    const boxHeight = 100;
+function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj}) {
     const columns = 2;
     const mode = "DISPLAY"; //decide behavior of component: DISPLAY, SELECT, or EDIT
-    //TODO: make displayWord a variable of App.jsx passed down to dictionary?
-    const [displayWord, updateDisplayWord] = useState({});
-
-    async function fetchPage(page) {
-        let list = await getPage(page);
-        updateDictPage(list);
-    }
 
     function Display() {
-        if (Object.entries(displayWord).length > 0) {
+        if (wordObj != null) {
             return (
                 <div>
-                    <h1>{displayWord.name}</h1>
+                    <h1>{wordObj.name}</h1>
                     <h2>{strings.definition[lang]}</h2>
                     <ul>
-                        {displayWord.defs.map((def) =>
+                        {wordObj.defs.map((def) =>
                             <li>{def}</li>
                         )}
                     </ul>
                     <h2>{strings.example[lang]}</h2>
                     <ul>
-                        {displayWord.exs.map((ex) =>
+                        {wordObj.exs.map((ex) =>
                             <li>{ex}</li>
                         )}
                     </ul>
-                    <Button onClick={() => {updateDisplayWord({})}}>{strings.back[lang]}</Button>
+                    <Button onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
                 </div>
             );
         } else { 
             //fetch page words
-            console.log(dictPage);
-            if (dictPage.length == 0) fetchPage(10);
+            if (pageWords.length == 0) getPage(10);
             //compute rows
             let rows = [];
             let row = [];
-            for (let i = 0; i < dictPage.length; i ++) {
+            for (let i = 0; i < pageWords.length; i ++) {
                 // for each word, add to row until row is full, then add full row to rows array
-                row.push(dictPage[i]);
+                row.push(pageWords[i]);
                 if ((i + 1) % columns == 0) {
                     rows.push(row)
                     row = [];
@@ -71,7 +60,7 @@ function Dictionary({lang, strings, getPage, getWord}) {
                             {rows.map((row) => 
                                 <tr>
                                     {row.map((entry) => 
-                                        <th key={entry[0]} onClick={() => {updateDisplayWord(getWord(entry[0]))}}>{entry[1]}</th>
+                                        <th id={parseInt(entry[0])} onClick={async () => {await getWord(parseInt(entry[0]))}}>{entry[1]}</th>
                                     )}
                                 </tr>
                             )}
