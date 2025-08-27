@@ -66,8 +66,8 @@ function App() {
   }
 
   async function getWord(id) {
-      let word = await waitor.fetchWordObj(userID, id);
-      setWordObj(word);
+    let word = await waitor.fetchWordObj(userID, id);
+    setWordObj(word);
   }
 
   async function getInfo() {

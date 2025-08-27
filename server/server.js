@@ -98,7 +98,6 @@ async function createUser(username, passkey) {
 
 async function wordById(wordID) {
     let res = await client.query(fetch_word, [wordID]);
-    console.log(wordID);
     let name = res.rows[0].name;
     res = await client.query(fetch_definitions, [wordID]);
     let defs = [];
@@ -136,7 +135,6 @@ async function userInfo(userID) {
 
 //http methods
 app.post('/api/account', async (req, res) => {
-    console.log(req.body);
     let id = -1;
     let action = req.body.action;
     switch(action) {
@@ -175,7 +173,7 @@ app.post('/api/dictionary', async (req, res) => {
             console.log(list);
         break;
         case 'word':
-            let obj = await wordById(req.body.word);
+            let obj = await wordById(req.body.wordID);
             res.json({word: obj});
             console.log(obj);
         break;
