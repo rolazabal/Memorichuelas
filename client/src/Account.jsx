@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 
-function Account({lang, strings, user, updateUsername}) {
+function Account({lang, strings, info}) {
 
     return (
         <Card.Body>
@@ -20,9 +20,9 @@ function Account({lang, strings, user, updateUsername}) {
                 <ListGroup.Item>
                     <Card.Text>{strings.user_information[lang]}</Card.Text>
                     <Card.Text>
-                        {strings.username[lang]}: {user.username}
+                        {strings.username[lang]}: {info != null ? info.name : ''}
                         <br />
-                        {strings.user_date[lang]}: {user.date}
+                        {strings.user_date[lang]}: {info != null ? info.date : ''}
                     </Card.Text>
                     <Button>{strings.user_delete[lang]}</Button>
                 </ListGroup.Item>

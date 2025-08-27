@@ -10,7 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 //import * as formik from 'formik';
 //import * as yup from 'yup';
 
-function Home({lang, strings, user, logIn}) {
+function Home({lang, strings, user, logIn, loggedIn}) {
     const [createModal, setCreateModal] = useState(false);
     //const { formik } = formik;
     /*const schema = yup.object().shape({
@@ -18,7 +18,7 @@ function Home({lang, strings, user, logIn}) {
         passkey: yup.number().required()
     });*/
     function AccountForm() {
-        if (user) return;
+        if (loggedIn) return;
         return(
             <ListGroup>
                 <ListGroup.Item>

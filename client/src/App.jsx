@@ -26,8 +26,11 @@ function App() {
   const [toastType, setToastType] = useState(0);
   //language 0 = english; 1 = spanish
   const [lang, setLang] = useState(0);
+  const [loggedIn, setLoggedIn] = useState(false);
+  //info
+  const [info, setInfo] = useState(null);
   //server communicator
-  const waitor = new Waitor();
+  const waitor = useState(new Waitor());
 
   ///functions
   function showToast(type) {
@@ -37,17 +40,20 @@ function App() {
   
   async function logIn(user, pass) {
     await waitor.fetchUserID(user, pass);
-    if (waitor.isLoggedIn()) {
+    if (waitor.hasLoggedIn()) {
       //successful log in toast
+      setLoggedIn(true);
       showToast(0);
       setPage(2);
+      console.log(waitor.userID);
     } else showToast(3); //failure to log in toast
   }
 
   async function logOut() {
     await waitor.logOutUser();
-    if (!waitor.isLoggedIn) {
+    if (!waitor.hasLoggedIn) {
       //successful log out toast
+      setLoggedIn(false);
       showToast(0);
       setPage(0);
     } else showToast(3); //failure to log out toast?
@@ -63,10 +69,17 @@ function App() {
       return word;
   }
 
+  async function fetchInfo() {
+    console.log(waitor.userID);
+    let newInfo = await waitor.fetchUserInfo();
+    setInfo(newInfo);
+    setPage(3);
+  }
+
   function DisplayContent() {
     switch(page) {
       case 0:
-        return <Home lang={lang} strings={strings} logIn={logIn} logOut={logOut} />;
+        return <Home lang={lang} strings={strings} logIn={logIn} loggedIn={loggedIn} />;
       break;
       case 1:
         return <Dictionary lang={lang} strings={strings} getPage={getPage} getWord={getWord} />;
@@ -75,7 +88,7 @@ function App() {
         return <Sets lang={lang} strings={strings} />;
       break;
       case 3:
-        return <Account lang={lang} strings={strings} />;
+        return <Account lang={lang} strings={strings} info={info} />;
       break;
       default:
         return;
@@ -84,11 +97,11 @@ function App() {
   }
 
   function NavAccount() {
-    if (!waitor.isLoggedIn()) return;
+    if (!loggedIn) return;
     return(
       <>
         <Nav.Link onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
-        <Nav.Link onClick={() => setPage(3)}>{strings.user_title[lang]}</Nav.Link>
+        <Nav.Link onClick={async () => await fetchInfo()}>{strings.user_title[lang]}</Nav.Link>
       </>
     );
   }
@@ -111,7 +124,6 @@ function App() {
                 </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-          {waitor.isLoggedIn() ? <Button onClick={() => logOut()}>{strings.logout[lang]}</Button> : <></>}
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">

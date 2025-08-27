@@ -7,7 +7,7 @@ class Waitor {
         this.userID = id;
     }
 
-    isLoggedIn() {
+    hasLoggedIn() {
         return (this.userID != -1);
     }
 
@@ -17,9 +17,10 @@ class Waitor {
             let res = await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'logIn', username: 'user', passkey: 14242})
+                body: JSON.stringify({action: 'logIn', username: "admin", passkey: 12345678})
             });
-            let id = await res.json();
+            res = await res.json();
+            let id = res.id;
             this.setUserID(id);
         } catch(error) {
             console.log(error);
@@ -61,6 +62,20 @@ class Waitor {
                 body: JSON.stringify({action: 'word', wordID: id, userID: this.userID})
             });
             return await res.json().word;
+        } catch(error) {
+            console.log(error);
+            return {};
+        }
+    }
+
+    async fetchUserInfo() {
+        try {
+            let res = await fetch('http://localhost:5050/api/account', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'info', userID: this.userID})
+            });
+            return await res.json().info;
         } catch(error) {
             console.log(error);
             return {};

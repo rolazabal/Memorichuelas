@@ -13,8 +13,9 @@ const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions
 const fetch_examples = 'SELECT (example) FROM "Memorichuelas"."Examples" WHERE "wordID" = $1';
 const fetch_dict_page = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" ORDER BY "wordID" ASC LIMIT $1';
 const fetch_active_users = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE active = true';
-const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timestamp = CURRENT_DATE WHERE "userID" = $1';
+const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timestamp = CURRENT_TIMESTAMP WHERE "userID" = $1';
 const timeout_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
+const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 
 //pool
 const pool = new Pool({
@@ -32,11 +33,12 @@ app.use(cors());
 app.use(express.json());
 
 ///functions
+//TODO: activate user function that checks if user is active before activating, return false if not
 async function logIn(username, passkey) {
     //get user id
     let res = await client.query(fetch_user, [username, passkey]);
     if (res.rows.length == 0) return -1;
-    let id = res.rows;
+    let id = res.rows[0].userID;
     //activate user
     await client.query(activate_user, [id]);
     return id;
@@ -85,14 +87,14 @@ async function createUser(username, passkey) {
     return id;
 }
 
-async function wordById(id) {
-    let res = await client.query(fetch_word, [id]);
+async function wordById(wordID) {
+    let res = await client.query(fetch_word, [wordID]);
     let name = res.rows[0].name;
-    res = await client.query(fetch_definitions, [id]);
+    res = await client.query(fetch_definitions, [wordID]);
     let defs = [];
     for (let x of res.rows)
         defs.push(x.definition);
-    res = await client.query(fetch_examples, [id]);
+    res = await client.query(fetch_examples, [wordID]);
     let exs = [];
     for (let y of res.rows)
         exs.push(y.example);
@@ -114,18 +116,35 @@ async function dictionaryPage(page) {
     return list;
 }
 
+async function userInfo(userID) {
+    let res = await client.query(fetch_user_info, [userID]);
+    res = res.rows[0].row;
+    let list = res.substring(1, res.length -1).split(",");
+    let info = {name: list[0], date: list[1]};
+    return info;
+}
+
 //http methods
 app.post('/api/account', async (req, res) => {
-    switch(req.body.action) {
+    console.log(req.body);
+    let id = -1;
+    let action = req.body.action;
+    switch(action) {
         case 'logIn':
-            let id = await logIn(req.body.username, req.body.passkey);
+            id = await logIn(req.body.username, req.body.passkey);
             res.json({id});
             console.log(id);
         break;
         case 'logOut':
             id = req.body.userID;
-            logOut(id);
+            await logOut(id);
             console.log("user " + id + " logged out!");
+        break;
+        case 'info':
+            id = req.body.userID;
+            let info = await userInfo();
+            res.json({info});
+            console.log(info);
         break;
         case 'create':
 
