@@ -2,8 +2,8 @@ const strings = {
     language: ["Language", "Lenguaje"],
     about_title: ["About", "Inicio"],
     about_blurb: [
-        "Personalized vocabulary learning using sets of words. Users can create and select sets and words from our vocabulary to learn interactively.", 
-        "Aprendizaje personalizado de vocabulario utilizando colecciones de palabras. Como usuario, podras crear y seleccionar collectiones y palabras de nuestro vocabulario para aprender de forma interactiva."
+        "Personalized vocabulary learning using sets of words. Users can create and select sets and words from our dictionary to learn interactively.", 
+        "Aprendizaje de vocabulario personalizado utilizando colecciones de palabras. Como usuario, podras crear y seleccionar collectiones y palabras de nuestro diccionario para aprender de forma interactiva."
     ],
     dictionary_title: ["Dictionary", "Diccionario"],
     sets_title: ["Sets", "Collecciones"],
@@ -13,7 +13,7 @@ const strings = {
     sort_alphd: ["Z-A", "Z-A"],
     sort_scorei: ["Score increasing", "Score"],
     sort_scored: ["Score decreasing", "Score"],
-    user_title: ["Settings", "Configuracion"],
+    user_title: ["Account", "Cuenta"],
     create: ["Create", "Crear"],
     user_create_text: ["Create an account", "Crea una cuenta"],
     login: ["Log in", "Entrar"],

@@ -6,7 +6,7 @@ class Waitor {
             let res = await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'logIn', username: "admin", passkey: 12345678})
+                body: JSON.stringify({action: 'logIn', username: user, passkey: pass})
             });
             res = await res.json();
             let id = res.id;
@@ -23,6 +23,20 @@ class Waitor {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'logOut', userID: uID})
+            });
+            return true;
+        } catch(error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    async createUser(user, pass) {
+        try {
+            await fetch('http://localhost:5050/api/account', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'create', username: user, passkey: pass})
             });
             return true;
         } catch(error) {
@@ -75,6 +89,14 @@ class Waitor {
             console.log(error);
             return {};
         }
+    }
+
+    async fetchUserSets(uID) {
+
+    }
+
+    async fetchSetWords(wID) {
+        
     }
 }
 

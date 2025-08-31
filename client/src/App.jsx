@@ -31,6 +31,8 @@ function App() {
   const [info, setInfo] = useState(null);
   const [pageWords, setPageWords] = useState([]);
   const [wordObj, setWordObj] = useState(null);
+  //forms
+  const accountForm = useState({username: "", passkey: 0});
   //server communicator
   const waitor = new Waitor();
 
@@ -60,6 +62,15 @@ function App() {
     } else showToast(3); //failure to log out toast?
   }
 
+  async function createAccount(user, pass) {
+    let op = await waitor.createUser(user, pass);
+    if (op) {
+      logIn(user, pass);
+    } else {
+      //handle create account fail
+    }
+  }
+
   async function getPage(page) {
     let list = await waitor.fetchDictPage(userID, page);
     setPageWords(list);
@@ -71,15 +82,17 @@ function App() {
   }
 
   async function getInfo() {
-    let newInfo = await waitor.fetchUserInfo(userID);
-    setInfo(newInfo);
+    if (info == null) {
+      let newInfo = await waitor.fetchUserInfo(userID);
+      setInfo(newInfo);
+    }
     setPage(3);
   }
 
   function DisplayContent() {
     switch(page) {
       case 0:
-        return <Home lang={lang} strings={strings} logIn={logIn} loggedIn={userID == -1 ? false : true} />;
+        return <Home lang={lang} strings={strings} logIn={logIn} accountForm={accountForm} createAccount={createAccount} loggedIn={userID == -1 ? false : true} />;
       break;
       case 1:
         return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} />;
@@ -88,7 +101,7 @@ function App() {
         return <Sets lang={lang} strings={strings} />;
       break;
       case 3:
-        return <Account lang={lang} strings={strings} info={info} />;
+        return <Account lang={lang} strings={strings} info={info} logOut={logOut} />;
       break;
       default:
         return;

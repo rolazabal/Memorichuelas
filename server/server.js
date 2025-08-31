@@ -7,14 +7,14 @@ import { Pool } from 'pg';
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; //get all user's set's ids as array
 const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
-const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE) RETURNING "userID"';
+const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
 const fetch_word = 'SELECT (name) FROM "Memorichuelas"."Words" WHERE "wordID" = $1';
 const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions" WHERE "wordID" = $1';
 const fetch_examples = 'SELECT (example) FROM "Memorichuelas"."Examples" WHERE "wordID" = $1';
 const fetch_dict_page = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" ORDER BY "wordID" ASC LIMIT $1';
 const fetch_active_users = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE active = true';
 const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timestamp = CURRENT_TIMESTAMP WHERE "userID" = $1';
-const timeout_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
+const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 
 //pool
@@ -78,7 +78,7 @@ async function logIn(username, passkey) {
 
 async function logOut(userID) {
     //deactivate user
-    await client.query()
+    await client.query(deactivate_user, [userID]);
 }
 
 async function createUser(username, passkey) {
@@ -89,11 +89,8 @@ async function createUser(username, passkey) {
     let res = await client.query(username_total, [username]);
     if (res.rows[0].count != 0) return false;
     //create user
-    res = await client.query(create_user, [username, passkey]);
-    let id = res.rows;
-    //activate user
-    await client.query(activate_user, [id]);
-    return id;
+    await client.query(create_user, [username, passkey]);
+    return true;
 }
 
 async function wordById(wordID) {
@@ -155,7 +152,7 @@ app.post('/api/account', async (req, res) => {
             console.log(info);
         break;
         case 'create':
-
+            let op = await createUser(req.body.username, req.body.passkey);
         break;
         default:
             console.log("account access error!");

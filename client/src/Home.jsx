@@ -10,13 +10,16 @@ import Modal from 'react-bootstrap/Modal';
 //import * as formik from 'formik';
 //import * as yup from 'yup';
 
-function Home({lang, strings, user, logIn, loggedIn}) {
+function Home({lang, strings, logIn, accountForm, createAccount, loggedIn}) {
+    ///variables
     const [createModal, setCreateModal] = useState(false);
-    //const { formik } = formik;
-    /*const schema = yup.object().shape({
-        username: yup.string().required(),
-        passkey: yup.number().required()
-    });*/
+
+    function create(user, pass) {
+        setCreateModal(false);
+        createAccount(user, pass);
+    }
+
+    ///functions
     function AccountForm() {
         if (loggedIn) return;
         return(
@@ -26,19 +29,17 @@ function Home({lang, strings, user, logIn, loggedIn}) {
                 </ListGroup.Item>
                 <ListGroup.Item>
                 <Card.Text>{strings.login_text[lang]}</Card.Text>
-                    {/* <Formik noValidate> */}
-                        <Form>
-                            <Form.Group className="mb-3" controlId="formUsername">
-                                <Form.Label>{strings.username[lang]}</Form.Label>
-                                <Form.Control type="username" placeholder={strings.username_text[lang]} />
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="formPass">
-                                <Form.Label>{strings.passkey[lang]}</Form.Label>
-                                <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
-                            </Form.Group>
-                            <Button onClick={() => {logIn("admin", 12345678)}}>{strings.login[lang]}</Button>
-                        </Form>
-                    {/* </Formik> */}
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>{strings.username[lang]}</Form.Label>
+                            <Form.Control type="username" id="login_name" onChange={() => {accountForm.username = document.getElementById("login_name").value}} placeholder={strings.username_text[lang]} />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>{strings.passkey[lang]}</Form.Label>
+                            <Form.Control type="password" id="login_pass" onChange={() => {accountForm.passkey = document.getElementById("login_pass").value}} placeholder={strings.passkey_text[lang]} />
+                        </Form.Group>
+                        <Button onClick={() => {logIn(accountForm.username, accountForm.passkey)}}>{strings.login[lang]}</Button>
+                    </Form>
                 </ListGroup.Item>
             </ListGroup>
         );
@@ -62,17 +63,17 @@ function Home({lang, strings, user, logIn, loggedIn}) {
                 </Modal.Header>
                 <Form>
                     <Modal.Body>
-                        <Form.Group className="mb-3" controlId="formUsername">
+                        <Form.Group className="mb-3">
                             <Form.Label>{strings.username[lang]}</Form.Label>
-                            <Form.Control type="username" placeholder={strings.username_text[lang]} />
+                            <Form.Control id="create_user" type="username" onChange={() => {accountForm.username = document.getElementById("create_user").value}} placeholder={strings.username_text[lang]} />
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="formPass">
+                        <Form.Group className="mb-3">
                             <Form.Label>{strings.passkey[lang]}</Form.Label>
-                            <Form.Control type="password" placeholder={strings.passkey_text[lang]} />
+                            <Form.Control id="create_pass" type="password" onChange={() => {accountForm.passkey = document.getElementById("create_pass").value}} placeholder={strings.passkey_text[lang]} />
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={() => {setCreateModal(false)}}>{strings.create[lang]}</Button>
+                        <Button onClick={() => {create(accountForm.username, accountForm.passkey)}}>{strings.create[lang]}</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>

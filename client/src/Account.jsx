@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 
-function Account({lang, strings, info}) {
+function Account({lang, strings, info, logOut}) {
 
     return (
         <Card.Body>
@@ -24,7 +24,7 @@ function Account({lang, strings, info}) {
                         <br />
                         {strings.user_date[lang]}: {info != null ? info.date : ''}
                     </Card.Text>
-                    <Button>{strings.logout[lang]}</Button>
+                    <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
                     <Button>{strings.user_delete[lang]}</Button>
                 </ListGroup.Item>
             </ListGroup>
