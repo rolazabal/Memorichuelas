@@ -12,7 +12,7 @@ function Account({lang, strings, info, logOut}) {
             <ListGroup>
                 <ListGroup.Item>
                     <Card.Text>{strings.change_name[lang]}</Card.Text>
-                    <Form controlId="changeUsername">
+                    <Form>
                         <Form.Control type="username" placeholder={strings.change_name_text[lang]} />
                         <Button>{strings.update[lang]}</Button>
                     </Form>
@@ -24,7 +24,7 @@ function Account({lang, strings, info, logOut}) {
                         <br />
                         {strings.user_date[lang]}: {info != null ? info.date : ''}
                     </Card.Text>
-                    <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
+                    <Button onClick={async () => {await logOut()}}>{strings.logout[lang]}</Button>
                     <Button>{strings.user_delete[lang]}</Button>
                 </ListGroup.Item>
             </ListGroup>

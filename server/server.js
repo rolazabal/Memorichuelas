@@ -51,29 +51,6 @@ async function logIn(username, passkey) {
     //activate user
     await client.query(activate_user, [id]);
     return id;
-    /*
-    res = await client.query(fetch_set_ids, [id]);
-    let setIds = res.rows;
-    let sets = [];
-    if (setIds.length > 0) {
-        let set = [];
-        for (let x of setIds) {
-            res = await client.query(fetch_set_words, [x.setID]);
-            let words = res.rows;
-            if (words.length > 0) {
-                for (let y of words) {
-                    // TODO: rewrite query so I dont have to parse this
-                    y = y.row.substring(1, y.row.length - 1).split(",");
-                    y[0] = parseInt(y[0]);
-                    y[2] = parseFloat(y[2]);
-                    set.push({id: y[0], name: y[1], score: y[2]});
-                }
-            }
-            sets.push(set);
-            set = [];
-        }
-    }
-    */
 }
 
 async function logOut(userID) {
@@ -130,13 +107,42 @@ async function userInfo(userID) {
     return info;
 }
 
+async function userSets(userID) {
+    let res = await client.query(fetch_set_ids, [userID]);
+    let setIds = res.rows;
+    let sets = [];
+    if (setIds.length > 0) {
+        let set = [];
+        for (let x of setIds) {
+            res = await client.query(fetch_set_words, [x.setID]);
+            let words = res.rows;
+            if (words.length > 0) {
+                for (let y of words) {
+                    // TODO: rewrite query so I dont have to parse this
+                    y = y.row.substring(1, y.row.length - 1).split(",");
+                    y[0] = parseInt(y[0]);
+                    y[2] = parseFloat(y[2]);
+                    set.push({id: y[0], name: y[1], score: y[2]});
+                }
+            }
+            sets.push(set);
+            set = [];
+        }
+    }
+    return sets;
+}
+
 //http methods
 app.post('/api/account', async (req, res) => {
     let id = -1;
+    let op = false;
     let action = req.body.action;
     switch(action) {
         case 'logIn':
             id = await logIn(req.body.username, req.body.passkey);
+            //log action
+            op = await logAction(id);
+            if (!op) id = -1;
             res.json({id});
             console.log(id);
         break;
@@ -147,12 +153,28 @@ app.post('/api/account', async (req, res) => {
         break;
         case 'info':
             id = req.body.userID;
-            let info = await userInfo(id);
-            res.json({info});
-            console.log(info);
+            //log action
+            op = await logAction(id);
+            if (op) {
+                let info = await userInfo(id);
+                res.json({info});
+                console.log(info);
+            }
         break;
         case 'create':
-            let op = await createUser(req.body.username, req.body.passkey);
+            op = await createUser(req.body.username, req.body.passkey);
+            if (op) console.log("account created under username: " + req.body.username);
+            else console.log("account with username " + req.body.username + " failed to be created.");
+        break;
+        case 'sets':
+            id = req.body.userID;
+            //log action
+            op = await logAction(id);
+            if (op) {
+                let list = await userSets(id);
+                res.json({sets: list});
+                console.log(list);
+            }
         break;
         default:
             console.log("account access error!");
@@ -178,17 +200,6 @@ app.post('/api/dictionary', async (req, res) => {
             console.log("dictionary access error!");
         break;
     }
-});
-
-//create account
-app.post('/api/create', async (req, res) => {
-    //TODO: check req formatting
-    let {username, passkey} = req.body;
-    let op = await createUser(username, passkey);
-    //TODO: check op success
-    let user = await requestUserState("admin", 12345678);
-    res.json({state: user});
-    console.log(user);
 });
 
 app.listen(PORT, () => {

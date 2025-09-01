@@ -52,6 +52,7 @@ function App() {
     } else showToast(3); //failure to log in toast
   }
 
+  //TODO: figure out why this fucntion does not execute past first line
   async function logOut() {
     let op = await waitor.logOutUser(userID);
     if (op) {
@@ -59,7 +60,9 @@ function App() {
       setUserID(-1);
       showToast(0);
       setPage(0);
-    } else showToast(3); //failure to log out toast?
+    } else {
+      showToast(3); //failure to log out toast?
+    }
   }
 
   async function createAccount(user, pass) {
