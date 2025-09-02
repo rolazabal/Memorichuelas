@@ -32,6 +32,7 @@ function App() {
   const [pageWords, setPageWords] = useState([]);
   const [wordObj, setWordObj] = useState(null);
   //forms
+  const usernameForm = useState("");
   const accountForm = useState({username: "", passkey: 0});
   //server communicator
   const waitor = new Waitor();
@@ -54,12 +55,12 @@ function App() {
 
   //TODO: figure out why this fucntion does not execute past first line
   async function logOut() {
+    setUserID(-1);
+    setPage(0);
     let op = await waitor.logOutUser(userID);
     if (op) {
       //successful log out toast
-      setUserID(-1);
       showToast(0);
-      setPage(0);
     } else {
       showToast(3); //failure to log out toast?
     }
@@ -92,6 +93,19 @@ function App() {
     setPage(3);
   }
 
+  async function changeUsername(user) {
+    let op = await waitor.updateUsername(userID, user);
+    if (op) {
+      //update info (this might not be the best way to do this)
+      setInfo(null);
+      await getInfo();
+      //show toast
+      showToast(0);
+    } else {
+      //handle exception
+    }
+  }
+
   function DisplayContent() {
     switch(page) {
       case 0:
@@ -104,7 +118,7 @@ function App() {
         return <Sets lang={lang} strings={strings} />;
       break;
       case 3:
-        return <Account lang={lang} strings={strings} info={info} logOut={logOut} />;
+        return <Account lang={lang} strings={strings} info={info} logOut={logOut} usernameForm={usernameForm} changeUsername={changeUsername} />;
       break;
       default:
         return;
@@ -116,8 +130,8 @@ function App() {
     if (userID == -1) return;
     return(
       <>
-        <Nav.Link onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
-        <Nav.Link onClick={async () => await getInfo()}>{strings.user_title[lang]}</Nav.Link>
+        <Nav.Link eventKey="3" onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
+        <Nav.Link eventKey="4" onClick={async () => await getInfo()}>{strings.user_title[lang]}</Nav.Link>
       </>
     );
   }
@@ -125,7 +139,7 @@ function App() {
   return (
     <>
       <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
-        <Container fluid>
+        <Container>
           <Navbar.Brand>Memorichuelas</Navbar.Brand>
           <Dropdown>
             <Dropdown.Toggle id="lang-dropdown">
@@ -143,8 +157,8 @@ function App() {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link onClick={() => setPage(0)}>{strings.about_title[lang]}</Nav.Link>
-              <Nav.Link onClick={() => setPage(1)}>{strings.dictionary_title[lang]}</Nav.Link>
+              <Nav.Link eventKey="1" onClick={() => setPage(0)}>{strings.about_title[lang]}</Nav.Link>
+              <Nav.Link eventKey="2" onClick={() => setPage(1)}>{strings.dictionary_title[lang]}</Nav.Link>
               <NavAccount />
             </Nav>
           </Navbar.Collapse>
@@ -210,11 +224,10 @@ function App() {
           </Toast.Body>
         </Toast>
       </ToastContainer>
-      <Card style={{width: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}>
+      <Card id={"card"}>
         <DisplayContent />
       </Card>
-      <br />
-      <div>
+      <div id={"footer"}>
         Ricardo Olazabal @ 2026 // app version {verStr}
       </div>
     </>

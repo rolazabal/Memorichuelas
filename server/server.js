@@ -16,6 +16,8 @@ const fetch_active_users = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE
 const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timestamp = CURRENT_TIMESTAMP WHERE "userID" = $1';
 const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
+const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
+const username_total = '';
 
 //pool
 const pool = new Pool({
@@ -132,6 +134,15 @@ async function userSets(userID) {
     return sets;
 }
 
+async function updateUsername(userID, username) {
+    //check for existing username
+    let res = await client.query(username_total, [username]);
+    if (res.rows[0].count != 0) return false;
+    //update username
+    await client.query(update_user_name, [userID, username]);
+    return true;
+}
+
 //http methods
 app.post('/api/account', async (req, res) => {
     let id = -1;
@@ -176,6 +187,18 @@ app.post('/api/account', async (req, res) => {
                 console.log(list);
             }
         break;
+        case 'updateName':
+            id = req.body.userID;
+            let active = await logAction(id);
+            if (active) {
+                op = await updateUsername(id, req.body.username);
+                if (op) console.log("username updated for id: " + id);
+                else {
+                    //communicate this to client
+                    console.log("username already exists!");
+                }
+            }
+        break;
         default:
             console.log("account access error!");
         break;
@@ -198,6 +221,29 @@ app.post('/api/dictionary', async (req, res) => {
         break;
         default:
             console.log("dictionary access error!");
+        break;
+    }
+});
+
+app.post('/api/sets', async (req, res) => {
+    switch(req.body.action) {
+        case 'wordScores':
+
+        break;
+        case 'create':
+
+        break;
+        case 'delete':
+
+        break;
+        case 'addWord':
+
+        break;
+        case 'removeWord':
+
+        break;
+        default:
+
         break;
     }
 });

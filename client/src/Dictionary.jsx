@@ -17,72 +17,107 @@ import Button from 'react-bootstrap/Button';
 
 function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj}) {
     const columns = 2;
-    const mode = "DISPLAY"; //decide behavior of component: DISPLAY, SELECT, or EDIT
+    const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
 
     function Display() {
-        if (wordObj != null) {
-            return (
-                <div>
-                    <h1>{wordObj.name}</h1>
-                    <h2>{strings.definition[lang]}</h2>
-                    <ul>
-                        {wordObj.defs.map((def) =>
-                            <li>{def}</li>
-                        )}
-                    </ul>
-                    <h2>{strings.example[lang]}</h2>
-                    <ul>
-                        {wordObj.exs.map((ex) =>
-                            <li>{ex}</li>
-                        )}
-                    </ul>
-                    <Button onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
-                </div>
-            );
-        } else { 
-            //fetch page words
-            if (pageWords.length == 0) getPage(10);
-            //compute rows
-            let rows = [];
-            let row = [];
-            for (let i = 0; i < pageWords.length; i ++) {
-                // for each word, add to row until row is full, then add full row to rows array
-                row.push(pageWords[i]);
-                if ((i + 1) % columns == 0) {
-                    rows.push(row)
-                    row = [];
-                }
-            }
+        if (wordObj != null) { 
             return (
                 <>
-                    <Table>
-                        <tbody>
-                            {rows.map((row) => 
-                                <tr>
-                                    {row.map((entry) => 
-                                        <th id={parseInt(entry[0])} onClick={async () => {await getWord(parseInt(entry[0]))}}>{entry[1]}</th>
-                                    )}
-                                </tr>
-                            )}
-                        </tbody>
-                    </Table>
-                    <Button>{"<"}</Button>
-                    {"0"}
-                    <Button>{">"}</Button>
+                    <h1>
+                        {wordObj.name}
+                        <Button onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
+                    </h1>
+                    {wordObj.defs.length > 0 ? 
+                        <>
+                            <h2>{strings.definition[lang]}</h2>
+                            <ul>
+                                {wordObj.defs.map((def) =>
+                                    <li>{def}</li>
+                                )}
+                            </ul>
+                        </> 
+                        : <></>
+                    }
+                    {wordObj.exs.length > 0 ? 
+                        <>
+                            <h2>{strings.example[lang]}</h2>
+                            <ul>
+                                {wordObj.exs.map((ex) =>
+                                    <li>{ex}</li>
+                                )}
+                            </ul>
+                        </> 
+                        : <></>
+                    }
                 </>
             );
         }
+        //fetch page words
+        if (pageWords.length == 0) getPage(10);
+        //compute rows
+        let rows = [];
+        let row = [];
+        for (let i = 0; i < pageWords.length; i ++) {
+            // for each word, add to row until row is full, then add full row to rows array
+            row.push(pageWords[i]);
+            if ((i + 1) % columns == 0) {
+                rows.push(row)
+                row = [];
+            }
+        }
+        return (
+            <>
+                <Table>
+                    <tbody>
+                        {rows.map((row) => 
+                            <tr>
+                                {row.map((entry) => 
+                                    <th id={parseInt(entry[0])} onClick={async () => {await getWord(parseInt(entry[0]))}}>{entry[1]}</th>
+                                )}
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+                <Button>{"<"}</Button>
+                {"0"}
+                <Button>{">"}</Button>
+            </>
+        );
+    }
+
+    function Select() {
+
+        return (
+            <>
+                <Table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <tr>
+                                    <th>
+                                        {"hey"}
+                                    </th>
+                                </tr>
+                            </th>
+                            <th>
+                                {"hii"}
+                            </th>
+                        </tr>
+                    </tbody>
+                </Table>
+            </>
+        );
     }
 
     function Content() {
         switch(mode) {
-            case "DISPLAY":
+            case "display":
                 return <Display />;
             break;
-            case "SELECT":
-                return;
+            case "select":
+                return <Select />;
             break;
-            case "EDIT":
+            case "edit":
                 return;
             break;
             default:

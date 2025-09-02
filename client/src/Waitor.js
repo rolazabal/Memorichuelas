@@ -91,6 +91,22 @@ class Waitor {
         }
     }
 
+    async updateUsername(uID, user) {
+        try {
+            let res = await fetch('http://localhost:5050/api/account', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'updateName', userID: uID, username: user})
+            });
+            //handle exception
+            res = await res.json();
+            return true;
+        } catch(error) {
+            console.log(error);
+            return false;
+        }
+    }
+
     async fetchUserSets(uID) {
 
     }

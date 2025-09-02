@@ -1,11 +1,19 @@
 #root {
   width: 100%;
   height: 100%;
-  margin: auto;
-  vertical-align: top;
 }
 
-#app {
+#footer {
+  background-color:#7fd0ff;
+  width: 100%;
+  height: 100%;
+}
+
+#card {
+  width: 90%;
+  display: block; 
+  margin-left: auto;
+  margin-right: auto;
   height: 100%;
 }
 
