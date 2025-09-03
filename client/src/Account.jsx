@@ -3,9 +3,10 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
+import Modal from 'react-bootstrap/Modal';
 import Stack from 'react-bootstrap/Stack';
 
-function Account({lang, strings, info, logOut, usernameForm, changeUsername}) {
+function Account({lang, strings, info, logOut, usernameForm, changeUsername, deleteUser}) {
 
     return (
         <Card.Body>
@@ -29,8 +30,11 @@ function Account({lang, strings, info, logOut, usernameForm, changeUsername}) {
                     </Card.Text>
                     <Stack direction="horizontal">
                         <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
-                        <Button className="ms-auto" variant="danger" onClick={() => {}}>{strings.user_delete[lang]}</Button>
+                        <Button className="ms-auto" variant="danger" onClick={() => {deleteUser()}}>{strings.user_delete[lang]}</Button>
                     </Stack>
+                    <Modal>
+                        {/*are you sure you want to delete account?*/}
+                    </Modal>
                 </ListGroup.Item>
             </ListGroup>
         </Card.Body>

@@ -30,7 +30,7 @@ function App() {
   //user variables
   const [userID, setUserID] = useState(-1);
   const [info, setInfo] = useState(null);
-  const [pageWords, setPageWords] = useState([]);
+  const [pageWords, setPageWords] = useState(null);
   const [wordObj, setWordObj] = useState(null);
   //forms
   const usernameForm = useState("");
@@ -56,10 +56,10 @@ function App() {
 
   //TODO: figure out why this fucntion does not execute past first line
   async function logOut() {
-    setUserID(-1);
-    setPage(0);
     let op = await waitor.logOutUser(userID);
     if (op) {
+      setUserID(-1);
+      setPage(0);
       //successful log out toast
       showToast(0);
     } else {
@@ -79,6 +79,11 @@ function App() {
 
   async function getPage(letter) {
     let list = await waitor.fetchDictPage(userID, letter);
+    setPageWords(list);
+  }
+
+  async function search(string) {
+    let list = await waitor.dictionarySearch(userID, string);
     setPageWords(list);
   }
 
@@ -109,19 +114,30 @@ function App() {
     }
   }
 
+  async function deleteUser() {
+    let op = await waitor.deleteUser(userID);
+    if (op) {
+      setUserID(-1);
+      setPage(0);
+      showToast(0);
+    } else {
+      showToast(3);
+    }
+  }
+
   function DisplayContent() {
     switch(page) {
       case 0:
         return <Home lang={lang} strings={strings} logIn={logIn} accountForm={accountForm} createAccount={createAccount} loggedIn={userID == -1 ? false : true} />;
       break;
       case 1:
-        return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} />;
+        return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} search={search} />;
       break;
       case 2:
         return <Sets lang={lang} strings={strings} />;
       break;
       case 3:
-        return <Account lang={lang} strings={strings} info={info} logOut={logOut} usernameForm={usernameForm} changeUsername={changeUsername} />;
+        return <Account lang={lang} strings={strings} info={info} logOut={logOut} usernameForm={usernameForm} changeUsername={changeUsername} deleteUser={deleteUser} />;
       break;
       default:
         return;

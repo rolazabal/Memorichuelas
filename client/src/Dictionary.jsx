@@ -13,9 +13,10 @@ import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
+import Form from 'react-bootstrap/Form';
 
 
-function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj}) {
+function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj, search}) {
     const columns = 2;
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
     const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
@@ -55,26 +56,33 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
             );
         }
         //fetch page words
-        if (pageWords.length == 0) getPage(alph[0]);
+        if (pageWords == null) getPage(alph[0]);
         //compute rows
         let rows = [];
         let row = [];
-        for (let i = 0; i < pageWords.length; i ++) {
-            // for each word, add to row until row is full, then add full row to rows array
-            row.push(pageWords[i]);
-            if ((i + 1) % columns == 0) {
-                rows.push(row)
-                row = [];
+        if (pageWords != null) {
+            for (let i = 0; i < pageWords.length; i ++) {
+                // for each word, add to row until row is full, then add full row to rows array
+                row.push(pageWords[i]);
+                if ((i + 1) % columns == 0) {
+                    rows.push(row)
+                    row = [];
+                }
             }
         }
+            
         return (
             <>
-                <Stack direction="horizontal">
-                    {alph.map((letter) =>
-                        <Button onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
-                    )}
-                </Stack>
-                <Table>
+                <Container>
+                    <Row>
+                        {alph.map((letter) =>
+                            <Col xs={1}>
+                                <Button style={{width: "100%"}} onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
+                            </Col>
+                        )}
+                    </Row>
+                </Container>
+                <Container>
                     {rows.map((row) => 
                         <Row>
                             {row.map((entry) => 
@@ -82,7 +90,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                             )}
                         </Row>
                     )}
-                </Table>
+                </Container>
             </>
         );
     }
@@ -90,8 +98,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
     function Select() {
 
         return (
-            <Table>
-            </Table>
+            <></>
         );
     }
 
@@ -116,7 +123,14 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
         <Card.Body>
             <Stack direction="horizontal">
                 <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
-                {wordObj != null ? <></> : <Button className="ms-auto">{strings.search[lang]}</Button>}
+                {wordObj != null ? <></> : 
+                    <Form class="ms-auto">
+                        <Stack direction='horizontal'>
+                            <Form.Control id="search" type="text" />
+                            <Button onClick={() => {search(document.getElementById("search").value)}}>{strings.search[lang]}</Button>
+                        </Stack>
+                    </Form>
+                }
             </Stack>
             <Content />
         </Card.Body>

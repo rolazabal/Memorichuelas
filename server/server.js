@@ -18,10 +18,8 @@ const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, time
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
 const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
-//write trigger on database to clear all user sets
-const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1';
-//write trigger on database to clear all set words
-const remove_set = '';
+const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1'; //write trigger on database to clear all user sets
+const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1'; //write trigger on database to clear all set words
 const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
 //pool
@@ -151,8 +149,20 @@ async function updateUsername(userID, username) {
     return true;
 }
 
+async function dictionarySearch(string) {
+    let list = [];
+    //empty search gets empty result
+    if (string == "") return list;
+    string = '%' + string + '%';
+    let res = await client.query(regex_words, [string]);
+    for (let x of res.rows) {
+        list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
+    }
+    return list;
+}
+
 async function deleteUser(userID) {
-    
+    await client.query(remove_user, [userID]);
 }
 
 //http methods
@@ -221,7 +231,10 @@ app.post('/api/account', async (req, res) => {
             }
         break;
         case 'delete':
-
+            id = req.body.userID;
+            await deleteUser(id);
+            res.json({msg: "yes"});
+            console.log("user deleted with id: " + id);
         break;
         default:
             console.log("account access error!");
@@ -229,14 +242,14 @@ app.post('/api/account', async (req, res) => {
     }
 });
 
-//get page
 app.post('/api/dictionary', async (req, res) => {
     //log action if user is active
     let id = req.body.userID;
+    let list = [];
     await logAction(id);
     switch(req.body.action) {
         case 'page':
-            let list = await dictionaryPage(req.body.letter);
+            list = await dictionaryPage(req.body.letter);
             res.json({words: list});
             console.log(list);
         break;
@@ -244,6 +257,11 @@ app.post('/api/dictionary', async (req, res) => {
             let obj = await wordById(req.body.wordID);
             res.json({word: obj});
             console.log(obj);
+        break;
+        case 'search':
+            list = await dictionarySearch(req.body.string);
+            res.json({words: list});
+            console.log(list);
         break;
         default:
             console.log("dictionary access error!");

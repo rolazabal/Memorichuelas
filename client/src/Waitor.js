@@ -32,14 +32,26 @@ class Waitor {
     }
 
     async createUser(user, pass) {
-        console.log("test1");
         try {
             await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'create', username: user, passkey: pass})
             });
-            console.log("test2");
+            return true;
+        } catch(error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    async deleteUser(uID) {
+        try {
+            await fetch('', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'delete', userID: uID})
+            });
             return true;
         } catch(error) {
             console.log(error);
@@ -100,11 +112,26 @@ class Waitor {
                 body: JSON.stringify({action: 'updateName', userID: uID, username: user})
             });
             //handle exception
-            //res = await res.json();
+            res = await res.json();
             return true;
         } catch(error) {
             console.log(error);
             return false;
+        }
+    }
+
+    async dictionarySearch(uID, string) {
+        try {
+            let res = await fetch('http://localhost:5050/api/dictionary', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'search', string: string, userID: uID})
+            });
+            res = await res.json();
+            return res.words;
+        } catch(error) {
+            console.log(error);
+            return [];
         }
     }
 
