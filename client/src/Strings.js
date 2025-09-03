@@ -32,6 +32,7 @@ const strings = {
     back: ["Back", "Regresar"],
     definition: ["Definition(s):", "Definicion(es):"],
     example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
+    search: ["Search", "Buscar"],
     t_login_success: [],
     t_login_fail: [],
     t_logout_success: [],

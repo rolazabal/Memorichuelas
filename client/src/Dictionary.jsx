@@ -18,7 +18,7 @@ import Stack from 'react-bootstrap/Stack';
 function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj}) {
     const columns = 2;
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
-    const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
     function Display() {
         if (wordObj != null) { 
@@ -55,7 +55,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
             );
         }
         //fetch page words
-        if (pageWords.length == 0) getPage(10);
+        if (pageWords.length == 0) getPage(alph[0]);
         //compute rows
         let rows = [];
         let row = [];
@@ -71,19 +71,17 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
             <>
                 <Stack direction="horizontal">
                     {alph.map((letter) =>
-                        <Button><small>{letter}</small></Button>
+                        <Button onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
                     )}
                 </Stack>
                 <Table>
-                    <tbody>
-                        {rows.map((row) => 
-                            <tr>
-                                {row.map((entry) => 
-                                    <th id={parseInt(entry[0])} onClick={async () => {await getWord(parseInt(entry[0]))}}>{entry[1]}</th>
-                                )}
-                            </tr>
-                        )}
-                    </tbody>
+                    {rows.map((row) => 
+                        <Row>
+                            {row.map((entry) => 
+                                <Col id={parseInt(entry[0])} onClick={() => {getWord(parseInt(entry[0]))}}>{entry[1]}</Col>
+                            )}
+                        </Row>
+                    )}
                 </Table>
             </>
         );
@@ -92,24 +90,8 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
     function Select() {
 
         return (
-            <>
-                <Table>
-                    <tbody>
-                        <tr>
-                            <th>
-                                <tr>
-                                    <th>
-                                        {"hey"}
-                                    </th>
-                                </tr>
-                            </th>
-                            <th>
-                                {"hii"}
-                            </th>
-                        </tr>
-                    </tbody>
-                </Table>
-            </>
+            <Table>
+            </Table>
         );
     }
 
@@ -132,7 +114,10 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
 
     return (
         <Card.Body>
-            <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
+            <Stack direction="horizontal">
+                <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
+                {wordObj != null ? <></> : <Button className="ms-auto">{strings.search[lang]}</Button>}
+            </Stack>
             <Content />
         </Card.Body>
     );

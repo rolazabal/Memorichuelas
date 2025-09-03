@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node --watch --env-file=.env ./server.js",
-    "build-db": "node --env-file=.env ./build-db/build.js",
-    "test": "node --watch --env-file=.env ./db.js"
+    "build-db": "node --env-file=.env ./build-db/build.js"
   },
   "keywords": [],
   "author": "",

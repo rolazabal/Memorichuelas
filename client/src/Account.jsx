@@ -29,7 +29,7 @@ function Account({lang, strings, info, logOut, usernameForm, changeUsername}) {
                     </Card.Text>
                     <Stack direction="horizontal">
                         <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
-                        <Button className="ms-auto" onClick={() => {}}>{strings.user_delete[lang]}</Button>
+                        <Button className="ms-auto" variant="danger" onClick={() => {}}>{strings.user_delete[lang]}</Button>
                     </Stack>
                 </ListGroup.Item>
             </ListGroup>

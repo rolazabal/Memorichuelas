@@ -77,8 +77,8 @@ function App() {
     }
   }
 
-  async function getPage(page) {
-    let list = await waitor.fetchDictPage(userID, page);
+  async function getPage(letter) {
+    let list = await waitor.fetchDictPage(userID, letter);
     setPageWords(list);
   }
 

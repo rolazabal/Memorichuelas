@@ -18,7 +18,11 @@ const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, time
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
 const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
-const remove_user = '';
+//write trigger on database to clear all user sets
+const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1';
+//write trigger on database to clear all set words
+const remove_set = '';
+const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
 //pool
 const pool = new Pool({
@@ -93,9 +97,10 @@ async function wordById(wordID) {
     return word;
 }
 
-async function dictionaryPage(page) {
+async function dictionaryPage(letter) {
     //TODO: implement page logic
-    let res = await client.query(fetch_dict_page, [page]);
+    letter = letter + '%'
+    let res = await client.query(regex_words, [letter]);
     let list = [];
     for (let x of res.rows) {
         list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
@@ -167,6 +172,7 @@ app.post('/api/account', async (req, res) => {
         case 'logOut':
             id = req.body.userID;
             await logOut(id);
+            res.json({mgs: "yep"});
             console.log("user " + id + " logged out!");
         break;
         case 'info':
@@ -225,10 +231,12 @@ app.post('/api/account', async (req, res) => {
 
 //get page
 app.post('/api/dictionary', async (req, res) => {
+    //log action if user is active
+    let id = req.body.userID;
+    await logAction(id);
     switch(req.body.action) {
         case 'page':
-            //TODO: add page logic
-            let list = await dictionaryPage(req.body.page);
+            let list = await dictionaryPage(req.body.letter);
             res.json({words: list});
             console.log(list);
         break;

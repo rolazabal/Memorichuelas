@@ -47,12 +47,12 @@ class Waitor {
         }
     }
 
-    async fetchDictPage(uID, page) {
+    async fetchDictPage(uID, letter) {
         try {
             let res = await fetch('http://localhost:5050/api/dictionary', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'page', page: page, userID: uID})
+                body: JSON.stringify({action: 'page', letter: letter, userID: uID})
             });
             res = await res.json();
             return res.words;
