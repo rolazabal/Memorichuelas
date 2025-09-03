@@ -1,5 +1,4 @@
 import { createContext, useState } from 'react';
-import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Dropdown, ListGroup, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
@@ -13,42 +12,45 @@ import ToastContainer from 'react-bootstrap/ToastContainer';
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
+import Stack from 'react-bootstrap/Stack';
 
 
 function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj}) {
     const columns = 2;
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
+    const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
     function Display() {
         if (wordObj != null) { 
             return (
                 <>
-                    <h1>
-                        {wordObj.name}
-                        <Button onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
-                    </h1>
-                    {wordObj.defs.length > 0 ? 
-                        <>
-                            <h2>{strings.definition[lang]}</h2>
-                            <ul>
-                                {wordObj.defs.map((def) =>
-                                    <li>{def}</li>
-                                )}
-                            </ul>
-                        </> 
-                        : <></>
-                    }
-                    {wordObj.exs.length > 0 ? 
-                        <>
-                            <h2>{strings.example[lang]}</h2>
-                            <ul>
-                                {wordObj.exs.map((ex) =>
-                                    <li>{ex}</li>
-                                )}
-                            </ul>
-                        </> 
-                        : <></>
-                    }
+                    <Stack direction="horizontal">
+                        <h2>{wordObj.name}</h2>
+                        <Button className="ms-auto" onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
+                    </Stack>
+                    <Container>
+                        {wordObj.defs.length > 0 ? 
+                            <>
+                                <ul>
+                                    {wordObj.defs.map((def) =>
+                                        <li>{def}</li>
+                                    )}
+                                </ul>
+                            </> 
+                            : <></>
+                        }
+                        {wordObj.exs.length > 0 ? 
+                            <>
+                                <h3>{strings.example[lang]}</h3>
+                                <ul>
+                                    {wordObj.exs.map((ex) =>
+                                        <li>{ex}</li>
+                                    )}
+                                </ul>
+                            </> 
+                            : <></>
+                        }
+                    </Container>
                 </>
             );
         }
@@ -67,6 +69,11 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
         }
         return (
             <>
+                <Stack direction="horizontal">
+                    {alph.map((letter) =>
+                        <Button><small>{letter}</small></Button>
+                    )}
+                </Stack>
                 <Table>
                     <tbody>
                         {rows.map((row) => 
@@ -78,9 +85,6 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                         )}
                     </tbody>
                 </Table>
-                <Button>{"<"}</Button>
-                {"0"}
-                <Button>{">"}</Button>
             </>
         );
     }

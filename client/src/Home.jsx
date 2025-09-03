@@ -6,6 +6,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
+import Stack from 'react-bootstrap/Stack';
 
 //import * as formik from 'formik';
 //import * as yup from 'yup';
@@ -13,6 +14,12 @@ import Modal from 'react-bootstrap/Modal';
 function Home({lang, strings, logIn, accountForm, createAccount, loggedIn}) {
     ///variables
     const [createModal, setCreateModal] = useState(false);
+
+    function createDialog() {
+        accountForm.username = '';
+        accountForm.passkey = 0;
+        setCreateModal(true);
+    }
 
     function create(user, pass) {
         setCreateModal(false);
@@ -25,10 +32,13 @@ function Home({lang, strings, logIn, accountForm, createAccount, loggedIn}) {
         return(
             <ListGroup>
                 <ListGroup.Item>
-                    <Button onClick={() => {setCreateModal(true)}}>{strings.user_create_text[lang]}</Button>
+                    <Stack direction="horizontal" gap={3}>
+                        <Button onClick={() => {createDialog()}}>{strings.user_create_text[lang]}</Button>
+                        <div className="vr" />
+                        <Card.Text>{strings.login_text[lang]}</Card.Text>
+                    </Stack>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                <Card.Text>{strings.login_text[lang]}</Card.Text>
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>{strings.username[lang]}</Form.Label>

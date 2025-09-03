@@ -32,12 +32,14 @@ class Waitor {
     }
 
     async createUser(user, pass) {
+        console.log("test1");
         try {
             await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'create', username: user, passkey: pass})
             });
+            console.log("test2");
             return true;
         } catch(error) {
             console.log(error);
@@ -68,7 +70,6 @@ class Waitor {
                 body: JSON.stringify({action: 'word', wordID: wID, userID: uID})
             });
             res = await res.json();
-            console.log(res);
             return res.word;
         } catch(error) {
             console.log(error);
@@ -99,7 +100,7 @@ class Waitor {
                 body: JSON.stringify({action: 'updateName', userID: uID, username: user})
             });
             //handle exception
-            res = await res.json();
+            //res = await res.json();
             return true;
         } catch(error) {
             console.log(error);

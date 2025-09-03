@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
+import Stack from 'react-bootstrap/Stack';
 
 function Account({lang, strings, info, logOut, usernameForm, changeUsername}) {
 
@@ -13,8 +14,10 @@ function Account({lang, strings, info, logOut, usernameForm, changeUsername}) {
                 <ListGroup.Item>
                     <Card.Text>{strings.change_name[lang]}</Card.Text>
                     <Form>
-                        <Form.Control id="change_name" type="username" onChange={() => {usernameForm = document.getElementById("change_name").value}} placeholder={strings.change_name_text[lang]} />
-                        <Button onClick={() => {changeUsername(usernameForm)}}>{strings.update[lang]}</Button>
+                        <Stack direction="horizontal" gap={3}>
+                            <Form.Control id="change_name" type="username" onChange={() => {usernameForm = document.getElementById("change_name").value}} placeholder={strings.change_name_text[lang]} />
+                            <Button onClick={() => {changeUsername(usernameForm)}}>{strings.update[lang]}</Button>
+                        </Stack>
                     </Form>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -24,8 +27,10 @@ function Account({lang, strings, info, logOut, usernameForm, changeUsername}) {
                         <br />
                         {strings.user_date[lang]}: {info != null ? info.date : ''}
                     </Card.Text>
-                    <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
-                    <Button>{strings.user_delete[lang]}</Button>
+                    <Stack direction="horizontal">
+                        <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
+                        <Button className="ms-auto" onClick={() => {}}>{strings.user_delete[lang]}</Button>
+                    </Stack>
                 </ListGroup.Item>
             </ListGroup>
         </Card.Body>

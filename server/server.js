@@ -17,7 +17,8 @@ const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timesta
 const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
-const username_total = '';
+const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
+const remove_user = '';
 
 //pool
 const pool = new Pool({
@@ -66,7 +67,8 @@ async function createUser(username, passkey) {
     if (passkey > 99999999 || passkey == 0) return false;
     //check for existing username
     let res = await client.query(username_total, [username]);
-    if (res.rows[0].count != 0) return false;
+    let count = res.rows[0];
+    if (count != undefined) return false;
     //create user
     await client.query(create_user, [username, passkey]);
     return true;
@@ -137,10 +139,15 @@ async function userSets(userID) {
 async function updateUsername(userID, username) {
     //check for existing username
     let res = await client.query(username_total, [username]);
-    if (res.rows[0].count != 0) return false;
+    let count = res.rows[0];
+    if (count != undefined) return false;
     //update username
     await client.query(update_user_name, [userID, username]);
     return true;
+}
+
+async function deleteUser(userID) {
+    
 }
 
 //http methods
@@ -174,8 +181,13 @@ app.post('/api/account', async (req, res) => {
         break;
         case 'create':
             op = await createUser(req.body.username, req.body.passkey);
-            if (op) console.log("account created under username: " + req.body.username);
-            else console.log("account with username " + req.body.username + " failed to be created.");
+            if (op) {
+                console.log("account created under username: " + req.body.username);
+                res.json({msg: "yay"});
+            } else {
+                console.log("account with username " + req.body.username + " failed to be created.");
+                res.json({msg: "noo"});
+            }
         break;
         case 'sets':
             id = req.body.userID;
@@ -192,12 +204,18 @@ app.post('/api/account', async (req, res) => {
             let active = await logAction(id);
             if (active) {
                 op = await updateUsername(id, req.body.username);
-                if (op) console.log("username updated for id: " + id);
-                else {
+                if (op) {
+                    console.log("username updated for id: " + id);
+                    res.json({msg: "yep"});
+                } else {
                     //communicate this to client
                     console.log("username already exists!");
+                    res.json({msg: "nop"});
                 }
             }
+        break;
+        case 'delete':
+
         break;
         default:
             console.log("account access error!");
