@@ -33,10 +33,17 @@ const strings = {
     definition: ["Definition(s):", "Definicion(es):"],
     example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
     search: ["Search", "Buscar"],
-    t_login_success: [],
-    t_login_fail: [],
-    t_logout_success: [],
-    t_logout_fail: []
+    delete: ["Delete", "Borrar"],
+    t_success: ["Success!", ""],
+    t_fail: ["Oops!", ""],
+    t_login_success: ["Logged in!", ""],
+    t_login_fail: ["Log in failed!" , ""],
+    t_logout_success: ["Logged out!", ""],
+    t_create_acc_fail: ["Failed to create account!", ""],
+    t_change_name_success: ["Username changed!", ""],
+    t_change_name_fail: ["Failed to change username!", ""],
+    t_delete_acc_success: ["Account deleted!", ""],
+    t_delete_acc_fail: ["Failed to delete account!", ""]
 };
 
 export default strings

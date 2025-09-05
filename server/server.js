@@ -150,11 +150,11 @@ async function updateUsername(userID, username) {
 }
 
 async function dictionarySearch(string) {
-    let list = [];
     //empty search gets empty result
-    if (string == "") return list;
+    if (string == "") return null;
     string = '%' + string + '%';
     let res = await client.query(regex_words, [string]);
+    let list = [];
     for (let x of res.rows) {
         list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
     }
@@ -202,6 +202,7 @@ app.post('/api/account', async (req, res) => {
                 res.json({msg: "yay"});
             } else {
                 console.log("account with username " + req.body.username + " failed to be created.");
+                throw new Error();
                 res.json({msg: "noo"});
             }
         break;
@@ -251,17 +252,17 @@ app.post('/api/dictionary', async (req, res) => {
         case 'page':
             list = await dictionaryPage(req.body.letter);
             res.json({words: list});
-            console.log(list);
+            //console.log(list);
         break;
         case 'word':
             let obj = await wordById(req.body.wordID);
             res.json({word: obj});
-            console.log(obj);
+            //console.log(obj);
         break;
         case 'search':
             list = await dictionarySearch(req.body.string);
             res.json({words: list});
-            console.log(list);
+            console.log("search for: " + req.body.string);
         break;
         default:
             console.log("dictionary access error!");

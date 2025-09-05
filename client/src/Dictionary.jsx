@@ -17,42 +17,64 @@ import Form from 'react-bootstrap/Form';
 
 
 function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj, search}) {
+    ///variables
     const columns = 2;
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
     const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    
+    ///functions
+    const submitSearch = event => {
+        event.preventDefault();
+        search(document.getElementById("search").value);
+    }
+
+    function Content() {
+        switch(mode) {
+            case "display":
+                return <Display />;
+            break;
+            case "select":
+                return <Select />;
+            break;
+            case "edit":
+                return;
+            break;
+            default:
+                return;
+            break;
+        }
+    }
 
     function Display() {
         if (wordObj != null) { 
             return (
-                <>
+                <Container>
                     <Stack direction="horizontal">
                         <h2>{wordObj.name}</h2>
                         <Button className="ms-auto" onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
                     </Stack>
-                    <Container>
-                        {wordObj.defs.length > 0 ? 
-                            <>
-                                <ul>
-                                    {wordObj.defs.map((def) =>
-                                        <li>{def}</li>
-                                    )}
-                                </ul>
-                            </> 
-                            : <></>
-                        }
-                        {wordObj.exs.length > 0 ? 
-                            <>
-                                <h3>{strings.example[lang]}</h3>
-                                <ul>
-                                    {wordObj.exs.map((ex) =>
-                                        <li>{ex}</li>
-                                    )}
-                                </ul>
-                            </> 
-                            : <></>
-                        }
-                    </Container>
-                </>
+                    {wordObj.defs.length > 0 ? 
+                        <>
+                            <ul>
+                                {wordObj.defs.map((def) =>
+                                    <li>{def}</li>
+                                )}
+                            </ul>
+                        </> 
+                        : <></>
+                    }
+                    {wordObj.exs.length > 0 ? 
+                        <>
+                            <h3>{strings.example[lang]}</h3>
+                            <ul>
+                                {wordObj.exs.map((ex) =>
+                                    <li>{ex}</li>
+                                )}
+                            </ul>
+                        </> 
+                        : <></>
+                    }
+                </Container>
             );
         }
         //fetch page words
@@ -69,6 +91,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                     row = [];
                 }
             }
+            if (row != []) rows.push(row);
         }
             
         return (
@@ -102,37 +125,22 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
         );
     }
 
-    function Content() {
-        switch(mode) {
-            case "display":
-                return <Display />;
-            break;
-            case "select":
-                return <Select />;
-            break;
-            case "edit":
-                return;
-            break;
-            default:
-                return;
-            break;
-        }
-    }
-
     return (
-        <Card.Body>
-            <Stack direction="horizontal">
+        <Card.Body style={{overflow: "hidden"}}>
+            <Stack style={{width: "100%"}} direction="horizontal">
                 <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
                 {wordObj != null ? <></> : 
-                    <Form class="ms-auto">
+                    <Form onSubmit={submitSearch}>
                         <Stack direction='horizontal'>
                             <Form.Control id="search" type="text" />
-                            <Button onClick={() => {search(document.getElementById("search").value)}}>{strings.search[lang]}</Button>
+                            <Button type="submit">{strings.search[lang]}</Button>
                         </Stack>
                     </Form>
                 }
             </Stack>
-            <Content />
+            <Container style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
+                <Content />
+            </Container>
         </Card.Body>
     );
 }
