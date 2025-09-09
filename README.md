@@ -15,6 +15,18 @@ Our national dialect of Spanish is one such practice and very few online resourc
 
 ## Implementation
 
-See the [1.3 release page][prot] for more info on that specific implementation, a new design is currently in the works.
+Version 0.2.0 of `Memorichuelas` aims to implement all functionality except set management and quiz games, which means about 1/2 of the app's overall functionality is implemented.
+
+###Frontend
+`Memorichuelas` uses `React` and `Vite`.
+
+###Backend
+`Memorichuelas` uses `Node.js`.
+
+###Database
+
+`Memorichuelas` uses `PostgreSQL`.
+
+See the [0.1.3 release page][prot] for more info on that specific implementation, a new design is currently in the works.
 
 [prot]: https://github.com/rolazabal/Memorichuelas/releases/tag/v1.3

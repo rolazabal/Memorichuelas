@@ -1,67 +1,58 @@
-import { Dropdown, ListGroup, Row } from 'react-bootstrap';
-import { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import { createContext, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Dropdown, ListGroup, Row, Col } from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import Home from './Home.jsx';
+import Account from './Account.jsx';
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
 import Card from 'react-bootstrap/Card';
-import SetPage from './SetPage.jsx';
+import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
+import Stack from 'react-bootstrap/Stack';
+import Form from 'react-bootstrap/Form';
 
-function Sets({lang, strings}) {
+function Sets({lang, strings, userSets, defaultSets, setObj}) {
+    ///variables
+    const [tab, setTab] = useState(0);
 
-    const [sets, setSets] = useState([]);
-    const [index, setIndex] = useState(0);
-    const [viewSet, setViewSet] = useState(-1);
-
-    const addSet = () => {
-        setIndex(index + 1);
-        let sName = "set " + index;
-        updateSets([...sets, {name:sName, words:[0], score:0.00}]);
-    }
-
-    function SetDisplay() {
-        if (viewSet == -1) {
+    ///functions
+    function Display() {
+        if (setObj == null) {
+            //get set info
+            //getSets();
             return (
-                <Card.Body>
-                    <Card.Title>
-                        {strings.sets_title[lang]}
-                        <Button onClick={addSet}>{strings.set_create[lang]}</Button>
-                        <Dropdown>
-                            <Dropdown.Toggle id="sort-dropdown">
-                                {strings.sort[lang]}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item>
-                                    {strings.sort_alphi[lang]}
-                                </Dropdown.Item>
-                                <Dropdown.Item>
-                                    {strings.sort_alphd[lang]}
-                                </Dropdown.Item>
-                                <Dropdown.Item>
-                                    {strings.sort_scorei[lang]}
-                                </Dropdown.Item>
-                                <Dropdown.Item>
-                                    {strings.sort_scored[lang]}
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Card.Title>
-                    <ListGroup>
-                        {sets.map((item) => (
-                            <ListGroup.Item action onClick={() => setViewSet(sets.indexOf(item))}>
-                                {item.name} : {item.score}
-                                {/* <Button onClick={() => {updateSets(sets.filter(a => a != item));}}>Delete</Button> */}
-                            </ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                </Card.Body>
+                <Container>
+                    <Row>
+                        <Stack direction='horizontal'>
+                            <Card.Title>
+                                {strings.sets_title[lang]}
+                            </Card.Title>
+                            <Nav variant="tabs" className="ms-auto">
+                                <Nav.Item eventKey="">
+                                    Custom sets
+                                </Nav.Item>
+                                <Nav.Item eventKey="">
+                                    Official sets
+                                </Nav.Item>
+                            </Nav>
+                        </Stack>
+                    </Row>
+                    <Row>
+
+                    </Row>
+                </Container>
+
             );
-        }
-        return (
-            <SetPage lang={lang} strings={strings} set={sets[viewSet]} />
-        );
+        } else return <></>;
     }
 
     return (
-        <SetDisplay />
+        <Card.Body style={{overflow: "hidden"}}>
+            <Display />
+        </Card.Body>
     )
 }
 

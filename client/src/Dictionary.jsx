@@ -18,9 +18,9 @@ import Form from 'react-bootstrap/Form';
 
 function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj, search}) {
     ///variables
-    const columns = 2;
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
     const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    const selection = [];
     
     ///functions
     const submitSearch = event => {
@@ -45,8 +45,28 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
         }
     }
 
+    function computeTable(columns) {
+        if (pageWords == null) getPage(alph[0]);    //fetch page words
+        let rows = [];
+        let row = [];
+        if (pageWords != null) {
+            for (let i = 0; i < pageWords.length; i ++) {
+                //for each word, add to row until row is full, then add full row to rows array
+                row.push(pageWords[i]);
+                if ((i + 1) % columns == 0) {
+                    rows.push(row)
+                    row = [];
+                }
+            }
+            //add remaining contents of row
+            if (row != []) rows.push(row);
+        }
+        return rows;
+    }
+
     function Display() {
         if (wordObj != null) { 
+            //word page
             return (
                 <Container>
                     <Stack direction="horizontal">
@@ -77,30 +97,17 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                 </Container>
             );
         }
-        //fetch page words
-        if (pageWords == null) getPage(alph[0]);
+        //dictionary page
         //compute rows
-        let rows = [];
-        let row = [];
-        if (pageWords != null) {
-            for (let i = 0; i < pageWords.length; i ++) {
-                // for each word, add to row until row is full, then add full row to rows array
-                row.push(pageWords[i]);
-                if ((i + 1) % columns == 0) {
-                    rows.push(row)
-                    row = [];
-                }
-            }
-            if (row != []) rows.push(row);
-        }
+        let rows = computeTable(2);
             
         return (
             <>
                 <Container>
                     <Row>
                         {alph.map((letter) =>
-                            <Col xs={1}>
-                                <Button style={{width: "100%"}} onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
+                            <Col>
+                                <Button onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
                             </Col>
                         )}
                     </Row>
@@ -119,9 +126,32 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
     }
 
     function Select() {
+        let rows = computeTable(2);
 
         return (
-            <></>
+            <>
+                <Container>
+                    <Row>
+                        {alph.map((letter) =>
+                            <Col>
+                                <Button onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
+                            </Col>
+                        )}
+                    </Row>
+                </Container>
+                <Container>
+                    {rows.map((row) => 
+                        <Row>
+                            {row.map((entry) => 
+                                <Col id={parseInt(entry[0])} onClick={() => {selection.push([entry[0], entry[1]])}}>{entry[1]}</Col>
+                            )}
+                            <Col>
+                            
+                            </Col>
+                        </Row>
+                    )}
+                </Container>
+            </>
         );
     }
 

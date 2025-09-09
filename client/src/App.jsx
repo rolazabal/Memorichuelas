@@ -31,6 +31,9 @@ function App() {
   const [info, setInfo] = useState(null);
   const [pageWords, setPageWords] = useState(null);
   const [wordObj, setWordObj] = useState(null);
+  const [userSets, setUserSets] = useState(null);
+  const [setObj, setSetObj] = useState(null);
+  const [defaultSets, setDefaultSets] = useState(null);
   //server communicator
   const waitor = new Waitor();
 
@@ -133,7 +136,7 @@ function App() {
         return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} search={search} />;
       break;
       case 2:
-        return <Sets lang={lang} strings={strings} />;
+        return <Sets lang={lang} strings={strings} userSets={userSets} defaultSets={defaultSets} setObj={setObj} />;
       break;
       case 3:
         return <Account lang={lang} strings={strings} info={info} logOut={logOut} getInfo={getInfo} changeUsername={changeUsername} deleteUser={deleteUser} />;
