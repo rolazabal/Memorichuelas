@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import { Pool } from 'pg';
+import { Worker } from 'worker_threads';
 
 ///variables
 //queries
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
+const fetch_user_status = 'SELECT (active) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; //get all user's set's ids as array
 const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
 const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
@@ -12,7 +14,7 @@ const fetch_word = 'SELECT (name) FROM "Memorichuelas"."Words" WHERE "wordID" = 
 const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions" WHERE "wordID" = $1';
 const fetch_examples = 'SELECT (example) FROM "Memorichuelas"."Examples" WHERE "wordID" = $1';
 const fetch_dict_page = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" ORDER BY "wordID" ASC LIMIT $1';
-const fetch_active_users = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE active = true';
+const fetch_active_users = 'SELECT ("userID", timestamp) FROM "Memorichuelas"."Users" WHERE active = true';
 const activate_user = 'UPDATE "Memorichuelas"."Users" SET active = true, timestamp = CURRENT_TIMESTAMP WHERE "userID" = $1';
 const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, timestamp = null WHERE "userID" = $1';
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
@@ -37,14 +39,44 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
+//monitor
+const monitor = new Worker("./monitor.js");
+const user_timeout_ms = 1800000; //30 minutes
+
 ///functions
+monitor.on("message", async (message) => {
+    console.log(message);
+    let res = await client.query(fetch_active_users);
+    for (let x of res.rows) {
+        //id and timestamp info
+        let data = x.row.substring(1, x.row.length - 1).split(",");
+        let userID = data[0];
+        let timeStamp = new Date(data[1]);
+        //check if date is valid
+        if (isNaN(timeStamp)) await client.query(deactivate_user, [userID]);
+        else {
+            let currDate = new Date();
+            let check = currDate.getTime() - timeStamp.getTime() > /*user_timeout_ms*/ 300000; //for debug: 5 minutes
+            if (check) await client.query(deactivate_user, [userID]);
+        }
+    }
+    console.log("done!");
+});
+
+async function userActive(userID) {
+    let res = await client.query(fetch_user_status, [userID]);
+    let active = false;
+    if (res.rows.length > 0) {
+        active = res.rows[0].active;
+    }
+    return active;
+}
+
 async function logAction(userID) {
     //check if user is active
-    let res = await client.query(fetch_active_users);
-    let isActive = false;
-    for (let x of res.rows) if (userID == x.userID) isActive = true;
+    let isActive = await userActive(userID);
     if (!isActive) return false;
-    res = await client.query(activate_user, [userID]);
+    await client.query(activate_user, [userID]);
     return true;
 }
 
@@ -53,6 +85,9 @@ async function logIn(username, passkey) {
     let res = await client.query(fetch_user, [username, passkey]);
     if (res.rows.length == 0) return -1;
     let id = res.rows[0].userID;
+    //check if user is active
+    let isActive = await userActive(id);
+    if (isActive) return -1;
     //activate user
     await client.query(activate_user, [id]);
     return id;
@@ -193,6 +228,8 @@ app.post('/api/account', async (req, res) => {
                 let info = await userInfo(id);
                 res.json({info});
                 console.log(info);
+            } else {
+                res.json("NOOOO");
             }
         break;
         case 'create':
@@ -214,6 +251,8 @@ app.post('/api/account', async (req, res) => {
                 let list = await userSets(id);
                 res.json({sets: list});
                 console.log(list);
+            } else {
+                res.json("NOOOO");
             }
         break;
         case 'updateName':
@@ -229,6 +268,8 @@ app.post('/api/account', async (req, res) => {
                     console.log("username already exists!");
                     res.json({msg: "nop"});
                 }
+            } else {
+                res.json("NOOOO");
             }
         break;
         case 'delete':
@@ -252,7 +293,7 @@ app.post('/api/dictionary', async (req, res) => {
         case 'page':
             list = await dictionaryPage(req.body.letter);
             res.json({words: list});
-            //console.log(list);
+            console.log(list);
         break;
         case 'word':
             let obj = await wordById(req.body.wordID);
