@@ -41,9 +41,10 @@ const strings = {
     t_logout_success: ["Logged out!", ""],
     t_create_acc_fail: ["Failed to create account!", ""],
     t_change_name_success: ["Username changed!", ""],
-    t_change_name_fail: ["Failed to change username!", ""],
+    t_change_name_fail: ["Username is already in use!", ""],
     t_delete_acc_success: ["Account deleted!", ""],
-    t_delete_acc_fail: ["Failed to delete account!", ""]
+    t_delete_acc_fail: ["Failed to delete account!", ""],
+    t_user_timed_out: ["", ""]
 };
 
 export default strings

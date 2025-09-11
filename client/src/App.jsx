@@ -26,6 +26,7 @@ function App() {
   const [toastType, setToastType] = useState(0);
   //language 0 = english; 1 = spanish
   const [lang, setLang] = useState(0);
+  const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
   //user variables
   const [userID, setUserID] = useState(-1);
   const [info, setInfo] = useState(null);
@@ -43,11 +44,15 @@ function App() {
     setToast(true);
   }
 
+  //helper method for logOut
   function clearVars() {
     setUserID(-1);
     setInfo(null);
     setPageWords(null);
     setWordObj(null);
+    setUserSets(null);
+    setDefaultSets(null);
+    setSetObj(null);
   }
   
   async function logIn(user, pass) {
@@ -60,7 +65,6 @@ function App() {
     } else showToast(1); //failure to log in toast
   }
 
-  //TODO: figure out why this fucntion does not execute past first line
   async function logOut() {
     let op = await waitor.logOutUser(userID);
     setPage(0);
@@ -108,12 +112,8 @@ function App() {
     if (op) {
       //update info
       await getInfo();
-      //show toast
       showToast(4);
-    } else {
-      //handle exception
-      showToast(5);
-    }
+    } else showToast(5);
   }
 
   async function deleteUser() {
@@ -128,21 +128,38 @@ function App() {
   }
 
   function DisplayContent() {
+    //manage user variables
+    if (page != 1) {
+      setPageWords(null);
+      setWordObj(null);
+    }
+    if (page != 2) {
+      setUserSets(null);
+      setDefaultSets(null);
+      setSetObj(null);
+    }
+    if (page != 3) setInfo(null);
+    //serve page contents
     switch(page) {
       case 0:
         return <Home lang={lang} strings={strings} logIn={logIn} createAccount={createAccount} loggedIn={userID == -1 ? false : true} />;
       break;
       case 1:
-        return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} search={search} />;
+        if (pageWords == null) getPage(alph[0]);
+        return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} search={search} alph={alph}/>;
       break;
       case 2:
+        if (info == null) getInfo();
         return <Sets lang={lang} strings={strings} userSets={userSets} defaultSets={defaultSets} setObj={setObj} />;
       break;
       case 3:
         return <Account lang={lang} strings={strings} info={info} logOut={logOut} getInfo={getInfo} changeUsername={changeUsername} deleteUser={deleteUser} />;
       break;
+      case 4:
+        return <>Quiz Game</>;
+      break;
       default:
-        return;
+        return <>Page index out of bounds.</>;
       break;
     }
   }

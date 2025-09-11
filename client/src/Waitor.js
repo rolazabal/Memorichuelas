@@ -1,16 +1,29 @@
+//interface that handles communicating with the server for the app
 class Waitor {
 
     ///functions
+    //account api
     async fetchUserID(user, pass) {
+        //returns -1 if username or password incorrect, false if user is logged in
         try {
             let res = await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'logIn', username: user, passkey: pass})
             });
-            res = await res.json();
-            let id = res.id;
-            return id;
+            if (res.status < 300) {
+                let id = res.json().ID;
+                return id;
+            } else {
+                switch(res.status) {
+                    case 403:
+                        return false;
+                    break;
+                    default:
+                        return -1;
+                    break;
+                }
+            }
         } catch(error) {
             console.log(error);
             return -1;
@@ -33,13 +46,14 @@ class Waitor {
 
     async createUser(user, pass) {
         try {
-            await fetch('http://localhost:5050/api/account', {
+            let res = await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'create', username: user, passkey: pass})
             });
-            return true;
+            return (res.status < 300);
         } catch(error) {
+            //invalid creds or username exists
             console.log(error);
             return false;
         }
@@ -47,11 +61,15 @@ class Waitor {
 
     async deleteUser(uID) {
         try {
-            await fetch('', {
+            let res = await fetch('', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'delete', userID: uID})
             });
+            if ('error' in res) {
+                console.log(res.error);
+                return false;
+            }
             return true;
         } catch(error) {
             console.log(error);
@@ -59,6 +77,46 @@ class Waitor {
         }
     }
 
+    async fetchUserInfo(uID) {
+        try {
+            let res = await fetch('http://localhost:5050/api/account', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'info', userID: uID})
+            });
+            res = await res.json();
+            //handle exception
+            if ('error' in res) {
+                console.log(res.error);
+                return {};
+            }
+            return res.info;
+        } catch(error) {
+            console.log(error);
+            return {};
+        }
+    }
+
+    async updateUsername(uID, user) {
+        try {
+            let res = await fetch('http://localhost:5050/api/account', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'updateName', userID: uID, username: user})
+            });
+            //handle exception
+            console.log(res.status);
+            if ('error' in await res.json()) {
+                return false;
+            }
+            return true;
+        } catch(error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    //dictionary api
     async fetchDictPage(uID, letter) {
         try {
             let res = await fetch('http://localhost:5050/api/dictionary', {
@@ -89,37 +147,6 @@ class Waitor {
         }
     }
 
-    async fetchUserInfo(uID) {
-        try {
-            let res = await fetch('http://localhost:5050/api/account', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'info', userID: uID})
-            });
-            res = await res.json();
-            return res.info;
-        } catch(error) {
-            console.log(error);
-            return {};
-        }
-    }
-
-    async updateUsername(uID, user) {
-        try {
-            let res = await fetch('http://localhost:5050/api/account', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'updateName', userID: uID, username: user})
-            });
-            //handle exception
-            res = await res.json();
-            return true;
-        } catch(error) {
-            console.log(error);
-            return false;
-        }
-    }
-
     async dictionarySearch(uID, string) {
         try {
             let res = await fetch('http://localhost:5050/api/dictionary', {
@@ -135,6 +162,7 @@ class Waitor {
         }
     }
 
+    //set api
     async fetchUserSets(uID) {
 
     }

@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Stack from 'react-bootstrap/Stack';
 
-function Account({lang, strings, info, logOut, getInfo, changeUsername, deleteUser}) {
+function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
     ///variables
     const [createModal, setCreateModal] = useState(false);
 
@@ -16,8 +16,6 @@ function Account({lang, strings, info, logOut, getInfo, changeUsername, deleteUs
         let username = document.getElementById("change_name").value;
         changeUsername(username);
     }
-
-    if (info == null) getInfo();
 
     return (
         <Card.Body style={{overflow: "hidden"}}>

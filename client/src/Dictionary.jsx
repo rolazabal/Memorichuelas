@@ -16,10 +16,9 @@ import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 
 
-function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj, search}) {
+function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj, search, alph}) {
     ///variables
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
-    const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
     const selection = [];
     
     ///functions
@@ -46,10 +45,9 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
     }
 
     function computeTable(columns) {
-        if (pageWords == null) getPage(alph[0]);    //fetch page words
         let rows = [];
-        let row = [];
         if (pageWords != null) {
+            let row = [];
             for (let i = 0; i < pageWords.length; i ++) {
                 //for each word, add to row until row is full, then add full row to rows array
                 row.push(pageWords[i]);
@@ -100,7 +98,6 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
         //dictionary page
         //compute rows
         let rows = computeTable(2);
-            
         return (
             <>
                 <Container>
@@ -127,7 +124,6 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
 
     function Select() {
         let rows = computeTable(2);
-
         return (
             <>
                 <Container>
