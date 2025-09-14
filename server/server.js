@@ -70,10 +70,7 @@ monitor.on("message", async (message) => {
 async function userActive(userID) {
     //check if user is active
     let res = await client.query(fetch_user_status, [userID]);
-    let active = false;
-    if (res.rows.length > 0) {
-        active = res.rows[0].active;
-    }
+    let active = res.rows[0].active;
     return active;
 }
 
@@ -92,15 +89,13 @@ async function userID(username, passkey) {
 
 
 async function createUser(username, passkey) {
-    //create user
     await client.query(create_user, [username, passkey]);
 }
 
 async function usernameExists(username) {
     let res = await client.query(username_total, [username]);
     let count = res.rows[0];
-    if (count != undefined) return true;
-    return false;
+    return (count != undefined);
 }
 
 async function wordById(wordID) {
@@ -165,7 +160,6 @@ async function userSets(userID) {
 }
 
 async function updateUsername(userID, username) {
-    //update username
     await client.query(update_user_name, [userID, username]);
 }
 
@@ -193,23 +187,27 @@ app.post('/api/account', async (req, res) => {
     let action = req.body.action;
     let user = "";
     let pass = -0;
+    console.log(req.body);
     switch(action) {
         case 'logIn':
             //check credentials
-            id = await userID(req.body.username, req.body.passkey);
+            id = await userID(req.body.username, parseInt(req.body.passkey));
+            //console.log(id);
             if (!id) {
                 res.status(400).json({error: 'invalid log in credentials!'});
             } else {
                 //check if user is active
                 op = await userActive(id);
-                if (op) res.status(403).json({msg: 'user is already logged in!'});
+                //console.log(op);
+                if (op) 
+                    res.status(403).json({msg: 'user is already logged in!'});
                 else {
                     //activate user
                     await logAction(id);
                     res.status(200).json({ID: id});
                 }
             }
-        break;
+            break;
         case 'logOut':
             id = req.body.userID;
             //check if user is active
@@ -218,7 +216,7 @@ app.post('/api/account', async (req, res) => {
                 await deactivateUser(id);
                 res.status(200).json({msg: 'success!'});
             } else res.status(403).json({error: 'user has timed out!'});
-        break;
+            break;
         case 'info':
             id = req.body.userID;
             //check if user is active
@@ -230,7 +228,7 @@ app.post('/api/account', async (req, res) => {
                 res.status(200).json({info});
                 //console.log(info);
             } else res.status(403).json({error: 'user has timed out!'});
-        break;
+            break;
         case 'create':
             user = req.body.username;
             pass = req.body.passkey;
@@ -238,12 +236,13 @@ app.post('/api/account', async (req, res) => {
             if (false) res.status(400).json({error: 'invalid credentials'}); //TODO: implement this
             //check if username exists
             op = await usernameExists(user);
-            if (op) res.status(400).json({error: 'username already exists!'});
+            if (op) 
+                res.status(400).json({error: 'username already exists!'});
             else {
                 await createUser(user, pass);
                 res.status(200).json({msg: 'success!'});
             }
-        break;
+            break;
         case 'sets':
             id = req.body.userID;
             op = await userActive(id);
@@ -252,23 +251,25 @@ app.post('/api/account', async (req, res) => {
                 let list = await userSets(id);
                 res.status(200).json({sets: list});
             } else res.status(403).json({error: 'user has timed out!'});
-        break;
+            break;
         case 'updateName':
             id = req.body.userID;
             user = req.body.username;
             let active = await userActive(id);
             if (active) {
                 //validate username
-                if (false) res.status(400).json({error: 'invalid credentials'}); //TODO: implement this
+                if (false) 
+                    res.status(400).json({error: 'invalid credentials'}); //TODO: implement this
                 //check if exists
-                op = await usernameExists();
+                op = await usernameExists(user);
                 if (!op) {
                     //log action
                     await logAction(id);
                     await updateUsername(id, user);
-                } else res.status(400),json({error: 'username already exists!'});
+                    res.status(200).json({msg: 'success!'});
+                } else res.status(400).json({error: 'username already exists!'});
             } else res.status(403).json({error: 'user has timed out!'});
-        break;
+            break;
         case 'delete':
             id = req.body.userID;
             op = await userActive(id);
@@ -276,17 +277,15 @@ app.post('/api/account', async (req, res) => {
                 await deleteUser(id);
                 res.status(200).json({msg: 'success!'});
             } else res.status(403).json({error: 'user has timed out!'});
-        break;
+            break;
         default:
             res.status(404).json({error: 'invalid action!'});
-            //console.log("account access error!");
-        break;
+            break;
     }
 });
 
 //dictionary api
 app.post('/api/dictionary', async (req, res) => {
-    //log action if user is active
     let id = req.body.userID;
     let list = [];
     //log action
@@ -295,22 +294,18 @@ app.post('/api/dictionary', async (req, res) => {
         case 'page':
             list = await dictionaryPage(req.body.letter);
             res.status(200).json({words: list});
-            //console.log(list);
-        break;
+            break;
         case 'word':
             let obj = await wordById(req.body.wordID);
             res.status(200).json({word: obj});
-            //console.log(obj);
-        break;
+            break;
         case 'search':
             list = await dictionarySearch(req.body.string);
             res.status(200).json({words: list});
-            //console.log("search for: " + req.body.string);
-        break;
+            break;
         default:
             res.status(404).json({error: 'invalid action!'});
-            //console.log("dictionary access error!");
-        break;
+            break;
     }
 });
 
@@ -319,22 +314,22 @@ app.post('/api/sets', async (req, res) => {
     switch(req.body.action) {
         case 'wordScores':
 
-        break;
+            break;
         case 'create':
 
-        break;
+            break;
         case 'delete':
 
-        break;
+            break;
         case 'addWord':
 
-        break;
+            break;
         case 'removeWord':
 
-        break;
+            break;
         default:
             res.status(404).json({error: 'invalid action!'});
-        break;
+            break;
     }
 });
 

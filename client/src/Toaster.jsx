@@ -5,7 +5,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
     const del = 5000;
     
     return (
-        <ToastContainer position={'bottom-end'} style={{zIndex: 1}}>
+        <ToastContainer position={'top-end'} style={{zIndex: 1}}>
           <Toast
             bg={'success'}
             onClose={() => setToast(false)}
@@ -58,7 +58,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-            <Toast.Body>{strings.t_change_name_fail[lang]}</Toast.Body>
+            <Toast.Body>{strings.t_name_exists[lang]}</Toast.Body>
           </Toast>
           <Toast
             bg={'success'}
@@ -88,6 +88,24 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
             <Toast.Body>
                 Cautiously cautious!
             </Toast.Body>
+          </Toast>
+          <Toast
+            bg={'warning'}
+            onClose={() => setToast(false)}
+            show={toast && toastType == 8}
+            delay={del} autohide
+          >
+            <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+            <Toast.Body>{strings.t_user_timed_out[lang]}</Toast.Body>
+          </Toast>
+            <Toast
+            bg={'danger'}
+            onClose={() => setToast(false)}
+            show={toast && toastType == 9}
+            delay={del} autohide
+          >
+            <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+            <Toast.Body>{strings.t_block_login[lang]}</Toast.Body>
           </Toast>
         </ToastContainer>
     )

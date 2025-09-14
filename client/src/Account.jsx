@@ -38,7 +38,7 @@ function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
                         {strings.user_date[lang]}: {info != null ? info.date : ''}
                     </Card.Text>
                     <Stack direction="horizontal">
-                        <Button onClick={() => {logOut()}}>{strings.logout[lang]}</Button>
+                        <Button onClick={() => {logOut(false)}}>{strings.logout[lang]}</Button>
                         <Button className="ms-auto" variant="danger" onClick={() => {setCreateModal(true)}}>{strings.user_delete[lang]}</Button>
                     </Stack>
                     <Modal>

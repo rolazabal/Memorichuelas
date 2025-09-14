@@ -34,17 +34,18 @@ const strings = {
     example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
     search: ["Search", "Buscar"],
     delete: ["Delete", "Borrar"],
-    t_success: ["Success!", ""],
-    t_fail: ["Oops!", ""],
-    t_login_success: ["Logged in!", ""],
-    t_login_fail: ["Log in failed!" , ""],
-    t_logout_success: ["Logged out!", ""],
-    t_create_acc_fail: ["Failed to create account!", ""],
-    t_change_name_success: ["Username changed!", ""],
-    t_change_name_fail: ["Username is already in use!", ""],
-    t_delete_acc_success: ["Account deleted!", ""],
-    t_delete_acc_fail: ["Failed to delete account!", ""],
-    t_user_timed_out: ["", ""]
+    t_success: ["Success!", "Exito!"],
+    t_fail: ["Oops!", "Ups!"],
+    t_login_success: ["Logged in!", "Session iniciada!"],
+    t_login_fail: ["Log in failed!" , "No se pudo iniciar la session!"],
+    t_logout_success: ["Logged out!", "Session cerrada!"],
+    t_create_acc_fail: ["Failed to create account!", "No se pudo crear la cuenta!"],
+    t_change_name_success: ["Username changed!", "Nombre de usuario cambiado!"],
+    t_name_exists: ["Username is already in use!", "Nombre de usuario ya esta en uso!"],
+    t_delete_acc_success: ["Account deleted!", "Cuenta borrada!"],
+    t_delete_acc_fail: ["Failed to delete account!", "No se puedo borrar la cuenta!"],
+    t_user_timed_out: ["User timed out!", "Session expirada!"],
+    t_block_login: ["User is active in a different tab!", "Usuario esta activo en otra pestana!"]
 };
 
 export default strings

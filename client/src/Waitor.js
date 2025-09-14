@@ -12,16 +12,17 @@ class Waitor {
                 body: JSON.stringify({action: 'logIn', username: user, passkey: pass})
             });
             if (res.status < 300) {
-                let id = res.json().ID;
+                res = await res.json();
+                let id = await res.ID;
                 return id;
             } else {
                 switch(res.status) {
                     case 403:
                         return false;
-                    break;
+                        break;
                     default:
                         return -1;
-                    break;
+                        break;
                 }
             }
         } catch(error) {
@@ -37,10 +38,10 @@ class Waitor {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'logOut', userID: uID})
             });
-            return true;
+            return 1;
         } catch(error) {
             console.log(error);
-            return false;
+            return -1;
         }
     }
 
@@ -51,9 +52,14 @@ class Waitor {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'create', username: user, passkey: pass})
             });
-            return (res.status < 300);
+            if (res.status < 300)
+                return 1;
+            else {
+                if (res.json().error == 'username already exists!')
+                    return -1;
+                return false;
+            }
         } catch(error) {
-            //invalid creds or username exists
             console.log(error);
             return false;
         }
@@ -61,19 +67,19 @@ class Waitor {
 
     async deleteUser(uID) {
         try {
-            let res = await fetch('', {
+            let res = await fetch('http://localhost:5050/api/account', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'delete', userID: uID})
             });
-            if ('error' in res) {
-                console.log(res.error);
+            console.log("requested");
+            if (res.status < 300)
+                return 1;
+            else
                 return false;
-            }
-            return true;
         } catch(error) {
             console.log(error);
-            return false;
+            return -1;
         }
     }
 
@@ -84,13 +90,12 @@ class Waitor {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'info', userID: uID})
             });
-            res = await res.json();
-            //handle exception
-            if ('error' in res) {
-                console.log(res.error);
-                return {};
-            }
-            return res.info;
+            if (res.status < 300) {
+                res = await res.json();
+                let info = res.info;
+                return info;
+            } else
+                return false;
         } catch(error) {
             console.log(error);
             return {};
@@ -104,15 +109,16 @@ class Waitor {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'updateName', userID: uID, username: user})
             });
-            //handle exception
-            console.log(res.status);
-            if ('error' in await res.json()) {
-                return false;
+            if (res.status < 300)
+                return 1;
+            else {
+                if (res.status == 403)
+                    return false;
+                return -1;
             }
-            return true;
         } catch(error) {
             console.log(error);
-            return false;
+            return -1;
         }
     }
 

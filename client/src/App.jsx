@@ -20,7 +20,7 @@ function App() {
   ///variables
   //0 home, 1 dictionary, 2 sets, 3 settings
   const [page, setPage] = useState(0);
-  const verStr = "0.1.7d";
+  const verStr = "0.1.7";
   const [toast, setToast] = useState(false);
   //0 login s, 1 login f, 2 logout s, 3 create acc f, 4 username s, 5 username f, 6 acc del s, 7 acc del f
   const [toastType, setToastType] = useState(0);
@@ -57,33 +57,35 @@ function App() {
   
   async function logIn(user, pass) {
     let id = await waitor.fetchUserID(user, pass);
-    if (id != -1) {
-      //successful log in toast
-      setUserID(id);
-      showToast(0);
-      setPage(2);
-    } else showToast(1); //failure to log in toast
+    if (id) {
+      if (id != -1) {
+        //successful log in toast
+        setUserID(id);
+        showToast(0);
+        setPage(2);
+      } else 
+        showToast(1); //log in failed toast
+    } else 
+      showToast(9); //already logged in toast
   }
 
-  async function logOut() {
-    let op = await waitor.logOutUser(userID);
+  async function logOut(supressToast) {
+    await waitor.logOutUser(userID);
     setPage(0);
     clearVars();
-    if (op) {
-      //successful log out toast
-      showToast(2);
-    } else {
-      //failure to log out toast?
-    }
+    if (!supressToast)
+      showToast(2); //successful log out toast
   }
 
   async function createAccount(user, pass) {
     let op = await waitor.createUser(user, pass);
-    if (op) {
-      logIn(user, pass);
-    } else {
-      //handle create account fail
-      showToast(3);
+    if (!op)
+      showToast(3); //create fail
+    else {
+      if (op == -1)
+        showToast(5); //username exists
+      else
+        logIn(user, pass);
     }
   }
 
@@ -104,26 +106,42 @@ function App() {
 
   async function getInfo() {
     let newInfo = await waitor.fetchUserInfo(userID);
-    setInfo(newInfo);
+    if (newInfo)
+      setInfo(newInfo);
+    else {
+      showToast(8); //timedout toast
+      logOut(true);
+    }
   }
 
   async function changeUsername(user) {
     let op = await waitor.updateUsername(userID, user);
     if (op) {
-      //update info
-      await getInfo();
-      showToast(4);
-    } else showToast(5);
+      if (op == -1)
+        showToast(5); //username exists
+      else {
+        await getInfo();
+        showToast(4); //username updated
+      }
+    } else {
+      showToast(8); //timedout toast
+      logOut(true);
+    }
   }
 
   async function deleteUser() {
     let op = await waitor.deleteUser(userID);
     if (op) {
-      setPage(0);
-      clearVars();
-      showToast(6);
+      if (op == -1)
+        showToast(7); //failure to delete
+      else {
+        setPage(0);
+        clearVars();
+        showToast(6); //user deleted
+      }
     } else {
-      showToast(7);
+      showToast(8); //timed out toast
+      logOut(true);
     }
   }
 
@@ -138,7 +156,8 @@ function App() {
       setDefaultSets(null);
       setSetObj(null);
     }
-    if (page != 3) setInfo(null);
+    if (page != 3) 
+      setInfo(null);
     //serve page contents
     switch(page) {
       case 0:
@@ -149,10 +168,10 @@ function App() {
         return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} search={search} alph={alph}/>;
       break;
       case 2:
-        if (info == null) getInfo();
         return <Sets lang={lang} strings={strings} userSets={userSets} defaultSets={defaultSets} setObj={setObj} />;
       break;
       case 3:
+        if (info == null) getInfo();
         return <Account lang={lang} strings={strings} info={info} logOut={logOut} getInfo={getInfo} changeUsername={changeUsername} deleteUser={deleteUser} />;
       break;
       case 4:
