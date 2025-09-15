@@ -1,7 +1,7 @@
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 
-function Toaster({lang, strings, toast, toastType, setToast}) {
+function Toaster({lang, strings, toast, t_menu, toastType, setToast}) {
     const del = 5000;
     
     return (
@@ -9,7 +9,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'success'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 0}
+            show={toast && toastType == t_menu.LOGIN_S}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_success[lang]}</Toast.Header>
@@ -18,7 +18,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'danger'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 1}
+            show={toast && toastType == t_menu.LOGIN_F}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
@@ -27,7 +27,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'success'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 2}
+            show={toast && toastType == t_menu.LOGOUT_S}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_success[lang]}</Toast.Header>
@@ -36,7 +36,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'danger'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 3}
+            show={toast && toastType == t_menu.ACC_CREATE_F}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
@@ -45,7 +45,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'success'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 4}
+            show={toast && toastType == t_menu.USERNAME_S}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_success[lang]}</Toast.Header>
@@ -54,7 +54,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'danger'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 5}
+            show={toast && toastType == t_menu.USERNAME_F}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
@@ -63,7 +63,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'success'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 6}
+            show={toast && toastType == t_menu.ACC_DEL_S}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_success[lang]}</Toast.Header>
@@ -72,7 +72,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'danger'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 7}
+            show={toast && toastType == t_menu.ACC_DEL_F}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
@@ -92,7 +92,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
           <Toast
             bg={'warning'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 8}
+            show={toast && toastType == t_menu.TIMEOUT}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
@@ -101,7 +101,7 @@ function Toaster({lang, strings, toast, toastType, setToast}) {
             <Toast
             bg={'danger'}
             onClose={() => setToast(false)}
-            show={toast && toastType == 9}
+            show={toast && toastType == t_menu.LOGIN_BLOCK}
             delay={del} autohide
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>

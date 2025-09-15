@@ -16,7 +16,7 @@ import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 
 
-function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWordObj, search, alph}) {
+function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, search, alph}) {
     ///variables
     const mode = "display"; //decide behavior of component: DISPLAY, SELECT, or EDIT
     const selection = [];
@@ -31,16 +31,16 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
         switch(mode) {
             case "display":
                 return <Display />;
-            break;
+                break;
             case "select":
                 return <Select />;
-            break;
+                break;
             case "edit":
                 return;
-            break;
+                break;
             default:
                 return;
-            break;
+                break;
         }
     }
 
@@ -57,7 +57,8 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                 }
             }
             //add remaining contents of row
-            if (row != []) rows.push(row);
+            if (row != []) 
+                rows.push(row);
         }
         return rows;
     }
@@ -69,7 +70,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                 <Container>
                     <Stack direction="horizontal">
                         <h2>{wordObj.name}</h2>
-                        <Button className="ms-auto" onClick={() => {setWordObj(null)}}>{strings.back[lang]}</Button>
+                        <Button className="ms-auto" onClick={() => {wordObj = null}}>{strings.back[lang]}</Button>
                     </Stack>
                     {wordObj.defs.length > 0 ? 
                         <>
@@ -104,7 +105,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                     <Row>
                         {alph.map((letter) =>
                             <Col>
-                                <Button onClick={() => {getPage(letter)}}><small>{letter}</small></Button>
+                                <h2 onClick={() => {getPage(letter)}}><small>{letter}</small></h2>
                             </Col>
                         )}
                     </Row>
@@ -164,7 +165,7 @@ function Dictionary({lang, strings, pageWords, wordObj, getPage, getWord, setWor
                     </Form>
                 }
             </Stack>
-            <Container style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
+            <Container style={{padding: "0", maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
                 <Content />
             </Container>
         </Card.Body>

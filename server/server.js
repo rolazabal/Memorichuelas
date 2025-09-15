@@ -56,8 +56,8 @@ monitor.on("message", async (message) => {
         let data = x.row.substring(1, x.row.length - 1).split(",");
         let userID = data[0];
         let timeStamp = new Date(data[1]);
-        //check if date is valid
-        if (isNaN(timeStamp)) await deactivateUser(userID);
+        if (isNaN(timeStamp)) 
+            await deactivateUser(userID);
         else {
             let currDate = new Date();
             let check = currDate.getTime() - timeStamp.getTime() > user_timeout_ms;
@@ -68,7 +68,6 @@ monitor.on("message", async (message) => {
 });
 
 async function userActive(userID) {
-    //check if user is active
     let res = await client.query(fetch_user_status, [userID]);
     let active = res.rows[0].active;
     return active;
@@ -79,14 +78,11 @@ async function logAction(userID) {
 }
 
 async function userID(username, passkey) {
-    //get user id
     let res = await client.query(fetch_user, [username, passkey]);
     if (res.rows.length == 0) return -0;
     let id = res.rows[0].userID;
     return id;
 }
-
-
 
 async function createUser(username, passkey) {
     await client.query(create_user, [username, passkey]);
@@ -118,12 +114,11 @@ async function wordById(wordID) {
 }
 
 async function dictionaryPage(letter) {
-    letter = letter + '%'
+    letter = letter + '%';
     let res = await client.query(regex_words, [letter]);
     let list = [];
-    for (let x of res.rows) {
+    for (let x of res.rows)
         list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
-    }
     return list;
 }
 
@@ -131,7 +126,10 @@ async function userInfo(userID) {
     let res = await client.query(fetch_user_info, [userID]);
     res = res.rows[0].row;
     let list = res.substring(1, res.length -1).split(",");
-    let info = {name: list[0], date: list[1]};
+    let info = {
+        name: list[0], 
+        date: list[1]
+    };
     return info;
 }
 
@@ -164,14 +162,12 @@ async function updateUsername(userID, username) {
 }
 
 async function dictionarySearch(string) {
-    //empty search gets empty result
-    if (string == "") return null;
+    let list = [];
+    if (string == "") return list;
     string = '%' + string + '%';
     let res = await client.query(regex_words, [string]);
-    let list = [];
-    for (let x of res.rows) {
+    for (let x of res.rows)
         list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
-    }
     return list;
 }
 
@@ -290,6 +286,7 @@ app.post('/api/dictionary', async (req, res) => {
     let list = [];
     //log action
     await logAction(id);
+    console.log(req.body);
     switch(req.body.action) {
         case 'page':
             list = await dictionaryPage(req.body.letter);

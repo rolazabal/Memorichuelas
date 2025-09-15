@@ -18,163 +18,197 @@ import Col from 'react-bootstrap/Col';
 
 function App() {
   ///variables
-  //0 home, 1 dictionary, 2 sets, 3 settings
-  const [page, setPage] = useState(0);
-  const verStr = "0.1.7";
+  const pages = {
+    HOME: 0,
+    DICTIONARY: 1,
+    SETS: 2,
+    SETTINGS: 3,
+    GAME: 4
+  }
+  const [page, setPage] = useState(pages.HOME);
+  const verStr = "0.1.8d";
   const [toast, setToast] = useState(false);
-  //0 login s, 1 login f, 2 logout s, 3 create acc f, 4 username s, 5 username f, 6 acc del s, 7 acc del f
-  const [toastType, setToastType] = useState(0);
+  const t_menu = {
+    LOGIN_S: 0,
+    LOGIN_F: 1,
+    LOGOUT_S: 2,
+    ACC_CREATE_F: 3,
+    USERNAME_S: 4,
+    USERNAME_F: 5,
+    ACC_DEL_S: 6,
+    ACC_DEL_F: 7,
+    TIMEOUT: 8,
+    LOGIN_BLOCK: 9
+  };
+  const [toastType, setToastType] = useState(t_menu.LOGIN_S);
   //language 0 = english; 1 = spanish
   const [lang, setLang] = useState(0);
-  const alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+  const alph = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
   //user variables
-  const [userID, setUserID] = useState(-1);
-  const [info, setInfo] = useState(null);
-  const [pageWords, setPageWords] = useState(null);
-  const [wordObj, setWordObj] = useState(null);
-  const [userSets, setUserSets] = useState(null);
-  const [setObj, setSetObj] = useState(null);
-  const [defaultSets, setDefaultSets] = useState(null);
+  const [data, setData] = useState({
+    userID: -1,
+    info: null,
+    pageWords: null,
+    wordObj: null,
+    userSets: null,
+    setObj: null,
+  });
   //server communicator
   const waitor = new Waitor();
 
   ///functions
+  function loggedIn() {
+    return (data.userID != -1);
+  }
+
+  function clearData() {
+    setData({
+      userID: -1,
+      info: null,
+      pageWords: null,
+      wordObj: null,
+      userSets: null,
+      setObj: null,
+    });
+  }
+
   function showToast(type) {
     setToastType(type);
     setToast(true);
-  }
-
-  //helper method for logOut
-  function clearVars() {
-    setUserID(-1);
-    setInfo(null);
-    setPageWords(null);
-    setWordObj(null);
-    setUserSets(null);
-    setDefaultSets(null);
-    setSetObj(null);
   }
   
   async function logIn(user, pass) {
     let id = await waitor.fetchUserID(user, pass);
     if (id) {
       if (id != -1) {
-        //successful log in toast
-        setUserID(id);
-        showToast(0);
+        data.userID = id;
+        showToast(t_menu.LOGIN_S);
         setPage(2);
       } else 
-        showToast(1); //log in failed toast
+        showToast(t_menu.LOGIN_F);
     } else 
-      showToast(9); //already logged in toast
+      showToast(t_menu.LOGIN_BLOCK);
   }
 
   async function logOut(supressToast) {
-    await waitor.logOutUser(userID);
+    await waitor.logOutUser(data.userID);
     setPage(0);
-    clearVars();
+    clearData();
     if (!supressToast)
-      showToast(2); //successful log out toast
+      showToast(t_menu.LOGOUT_S);
   }
 
   async function createAccount(user, pass) {
     let op = await waitor.createUser(user, pass);
     if (!op)
-      showToast(3); //create fail
+      showToast(t_menu.ACC_CREATE_F);
     else {
       if (op == -1)
-        showToast(5); //username exists
+        showToast(t_menu.USERNAME_F);
       else
         logIn(user, pass);
     }
   }
 
   async function getPage(letter) {
-    let list = await waitor.fetchDictPage(userID, letter);
-    setPageWords(list);
+    let list = await waitor.fetchDictPage(data.userID, letter);
+    setData({
+      ...data,
+      pageWords: list
+    });
   }
 
   async function search(string) {
-    let list = await waitor.dictionarySearch(userID, string);
-    setPageWords(list);
+    let list = await waitor.dictionarySearch(data.userID, string);
+    setData({
+      ...data,
+      pageWords: list
+    });
   }
 
   async function getWord(id) {
-    let word = await waitor.fetchWordObj(userID, id);
-    setWordObj(word);
+    let word = await waitor.fetchWordObj(data.userID, id);
+    setData({
+      ...data,
+      wordObj: word
+    });
   }
 
   async function getInfo() {
-    let newInfo = await waitor.fetchUserInfo(userID);
-    if (newInfo)
-      setInfo(newInfo);
-    else {
-      showToast(8); //timedout toast
+    let newInfo = await waitor.fetchUserInfo(data.userID);
+    if (newInfo) {
+      setData({
+        ...data,
+        info: newInfo
+      });
+    } else {
+      showToast(t_menu.TIMEOUT);
       logOut(true);
     }
   }
 
   async function changeUsername(user) {
-    let op = await waitor.updateUsername(userID, user);
+    let op = await waitor.updateUsername(data.userID, user);
     if (op) {
       if (op == -1)
-        showToast(5); //username exists
+        showToast(t_menu.USERNAME_F);
       else {
         await getInfo();
-        showToast(4); //username updated
+        showToast(t_menu.USERNAME_S);
       }
     } else {
-      showToast(8); //timedout toast
+      showToast(t_menu.TIMEOUT);
       logOut(true);
     }
   }
 
   async function deleteUser() {
-    let op = await waitor.deleteUser(userID);
+    let op = await waitor.deleteUser(data.userID);
     if (op) {
       if (op == -1)
-        showToast(7); //failure to delete
+        showToast(t_menu.ACC_DEL_F);
       else {
         setPage(0);
-        clearVars();
-        showToast(6); //user deleted
+        clearData();
+        showToast(t_menu.ACC_DEL_S);
       }
     } else {
-      showToast(8); //timed out toast
+      showToast(t_menu.TIMEOUT);
       logOut(true);
     }
   }
 
   function DisplayContent() {
     //manage user variables
-    if (page != 1) {
-      setPageWords(null);
-      setWordObj(null);
+    if (page != pages.DICTIONARY) {
+      data.pageWords = null;
+      data.wordObj = null;
     }
-    if (page != 2) {
-      setUserSets(null);
-      setDefaultSets(null);
-      setSetObj(null);
+    if (page != pages.SETS) {
+      data.userSets = null;
+      data.setObj = null;
     }
-    if (page != 3) 
-      setInfo(null);
+    if (page != pages.SETTINGS)
+      data.info = null;
     //serve page contents
     switch(page) {
-      case 0:
-        return <Home lang={lang} strings={strings} logIn={logIn} createAccount={createAccount} loggedIn={userID == -1 ? false : true} />;
+      case pages.HOME:
+        return <Home lang={lang} strings={strings} logIn={logIn} createAccount={createAccount} loggedIn={loggedIn()} />;
       break;
-      case 1:
-        if (pageWords == null) getPage(alph[0]);
-        return <Dictionary lang={lang} strings={strings} wordObj={wordObj} pageWords={pageWords} getPage={getPage} getWord={getWord} setWordObj={setWordObj} search={search} alph={alph}/>;
+      case pages.DICTIONARY:
+        if (data.pageWords == null) 
+          getPage(alph[0]);
+        return <Dictionary lang={lang} strings={strings} wordObj={data.wordObj} pageWords={data.pageWords} getPage={getPage} getWord={getWord} search={search} alph={alph}/>;
       break;
-      case 2:
-        return <Sets lang={lang} strings={strings} userSets={userSets} defaultSets={defaultSets} setObj={setObj} />;
+      case pages.SETS:
+        return <Sets lang={lang} strings={strings} userSets={data.userSets} setObj={data.setObj} />;
       break;
-      case 3:
-        if (info == null) getInfo();
-        return <Account lang={lang} strings={strings} info={info} logOut={logOut} getInfo={getInfo} changeUsername={changeUsername} deleteUser={deleteUser} />;
+      case pages.SETTINGS:
+        if (data.info == null)
+          getInfo();
+        return <Account lang={lang} strings={strings} info={data.info} logOut={logOut} getInfo={getInfo} changeUsername={changeUsername} deleteUser={deleteUser} />;
       break;
-      case 4:
+      case pages.GAME:
         return <>Quiz Game</>;
       break;
       default:
@@ -184,7 +218,7 @@ function App() {
   }
 
   function NavAccount() {
-    if (userID == -1) return;
+    if (loggedIn()) return;
     return(
       <>
         <Nav.Link eventKey="3" onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
@@ -224,7 +258,7 @@ function App() {
             </Navbar.Collapse>
           </Container>
         </Navbar>
-        <Toaster lang={lang} strings={strings} toast={toast} toastType={toastType} setToast={setToast} />
+        <Toaster lang={lang} strings={strings} toast={toast} t_menu={t_menu} toastType={toastType} setToast={setToast} />
       </Row>
       <Row style={{height: "80vh", backgroundColor: "gray"}}>
         <Card style={{width: "90%", maxHeight: "100%", marginLeft: "auto", marginRight: "auto"}}>

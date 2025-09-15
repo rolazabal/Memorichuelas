@@ -128,9 +128,10 @@ class Waitor {
             let res = await fetch('http://localhost:5050/api/dictionary', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'page', letter: letter, userID: uID})
+                body: JSON.stringify({action: 'page', letter: letter.toLowerCase(), userID: uID})
             });
             res = await res.json();
+            console.log(res);
             return res.words;
         } catch(error) {
             console.log(error);

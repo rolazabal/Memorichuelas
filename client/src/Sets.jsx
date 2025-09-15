@@ -14,7 +14,7 @@ import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 
-function Sets({lang, strings, userSets, defaultSets, setObj}) {
+function Sets({lang, strings, userSets, setObj}) {
     ///variables
     const [tab, setTab] = useState(0);
 
