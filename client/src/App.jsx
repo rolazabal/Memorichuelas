@@ -14,7 +14,6 @@ import Button from 'react-bootstrap/Button';
 import Waitor from './Waitor.js';
 import Toaster from './Toaster.jsx';
 import Stack from 'react-bootstrap/Stack';
-import Col from 'react-bootstrap/Col';
 
 function App() {
   ///variables
@@ -27,7 +26,7 @@ function App() {
   }
   const [page, setPage] = useState(pages.HOME);
   const verStr = "0.1.8d";
-  const [toast, setToast] = useState(false);
+  //toasts
   const t_menu = {
     LOGIN_S: 0,
     LOGIN_F: 1,
@@ -40,8 +39,9 @@ function App() {
     TIMEOUT: 8,
     LOGIN_BLOCK: 9
   };
+  const [toast, setToast] = useState(false);
   const [toastType, setToastType] = useState(t_menu.LOGIN_S);
-  //language 0 = english; 1 = spanish
+  //language: 0 = english, 1 = spanish
   const [lang, setLang] = useState(0);
   const alph = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
   //user variables
@@ -61,8 +61,16 @@ function App() {
     return (data.userID != -1);
   }
 
+  function setWordObj(word) {
+    setData({
+      ...data,
+      wordObj: word
+    });
+  }
+
   function clearData() {
     setData({
+      ...data,
       userID: -1,
       info: null,
       pageWords: null,
@@ -83,7 +91,7 @@ function App() {
       if (id != -1) {
         data.userID = id;
         showToast(t_menu.LOGIN_S);
-        setPage(2);
+        setPage(pages.SETS);
       } else 
         showToast(t_menu.LOGIN_F);
     } else 
@@ -92,7 +100,7 @@ function App() {
 
   async function logOut(supressToast) {
     await waitor.logOutUser(data.userID);
-    setPage(0);
+    setPage(pages.HOME);
     clearData();
     if (!supressToast)
       showToast(t_menu.LOGOUT_S);
@@ -168,7 +176,7 @@ function App() {
       if (op == -1)
         showToast(t_menu.ACC_DEL_F);
       else {
-        setPage(0);
+        setPage(pages.HOME);
         clearData();
         showToast(t_menu.ACC_DEL_S);
       }
@@ -179,50 +187,33 @@ function App() {
   }
 
   function DisplayContent() {
-    //manage user variables
-    if (page != pages.DICTIONARY) {
-      data.pageWords = null;
-      data.wordObj = null;
-    }
-    if (page != pages.SETS) {
-      data.userSets = null;
-      data.setObj = null;
-    }
-    if (page != pages.SETTINGS)
-      data.info = null;
     //serve page contents
     switch(page) {
       case pages.HOME:
         return <Home lang={lang} strings={strings} logIn={logIn} createAccount={createAccount} loggedIn={loggedIn()} />;
-      break;
       case pages.DICTIONARY:
         if (data.pageWords == null) 
           getPage(alph[0]);
-        return <Dictionary lang={lang} strings={strings} wordObj={data.wordObj} pageWords={data.pageWords} getPage={getPage} getWord={getWord} search={search} alph={alph}/>;
-      break;
+        return <Dictionary lang={lang} strings={strings} wordObj={data.wordObj} pageWords={data.pageWords} setWordObj={setWordObj} getPage={getPage} getWord={getWord} search={search} alph={alph}/>;
       case pages.SETS:
         return <Sets lang={lang} strings={strings} userSets={data.userSets} setObj={data.setObj} />;
-      break;
       case pages.SETTINGS:
         if (data.info == null)
           getInfo();
         return <Account lang={lang} strings={strings} info={data.info} logOut={logOut} getInfo={getInfo} changeUsername={changeUsername} deleteUser={deleteUser} />;
-      break;
       case pages.GAME:
         return <>Quiz Game</>;
-      break;
       default:
         return <>Page index out of bounds.</>;
-      break;
     }
   }
 
   function NavAccount() {
-    if (loggedIn()) return;
+    if (!loggedIn()) return;
     return(
       <>
-        <Nav.Link eventKey="3" onClick={() => setPage(2)}>{strings.sets_title[lang]}</Nav.Link>
-        <Nav.Link eventKey="4" onClick={() => setPage(3)}>{strings.user_title[lang]}</Nav.Link>
+        <Nav.Link eventKey="3" onClick={() => setPage(pages.SETS)}>{strings.sets_title[lang]}</Nav.Link>
+        <Nav.Link eventKey="4" onClick={() => setPage(pages.SETTINGS)}>{strings.user_title[lang]}</Nav.Link>
       </>
     );
   }
@@ -251,8 +242,8 @@ function App() {
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="me-auto">
-                <Nav.Link eventKey="1" onClick={() => setPage(0)}>{strings.about_title[lang]}</Nav.Link>
-                <Nav.Link eventKey="2" onClick={() => setPage(1)}>{strings.dictionary_title[lang]}</Nav.Link>
+                <Nav.Link eventKey="1" onClick={() => setPage(pages.HOME)}>{strings.about_title[lang]}</Nav.Link>
+                <Nav.Link eventKey="2" onClick={() => setPage(pages.DICTIONARY)}>{strings.dictionary_title[lang]}</Nav.Link>
                 <NavAccount />
               </Nav>
             </Navbar.Collapse>
