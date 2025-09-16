@@ -26,7 +26,7 @@ const remove_set_words = 'DELETE FROM "Memorichuelas"."SetWords" WHERE "setID" =
 const add_set_word = 'INSERT INTO "Memorichuelas"."SetWords"("setID", "wordID") VALUES ($1, $2)';
 const fetch_user_sets = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "userID" = $1';
 const fetch_set = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "setID" = $1';
-const create_set = 'INSERT INTO "Memorichuelas"."Sets"("userID", name) VALUES ($1, $2)';
+const create_set = 'INSERT INTO "Memorichuelas"."Sets"("userID", name) VALUES ($1, $2) RETURNING "setID"';
 const update_set_name = 'UPDATE "Memorichuelas"."Sets" SET name = $2 WHERE "setID" = $1';
 const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
@@ -209,9 +209,11 @@ async function updateSetName(setID, newName) {
 }
 
 async function createSet(userID, name) {
-    await client.query(create_set, [userID, name]);
+    let res = await client.query(create_set, [userID, name]);
+    let id = res.rows[0].setID;
+    return id;
 }
- 
+
 async function deleteSet(setID) {
     await client.query(remove_set, [setID]);
 }
@@ -237,12 +239,12 @@ async function deleteUser(userID) {
 //http functions
 //account api
 app.post('/api/account', async (req, res) => {
+    console.log(req.body);
     let id = -0;
     let op = false;
     let action = req.body.action;
     let user = "";
     let pass = -0;
-    console.log(req.body);
     switch(action) {
         case 'logIn':
             //check credentials
@@ -341,23 +343,26 @@ app.post('/api/account', async (req, res) => {
 
 //dictionary api
 app.post('/api/dictionary', async (req, res) => {
+    console.log(req.body);
     let id = req.body.userID;
     let action = req.body.action;
     let list = [];
     //log action
     await logAction(id);
-    console.log(req.body);
     switch(action) {
         case 'page':
-            list = await dictionaryPage(req.body.letter);
+            let letter = req.body.letter;
+            list = await dictionaryPage(letter);
             res.status(200).json({words: list});
             break;
         case 'word':
-            let obj = await wordById(req.body.wordID);
+            let wID = req.body.wordID;
+            let obj = await wordById(wID);
             res.status(200).json({word: obj});
             break;
         case 'search':
-            list = await dictionarySearch(req.body.string);
+            let string = req.body.string;
+            list = await dictionarySearch(string);
             res.status(200).json({words: list});
             break;
         default:
@@ -368,31 +373,51 @@ app.post('/api/dictionary', async (req, res) => {
 
 //sets api
 app.post('/api/sets', async (req, res) => {
+    console.log(req.body);
     let id = req.body.userID;
+    let sID = -0;
+    let words = [];
+    let obj = null;
     let action = req.body.action;
     if (await userActive(id)) {
         //log action
         await logAction(id);
         switch(action) {
             case 'sets':
-                let sets = [];
-
-
+                let list = await userSets(id);
+                res.status(200).json({sets: list});
                 break;
             case 'set':
-
+                sID = req.body.setID;
+                obj = await setById(sID);
+                res.status(200).json({set: obj});
                 break;
             case 'create':
-
+                let name = req.body.name;
+                words = req.body.words;
+                sID = await createSet(id, name);
+                await updateSetWords(sID, words);
+                obj = await setById(sID);
+                res.status(200).json({set: obj});
                 break;
             case 'delete':
-
+                sID = req.body.setID;
+                await deleteSet(sID);
+                res.status(200).json({msg: 'success!'});
                 break;
             case 'updateWords':
-
+                sID = req.body.setID;
+                words = req.body.words;
+                await updateSetWords(sID, words);
+                obj = await setById(sID);
+                res.status(200).json({set: obj});
                 break;
             case 'updateName':
-
+                sID = req.body.setID;
+                str = req.body.name;
+                await updateSetName(sID, str);
+                obj = await setById(sID);
+                res.status(200).json({set: obj});
                 break;
             default:
                 res.status(404).json({error: 'invalid action!'});
@@ -405,7 +430,3 @@ app.post('/api/sets', async (req, res) => {
 app.listen(PORT, () => {
    console.log(`Server is running on port ${PORT}`);
 });
-
-await updateSetWords(0, [224, 225, 246, 389]);
-let set = await setById(0);
-console.log(set);
