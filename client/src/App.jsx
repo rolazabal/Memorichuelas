@@ -37,7 +37,8 @@ function App() {
     ACC_DEL_S: 6,
     ACC_DEL_F: 7,
     TIMEOUT: 8,
-    LOGIN_BLOCK: 9
+    LOGIN_BLOCK: 9,
+    ERR: 10
   };
   const [toast, setToast] = useState(false);
   const [toastType, setToastType] = useState(t_menu.LOGIN_S);
@@ -86,7 +87,11 @@ function App() {
   }
   
   async function logIn(user, pass) {
-    let id = await waitor.fetchUserID(user, pass);
+    let [id, error] = await waitor.fetchUserID(user, pass);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     if (id) {
       if (id != -1) {
         data.userID = id;
@@ -99,7 +104,11 @@ function App() {
   }
 
   async function logOut(supressToast) {
-    await waitor.logOutUser(data.userID);
+    let [res, error] = await waitor.logOutUser(data.userID);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     setPage(pages.HOME);
     clearData();
     if (!supressToast)
@@ -107,7 +116,11 @@ function App() {
   }
 
   async function createAccount(user, pass) {
-    let op = await waitor.createUser(user, pass);
+    let [op, error] = await waitor.createUser(user, pass);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     if (!op)
       showToast(t_menu.ACC_CREATE_F);
     else {
@@ -119,7 +132,11 @@ function App() {
   }
 
   async function getPage(letter) {
-    let list = await waitor.fetchDictPage(data.userID, letter);
+    let [list, error] = await waitor.fetchDictPage(data.userID, letter);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     setData({
       ...data,
       pageWords: list
@@ -127,7 +144,11 @@ function App() {
   }
 
   async function search(string) {
-    let list = await waitor.dictionarySearch(data.userID, string);
+    let [list, error] = await waitor.dictionarySearch(data.userID, string);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     setData({
       ...data,
       pageWords: list
@@ -135,7 +156,11 @@ function App() {
   }
 
   async function getWord(id) {
-    let word = await waitor.fetchWordObj(data.userID, id);
+    let [word, error] = await waitor.fetchWordObj(data.userID, id);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     setData({
       ...data,
       wordObj: word
@@ -143,7 +168,11 @@ function App() {
   }
 
   async function getInfo() {
-    let newInfo = await waitor.fetchUserInfo(data.userID);
+    let [newInfo, error] = await waitor.fetchUserInfo(data.userID);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     if (newInfo) {
       setData({
         ...data,
@@ -156,7 +185,11 @@ function App() {
   }
 
   async function changeUsername(user) {
-    let op = await waitor.updateUsername(data.userID, user);
+    let [op, error] = await waitor.updateUsername(data.userID, user);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     if (op) {
       if (op == -1)
         showToast(t_menu.USERNAME_F);
@@ -171,7 +204,11 @@ function App() {
   }
 
   async function deleteUser() {
-    let op = await waitor.deleteUser(data.userID);
+    let [op, error] = await waitor.deleteUser(data.userID);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
     if (op) {
       if (op == -1)
         showToast(t_menu.ACC_DEL_F);
@@ -253,7 +290,9 @@ function App() {
       </Row>
       <Row style={{height: "80vh", backgroundColor: "gray"}}>
         <Card style={{width: "90%", maxHeight: "100%", marginLeft: "auto", marginRight: "auto"}}>
-          <DisplayContent />
+          <Card.Body style={{overflow: "hidden", margin: ".5%"}}>  
+            <DisplayContent />
+          </Card.Body>
         </Card>
       </Row>
       <Row style={{height: "10vh", backgroundColor: "#7cd4e2"}}>

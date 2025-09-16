@@ -18,7 +18,7 @@ function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
     }
 
     return (
-        <Card.Body style={{overflow: "hidden"}}>
+        <>
             <Card.Title>{strings.user_title[lang]}</Card.Title>
             <ListGroup style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
                 <ListGroup.Item>
@@ -65,7 +65,7 @@ function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
                     <Button variant='danger' onClick={() => {deleteUser()}}>{strings.delete[lang]}</Button>
                 </Modal.Footer>
             </Modal>
-        </Card.Body>
+        </>
     )
 }
 

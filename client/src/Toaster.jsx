@@ -98,7 +98,7 @@ function Toaster({lang, strings, toast, t_menu, toastType, setToast}) {
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
             <Toast.Body>{strings.t_user_timed_out[lang]}</Toast.Body>
           </Toast>
-            <Toast
+          <Toast
             bg={'danger'}
             onClose={() => setToast(false)}
             show={toast && toastType == t_menu.LOGIN_BLOCK}
@@ -106,6 +106,15 @@ function Toaster({lang, strings, toast, t_menu, toastType, setToast}) {
           >
             <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
             <Toast.Body>{strings.t_block_login[lang]}</Toast.Body>
+          </Toast>
+          <Toast
+            bg={'danger'}
+            onClose={() => setToast(false)}
+            show={toast && toastType == t_menu.ERR}
+            delay={del} autohide
+          >
+            <Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+            <Toast.Body>{strings.t_error[lang]}</Toast.Body>
           </Toast>
         </ToastContainer>
     )

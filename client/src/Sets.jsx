@@ -19,12 +19,14 @@ function Sets({lang, strings, userSets, setObj}) {
             //get set info
             //getSets();
             return (
-                <Container>
+                <>
                     <Row>
-                        <Stack direction='horizontal'>
+                        <Col>
                             <Card.Title>
                                 {strings.sets_title[lang]}
                             </Card.Title>
+                        </Col>
+                        <Col>
                             <Nav variant="tabs" className="ms-auto">
                                 <Nav.Item eventKey="">
                                     Custom sets
@@ -33,21 +35,18 @@ function Sets({lang, strings, userSets, setObj}) {
                                     Official sets
                                 </Nav.Item>
                             </Nav>
-                        </Stack>
+                        </Col>
                     </Row>
                     <Row>
 
                     </Row>
-                </Container>
-
+                </>
             );
         } else return <></>;
     }
 
     return (
-        <Card.Body style={{overflow: "hidden"}}>
-            <Display />
-        </Card.Body>
+        <Display />
     )
 }
 

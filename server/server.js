@@ -8,7 +8,8 @@ import { Worker } from 'worker_threads';
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_user_status = 'SELECT (active) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; //get all user's set's ids as array
-const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
+const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word ' + 
+    'JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
 const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
 const fetch_word = 'SELECT (name) FROM "Memorichuelas"."Words" WHERE "wordID" = $1';
 const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions" WHERE "wordID" = $1';
@@ -21,6 +22,12 @@ const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "us
 const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
 const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1'; //write trigger on database to clear all user sets
 const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1'; //write trigger on database to clear all set words
+const remove_set_words = 'DELETE FROM "Memorichuelas"."SetWords" WHERE "setID" = $1';
+const add_set_word = 'INSERT INTO "Memorichuelas"."SetWords"("setID", "wordID") VALUES ($1, $2)';
+const fetch_user_sets = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "userID" = $1';
+const fetch_set = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "setID" = $1';
+const create_set = 'INSERT INTO "Memorichuelas"."Sets"("userID", name) VALUES ($1, $2)';
+const update_set_name = 'UPDATE "Memorichuelas"."Sets" SET name = $2 WHERE "setID" = $1';
 const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
 //pool database connection
@@ -43,6 +50,10 @@ const monitor = new Worker("./monitor.js");
 const user_timeout_ms = 1800000; //30 minutes
 
 ///functions
+function parseRow(str) {
+    return str.substring(1, str.length - 1).replace(/"/g, "").split(",");
+}
+
 //database functions
 async function deactivateUser(userID) {
     await client.query(deactivate_user, [userID]);
@@ -53,7 +64,7 @@ monitor.on("message", async (message) => {
     let res = await client.query(fetch_active_users);
     for (let x of res.rows) {
         //id and timestamp info
-        let data = x.row.substring(1, x.row.length - 1).split(",");
+        let data = parseRow(x.row);
         let userID = data[0];
         let timeStamp = new Date(data[1]);
         if (isNaN(timeStamp)) 
@@ -118,14 +129,14 @@ async function dictionaryPage(letter) {
     let res = await client.query(regex_words, [letter]);
     let list = [];
     for (let x of res.rows)
-        list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
+        list.push(parseRow(x.row));
     return list;
 }
 
 async function userInfo(userID) {
     let res = await client.query(fetch_user_info, [userID]);
     res = res.rows[0].row;
-    let list = res.substring(1, res.length -1).split(",");
+    let list = parseRow(res);
     let info = {
         name: list[0], 
         date: list[1]
@@ -134,27 +145,75 @@ async function userInfo(userID) {
 }
 
 async function userSets(userID) {
-    let res = await client.query(fetch_set_ids, [userID]);
-    let setIds = res.rows;
+    let res = await client.query(fetch_user_sets, [userID]);
+    res = res.rows;
     let sets = [];
-    if (setIds.length > 0) {
-        let set = [];
-        for (let x of setIds) {
-            res = await client.query(fetch_set_words, [x.setID]);
-            let words = res.rows;
-            if (words.length > 0) {
-                for (let y of words) {
-                    y = y.row.substring(1, y.row.length - 1).split(",");
-                    y[0] = parseInt(y[0]);
-                    y[2] = parseFloat(y[2]);
-                    set.push({id: y[0], name: y[1], score: y[2]});
-                }
-            }
-            sets.push(set);
-            set = [];
-        }
+    if (res.length == 0)
+        return sets;
+    for (let x of res) {
+        let info = parseRow(x.row);
+        sets.push({
+            id: info[0],
+            name: info[1],
+            score: info[2]
+        });
     }
     return sets;
+}
+
+async function setById(setID) {
+    let res = await client.query(fetch_set, [setID]);
+    res = res.rows[0];
+    let set = null;
+    if (res.length == 0)
+        return set;
+    let words = [];
+    let info = parseRow(res.row);
+    set = {
+        id: parseInt(info[0]),
+        name: info[1],
+        score: parseFloat(info[2]),
+        words: words
+    };
+    res = await client.query(fetch_set_words, [setID]);
+    res = res.rows;
+    if (res.length == 0)
+        return set;
+    let word = {};
+    for (let x of res) {
+        let data = parseRow(x.row);
+        word = {
+            id: parseInt(data[0]),
+            name: data[1],
+            score: parseFloat(data[2])
+        };
+        words.push(word);
+    }
+    set = {
+        ...set,
+        words: words
+    };
+    return set;
+}
+
+async function updateSetWords(setID, wordArr) {
+    //delete words
+    await client.query(remove_set_words, [setID]);
+    //add words
+    for (let wordID of wordArr)
+        await client.query(add_set_word, [setID, wordID]);
+}
+
+async function updateSetName(setID, newName) {
+    await client.query(update_set_name, [setID, newName]);
+}
+
+async function createSet(userID, name) {
+    await client.query(create_set, [userID, name]);
+}
+ 
+async function deleteSet(setID) {
+    await client.query(remove_set, [setID]);
 }
 
 async function updateUsername(userID, username) {
@@ -167,7 +226,7 @@ async function dictionarySearch(string) {
     string = '%' + string + '%';
     let res = await client.query(regex_words, [string]);
     for (let x of res.rows)
-        list.push(x.row.substring(1, x.row.length - 1).replace(/"/g, "").split(","));
+        list.push(parseRow(x.row));
     return list;
 }
 
@@ -283,11 +342,12 @@ app.post('/api/account', async (req, res) => {
 //dictionary api
 app.post('/api/dictionary', async (req, res) => {
     let id = req.body.userID;
+    let action = req.body.action;
     let list = [];
     //log action
     await logAction(id);
     console.log(req.body);
-    switch(req.body.action) {
+    switch(action) {
         case 'page':
             list = await dictionaryPage(req.body.letter);
             res.status(200).json({words: list});
@@ -308,28 +368,44 @@ app.post('/api/dictionary', async (req, res) => {
 
 //sets api
 app.post('/api/sets', async (req, res) => {
-    switch(req.body.action) {
-        case 'wordScores':
+    let id = req.body.userID;
+    let action = req.body.action;
+    if (await userActive(id)) {
+        //log action
+        await logAction(id);
+        switch(action) {
+            case 'sets':
+                let sets = [];
 
-            break;
-        case 'create':
 
-            break;
-        case 'delete':
+                break;
+            case 'set':
 
-            break;
-        case 'addWord':
+                break;
+            case 'create':
 
-            break;
-        case 'removeWord':
+                break;
+            case 'delete':
 
-            break;
-        default:
-            res.status(404).json({error: 'invalid action!'});
-            break;
-    }
+                break;
+            case 'updateWords':
+
+                break;
+            case 'updateName':
+
+                break;
+            default:
+                res.status(404).json({error: 'invalid action!'});
+                break;
+        }
+    } else
+        res.status(403).json({error: 'user has timed out!'});
 });
 
 app.listen(PORT, () => {
    console.log(`Server is running on port ${PORT}`);
 });
+
+await updateSetWords(0, [224, 225, 246, 389]);
+let set = await setById(0);
+console.log(set);

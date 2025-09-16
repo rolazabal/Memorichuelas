@@ -59,7 +59,7 @@ function Home({lang, strings, logIn, createAccount, loggedIn}) {
     }
 
     return (
-        <Card.Body style={{overflow: "hidden"}}>
+        <>
             <Card.Title>{strings.about_title[lang]}</Card.Title>
             <Container style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
                 <Card.Text>{strings.about_blurb[lang]}</Card.Text>
@@ -93,7 +93,7 @@ function Home({lang, strings, logIn, createAccount, loggedIn}) {
                     </Modal.Footer>
                 </Form>
             </Modal>
-        </Card.Body>
+        </>
     )
 }
 

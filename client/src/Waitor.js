@@ -14,20 +14,20 @@ class Waitor {
             if (res.status < 300) {
                 res = await res.json();
                 let id = await res.ID;
-                return id;
+                return [id, false];
             } else {
                 switch(res.status) {
                     case 403:
-                        return false;
+                        return [false, false];
                         break;
                     default:
-                        return -1;
+                        return [-1, false];
                         break;
                 }
             }
         } catch(error) {
             console.log(error);
-            return -1;
+            return [null, error];
         }
     }
 
@@ -38,10 +38,10 @@ class Waitor {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'logOut', userID: uID})
             });
-            return 1;
+            return [1, false];
         } catch(error) {
             console.log(error);
-            return -1;
+            return [null, error];
         }
     }
 
@@ -53,15 +53,15 @@ class Waitor {
                 body: JSON.stringify({action: 'create', username: user, passkey: pass})
             });
             if (res.status < 300)
-                return 1;
+                return [1, false];
             else {
                 if (res.json().error == 'username already exists!')
-                    return -1;
-                return false;
+                    return [-1, false];
+                return [false, false];
             }
         } catch(error) {
             console.log(error);
-            return false;
+            return [null, error];
         }
     }
 
@@ -72,14 +72,13 @@ class Waitor {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'delete', userID: uID})
             });
-            console.log("requested");
             if (res.status < 300)
-                return 1;
+                return [1, false];
             else
-                return false;
+                return [false, false];
         } catch(error) {
             console.log(error);
-            return -1;
+            return [null, error];
         }
     }
 
@@ -93,12 +92,12 @@ class Waitor {
             if (res.status < 300) {
                 res = await res.json();
                 let info = res.info;
-                return info;
+                return [info, false];
             } else
-                return false;
+                return [false, false];
         } catch(error) {
             console.log(error);
-            return {};
+            return [null, error];
         }
     }
 
@@ -110,15 +109,15 @@ class Waitor {
                 body: JSON.stringify({action: 'updateName', userID: uID, username: user})
             });
             if (res.status < 300)
-                return 1;
+                return [1, false];
             else {
                 if (res.status == 403)
-                    return false;
-                return -1;
+                    return [false, false];
+                return [-1, false];
             }
         } catch(error) {
             console.log(error);
-            return -1;
+            return [null, error];
         }
     }
 
@@ -131,11 +130,10 @@ class Waitor {
                 body: JSON.stringify({action: 'page', letter: letter.toLowerCase(), userID: uID})
             });
             res = await res.json();
-            console.log(res);
-            return res.words;
+            return [res.words, false];
         } catch(error) {
             console.log(error);
-            return [];
+            return [null, error];
         }
     };
 
@@ -147,10 +145,10 @@ class Waitor {
                 body: JSON.stringify({action: 'word', wordID: wID, userID: uID})
             });
             res = await res.json();
-            return res.word;
+            return [res.word, false];
         } catch(error) {
             console.log(error);
-            return {};
+            return [null, error];
         }
     }
 
@@ -162,10 +160,10 @@ class Waitor {
                 body: JSON.stringify({action: 'search', string: string, userID: uID})
             });
             res = await res.json();
-            return res.words;
+            return [res.words, false];
         } catch(error) {
             console.log(error);
-            return [];
+            return [null, error];
         }
     }
 

@@ -45,7 +45,8 @@ const strings = {
     t_delete_acc_success: ["Account deleted!", "Cuenta borrada!"],
     t_delete_acc_fail: ["Failed to delete account!", "No se puedo borrar la cuenta!"],
     t_user_timed_out: ["User timed out!", "Session expirada!"],
-    t_block_login: ["User is active in a different tab!", "Usuario esta activo en otra pestana!"]
+    t_block_login: ["User is active in a different tab!", "Usuario esta activo en otra pestana!"],
+    t_error: ["", ""]
 };
 
 export default strings

@@ -112,22 +112,26 @@ function Dictionary({lang, strings, wordObj, pageWords, setWordObj, getPage, get
     /*<Col id={parseInt(entry[0])} onClick={() => {selection.push([entry[0], entry[1]])}}>{entry[1]}</Col>*/
 
     return (
-        <Card.Body style={{overflow: "hidden"}}>
-            <Stack style={{width: "100%"}} direction="horizontal">
-                <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
+        <>
+            <Row>
+                <Col>
+                    <Card.Title>{strings.dictionary_title[lang]}</Card.Title>
+                </Col>
                 {wordObj != null ? <></> : 
-                    <Form onSubmit={submitSearch}>
-                        <Stack direction='horizontal'>
-                            <Form.Control id="search" type="text" />
-                            <Button type="submit">{strings.search[lang]}</Button>
-                        </Stack>
-                    </Form>
+                    <Col>
+                        <Form onSubmit={submitSearch}>
+                            <Stack direction='horizontal'>
+                                <Form.Control id="search" type="text" />
+                                <Button type="submit">{strings.search[lang]}</Button>
+                            </Stack>
+                        </Form>
+                    </Col>
                 }
-            </Stack>
+            </Row>
             <Container style={{padding: "0", maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
                 <Content />
             </Container>
-        </Card.Body>
+        </>
     );
 }
 
