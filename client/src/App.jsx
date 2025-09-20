@@ -38,13 +38,21 @@ function App() {
     ACC_DEL_F: 7,
     TIMEOUT: 8,
     LOGIN_BLOCK: 9,
-    ERR: 10
+    ERR: 10,
+    SET_CREATE_S: 11,
+    SET_DEL_S: 12,
+    SET_NAME_S: 13,
+    SET_WORDS_S: 14
   };
   const [toast, setToast] = useState(false);
   const [toastType, setToastType] = useState(t_menu.LOGIN_S);
   //language: 0 = english, 1 = spanish
   const [lang, setLang] = useState(0);
-  const alph = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+  const alph = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+    'Y', 'Z'
+  ];
   //user variables
   const [data, setData] = useState({
     userID: -1,
@@ -58,6 +66,20 @@ function App() {
   const waitor = new Waitor();
 
   ///functions
+  function persistentUser() {
+    let id = localStorage.getItem('userID');
+    if (id == null) return;
+    id = parseInt(id);
+    setData({
+      ...data,
+      userID: id
+    });
+  }
+
+  window.onload = () => {
+    persistentUser();
+  }
+
   function loggedIn() {
     return (data.userID != -1);
   }
@@ -79,6 +101,7 @@ function App() {
       userSets: null,
       setObj: null,
     });
+    localStorage.removeItem('userID');
   }
 
   function showToast(type) {
@@ -94,7 +117,11 @@ function App() {
     }
     if (id) {
       if (id != -1) {
-        data.userID = id;
+        setData({
+          ...data,
+          userID: id
+        });
+        localStorage.setItem('userID', '' + id);
         showToast(t_menu.LOGIN_S);
         setPage(pages.SETS);
       } else 
@@ -223,6 +250,122 @@ function App() {
     }
   }
 
+  async function getSets() {
+    let [sets, error] = await waitor.fetchUserSets(data.userID);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
+    if (sets) {
+      console.log(sets);
+      setData({
+        ...data,
+        userSets: sets
+      });
+    } else {
+      showToast(t_menu.TIMEOUT);
+      logOut(true);
+    }
+  }
+
+  async function setSetObj(id) {
+    if (!id) {
+      setData({
+        ...data,
+        setObj: null
+      });
+      return;
+    }
+    let [set, error] = await waitor.fetchSetObj(data.userID, id);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
+    if (set) {
+      setData({
+        ...data,
+        setObj: set
+      });
+    } else {
+      showToast(t_menu.TIMEOUT);
+      logOut(true);
+    }
+  }
+
+  async function setSetWords(id, words) {
+    let [set, error] = await waitor.updateSetWords(data.userID, id, words);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
+    if (set) {
+      setData({
+        ...data,
+        setObj: set
+      });
+      showToast(t_menu.SET_WORDS_S);
+    } else {
+      showToast(t_menu.TIMEOUT);
+      logOut(true);
+    }
+  }
+
+  async function createSet(name, words) {
+    let [set, error] = await waitor.createSet(data.userID, name, words);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
+    if (set) {
+      await getSets();
+      setData({
+        ...data,
+        setObj: set
+      });
+      showToast(t_menu.SET_CREATE_S);
+    } else {
+      showToast(t_menu.TIMEOUT);
+      logOut(true);
+    }
+  }
+
+  async function deleteSet(id) {
+    console.log(id);
+    let [sets, error] = await waitor.deleteSet(data.userID, id);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
+    if (sets) {
+      setData({
+        ...data,
+        userSets: sets
+      });
+      showToast(t_menu.SET_DEL_S);
+    } else {
+      showToast(t_menu.TIMEOUT);
+      logOut(true);
+    }
+  }
+
+  async function setSetName(id, name) {
+    let [set, error] = await waitor.updateSetName(data.userID, id, name);
+    if (error) {
+      showToast(t_menu.ERR);
+      return;
+    }
+    if (set) {
+      setData({
+        ...data,
+        setObj: set
+      });
+      showToast(t_menu.SET_NAME_S);
+    } else {
+      showToast(t_menu.TIMEOUT);
+      logOut(true);
+    }
+  }
+
   function DisplayContent() {
     //serve page contents
     switch(page) {
@@ -233,7 +376,9 @@ function App() {
           getPage(alph[0]);
         return <Dictionary lang={lang} strings={strings} wordObj={data.wordObj} pageWords={data.pageWords} setWordObj={setWordObj} getPage={getPage} getWord={getWord} search={search} alph={alph}/>;
       case pages.SETS:
-        return <Sets lang={lang} strings={strings} userSets={data.userSets} setObj={data.setObj} />;
+        if (data.userSets == null)
+            getSets();
+        return <Sets lang={lang} strings={strings} userSets={data.userSets} setObj={data.setObj} getSets={getSets} setSetObj={setSetObj} createSet={createSet} deleteSet={deleteSet} setSetName={setSetName} setSetWords={setSetWords} />;
       case pages.SETTINGS:
         if (data.info == null)
           getInfo();
@@ -254,6 +399,8 @@ function App() {
       </>
     );
   }
+
+  console.log(data);
 
   return (
     <Container fluid style={{display: "block", height: "100%", width: "100%"}}>

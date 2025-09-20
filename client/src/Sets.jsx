@@ -9,15 +9,12 @@ import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 
-function Sets({lang, strings, userSets, setObj}) {
+function Sets({lang, strings, userSets, setObj, getSets, setSetObj, createSet, deleteSet, setSetName, setSetWord}) {
     ///variables
-    const [tab, setTab] = useState(0);
-
+    
     ///functions
     function Display() {
         if (setObj == null) {
-            //get set info
-            //getSets();
             return (
                 <>
                     <Row>
@@ -37,12 +34,30 @@ function Sets({lang, strings, userSets, setObj}) {
                             </Nav>
                         </Col>
                     </Row>
-                    <Row>
-
+                    <Row style={{overflowY: "auto"}}>
+                        <Row>
+                            <Button onClick={() => {createSet("set", [444])}}>{userSets == null ? 0 : userSets.length}</Button>
+                        </Row>
+                        {
+                            (userSets == null || userSets.length < 1) ? 
+                                <></>
+                            :
+                                userSets.map((set, index) => 
+                                    <Row key={index}>
+                                        {set.name}
+                                    </Row>
+                                )
+                        }
                     </Row>
                 </>
             );
-        } else return <></>;
+        } else {
+            return (
+                <>
+                    <Button onClick={() => {setSetObj(null)}}>Back</Button>
+                </>
+            );
+        }
     }
 
     return (

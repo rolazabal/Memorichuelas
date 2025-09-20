@@ -169,11 +169,113 @@ class Waitor {
 
     //set api
     async fetchUserSets(uID) {
-
+        try {
+            let res = await fetch('http://localhost:5050/api/sets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'sets', userID: uID})
+            });
+            if (res.status < 300) {
+                res = await res.json();
+                return [res.sets, false];
+            }
+            return [false, false];
+        } catch(error) {
+            console.log(error);
+            return [null, error];
+        }
     }
 
-    async fetchSetWords(wID) {
-        
+    async fetchSetObj(uID, sID) {
+        try {
+            let res = await fetch('http://localhost:5050/api/sets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'set', setID: sID, userID: uID})
+            });
+            if (res.status < 300) {
+                res = await res.json();
+                return [res.set, false];
+            }
+            return [false, false];
+        } catch(error) {
+            console.log(error);
+            return [null, error];
+        }
+    }
+
+    async createSet(uID, name, words) {
+        try {
+            let res = await fetch('http://localhost:5050/api/sets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'create', name: name, words: words, userID: uID})
+            });
+            if (res.status < 300) {
+                res = await res.json();
+                console.log(res);
+                return [res.set, false];
+            }
+            return [false, false];
+        } catch(error) {
+            console.log(error);
+            return [null, error];
+        }
+    }
+
+    async deleteSet(uID, sID) {
+        console.log(sID + " " + uID);
+        try {
+            let res = await fetch('http://localhost:5050/api/sets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'delete', setID: sID, userID: uID})
+            });
+            if (res.status < 300) {
+                res = await res.json();
+                return [res.sets, false];
+            }
+            return [false, false];
+        } catch(error) {
+            console.log(error);
+            return [null, error];
+        }
+    }
+
+    async updateSetWords(uID, sID, words) {
+        try {
+            let res = await fetch('http://localhost:5050/api/sets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'updateWords', setID: sID, words: words, userID: uID})
+            });
+            if (res.status < 300) {
+                res = await res.json();
+                return [res.set, false];
+            }
+            return [false, false];
+        } catch(error) {
+            console.log(error);
+            return [null, error];
+        }
+    }
+
+    async updateSetName(uID, sID, name) {
+        try {
+            let res = await fetch('http://localhost:5050/api/sets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'updateName', setID: sID, name: name, userID: uID})
+            });
+            if (res.status < 300) {
+                res = await res.json();
+                return [res.set, false];
+            }
+            return [false, false];
+        } catch(error) {
+            console.log(error);
+            return [null, error];
+        }
     }
 }
 

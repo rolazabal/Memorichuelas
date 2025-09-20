@@ -81,6 +81,7 @@ monitor.on("message", async (message) => {
 async function userActive(userID) {
     let res = await client.query(fetch_user_status, [userID]);
     let active = res.rows[0].active;
+    if (!active) return false;
     return active;
 }
 
@@ -153,7 +154,7 @@ async function userSets(userID) {
     for (let x of res) {
         let info = parseRow(x.row);
         sets.push({
-            id: info[0],
+            setID: info[0],
             name: info[1],
             score: info[2]
         });
@@ -170,7 +171,7 @@ async function setById(setID) {
     let words = [];
     let info = parseRow(res.row);
     set = {
-        id: parseInt(info[0]),
+        setID: parseInt(info[0]),
         name: info[1],
         score: parseFloat(info[2]),
         words: words
@@ -183,7 +184,7 @@ async function setById(setID) {
     for (let x of res) {
         let data = parseRow(x.row);
         word = {
-            id: parseInt(data[0]),
+            wordID: parseInt(data[0]),
             name: data[1],
             score: parseFloat(data[2])
         };
@@ -210,7 +211,7 @@ async function updateSetName(setID, newName) {
 
 async function createSet(userID, name) {
     let res = await client.query(create_set, [userID, name]);
-    let id = res.rows[0].setID;
+    let id = parseInt(res.rows[0].setID);
     return id;
 }
 
@@ -272,7 +273,8 @@ app.post('/api/account', async (req, res) => {
             if (op) {
                 await deactivateUser(id);
                 res.status(200).json({msg: 'success!'});
-            } else res.status(403).json({error: 'user has timed out!'});
+            } else
+                res.status(403).json({error: 'user has timed out!'});
             break;
         case 'info':
             id = req.body.userID;
@@ -284,7 +286,8 @@ app.post('/api/account', async (req, res) => {
                 let info = await userInfo(id);
                 res.status(200).json({info});
                 //console.log(info);
-            } else res.status(403).json({error: 'user has timed out!'});
+            } else
+                res.status(403).json({error: 'user has timed out!'});
             break;
         case 'create':
             user = req.body.username;
@@ -307,7 +310,8 @@ app.post('/api/account', async (req, res) => {
                 await logAction(id);
                 let list = await userSets(id);
                 res.status(200).json({sets: list});
-            } else res.status(403).json({error: 'user has timed out!'});
+            } else
+                res.status(403).json({error: 'user has timed out!'});
             break;
         case 'updateName':
             id = req.body.userID;
@@ -324,8 +328,10 @@ app.post('/api/account', async (req, res) => {
                     await logAction(id);
                     await updateUsername(id, user);
                     res.status(200).json({msg: 'success!'});
-                } else res.status(400).json({error: 'username already exists!'});
-            } else res.status(403).json({error: 'user has timed out!'});
+                } else
+                    res.status(400).json({error: 'username already exists!'});
+            } else
+                res.status(403).json({error: 'user has timed out!'});
             break;
         case 'delete':
             id = req.body.userID;
@@ -333,7 +339,8 @@ app.post('/api/account', async (req, res) => {
             if (op) {
                 await deleteUser(id);
                 res.status(200).json({msg: 'success!'});
-            } else res.status(403).json({error: 'user has timed out!'});
+            } else
+                res.status(403).json({error: 'user has timed out!'});
             break;
         default:
             res.status(404).json({error: 'invalid action!'});
@@ -373,10 +380,11 @@ app.post('/api/dictionary', async (req, res) => {
 
 //sets api
 app.post('/api/sets', async (req, res) => {
+    console.log("ho");
     console.log(req.body);
     let id = req.body.userID;
     let sID = -0;
-    let words = [];
+    let list = [];
     let obj = null;
     let action = req.body.action;
     if (await userActive(id)) {
@@ -384,7 +392,7 @@ app.post('/api/sets', async (req, res) => {
         await logAction(id);
         switch(action) {
             case 'sets':
-                let list = await userSets(id);
+                list = await userSets(id);
                 res.status(200).json({sets: list});
                 break;
             case 'set':
@@ -394,21 +402,22 @@ app.post('/api/sets', async (req, res) => {
                 break;
             case 'create':
                 let name = req.body.name;
-                words = req.body.words;
+                list = req.body.words;
                 sID = await createSet(id, name);
-                await updateSetWords(sID, words);
+                await updateSetWords(sID, list);
                 obj = await setById(sID);
                 res.status(200).json({set: obj});
                 break;
             case 'delete':
                 sID = req.body.setID;
                 await deleteSet(sID);
-                res.status(200).json({msg: 'success!'});
+                list = await userSets(id);
+                res.status(200).json({sets: list});
                 break;
             case 'updateWords':
                 sID = req.body.setID;
-                words = req.body.words;
-                await updateSetWords(sID, words);
+                list = req.body.words;
+                await updateSetWords(sID, list);
                 obj = await setById(sID);
                 res.status(200).json({set: obj});
                 break;
