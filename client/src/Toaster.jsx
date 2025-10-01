@@ -7,148 +7,138 @@ function Toaster({lang, strings, toast, t_menu, toastType, setToast}) {
     return (
         <ToastContainer position={'top-end'} style={{zIndex: 1}}>
 			<Toast
-			bg={'success'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.LOGIN_S}
-			delay={del} autohide
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.LOGIN_S}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_success[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_login_success[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_login_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
 			bg={'danger'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.LOGIN_F}
-			delay={del} autohide
+				bg={'danger'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.LOGIN_F}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_login_fail[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_login_fail[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'success'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.LOGOUT_S}
-			delay={del} autohide
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.LOGOUT_S}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_success[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_logout_success[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_logout_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'danger'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.ACC_CREATE_F}
-			delay={del} autohide
+				bg={'danger'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.ACC_CREATE_F}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_create_acc_fail[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_create_acc_fail[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'success'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.USERNAME_S}
-			delay={del} autohide
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.USERNAME_S}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_success[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_change_name_success[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_change_name_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'danger'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.USERNAME_F}
-			delay={del} autohide
+				bg={'danger'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.USERNAME_F}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_name_exists[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_name_exists[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'success'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.ACC_DEL_S}
-			delay={del} autohide
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.ACC_DEL_S}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_success[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_delete_acc_success[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_delete_acc_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'danger'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.ACC_DEL_F}
-			delay={del} autohide
+				bg={'danger'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.ACC_DEL_F}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_delete_acc_fail[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_delete_acc_fail[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'warning'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == 99}
-			delay={del} autohide
+				bg={'warning'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.TIMEOUT}
+				delay={del} autohide
 			>
-			<Toast.Header>Caution</Toast.Header>
-			<Toast.Body>
-				Cautiously cautious!
-			</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_user_timed_out[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'warning'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.TIMEOUT}
-			delay={del} autohide
+				bg={'danger'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.LOGIN_BLOCK}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_user_timed_out[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_block_login[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'danger'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.LOGIN_BLOCK}
-			delay={del} autohide
+				bg={'danger'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.ERR}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_block_login[lang]}</Toast.Body>
+				<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
+				<Toast.Body>{strings.t_error[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'danger'}
-			onClose={() => setToast(false)}
-			show={toast && toastType == t_menu.ERR}
-			delay={del} autohide
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.SET_CREATE_S}
+				delay={del} autohide
 			>
-			<Toast.Header>{strings.t_fail[lang]}</Toast.Header>
-			<Toast.Body>{strings.t_error[lang]}</Toast.Body>
-			</Toast>
-			<Toast
-        		bg={'success'}
-        		onClose={() => setToast(false)}
-           		show={toast && toastType == t_menu.SET_CREATE_S}
-            	delay={del} autohide
-        	>
 				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
 				<Toast.Body>{strings.t_create_set_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-        		bg={'success'}
-        		onClose={() => setToast(false)}
-           		show={toast && toastType == t_menu.SET_DEL_S}
-            	delay={del} autohide
-        	>
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.SET_DEL_S}
+				delay={del} autohide
+			>
 				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
 				<Toast.Body>{strings.t_delete_set_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-        		bg={'success'}
-        		onClose={() => setToast(false)}
-           		show={toast && toastType == t_menu.SET_NAME_S}
-            	delay={del} autohide
-        	>
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.SET_NAME_S}
+				delay={del} autohide
+			>
 				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
 				<Toast.Body>{strings.t_change_setname_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-        		bg={'success'}
-        		onClose={() => setToast(false)}
-           		show={toast && toastType == t_menu.SET_WORDS_S}
-            	delay={del} autohide
-        	>
+				bg={'success'}
+				onClose={() => setToast(false)}
+				show={toast && toastType == t_menu.SET_WORDS_S}
+				delay={del} autohide
+			>
 				<Toast.Header>{strings.t_success[lang]}</Toast.Header>
 				<Toast.Body>{strings.t_change_setwords_success[lang]}</Toast.Body>
 			</Toast>
