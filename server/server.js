@@ -3,11 +3,11 @@ import cors from 'cors';
 import { Pool } from 'pg';
 import { Worker } from 'worker_threads';
 
-///variables
-//queries
+// /variables
+// queries
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_user_status = 'SELECT (active) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
-const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; //get all user's set's ids as array
+const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; // get all user's set's ids as array
 const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word ' + 
     'JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
 const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
@@ -20,8 +20,8 @@ const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, time
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
 const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
-const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1'; //write trigger on database to clear all user sets
-const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1'; //write trigger on database to clear all set words
+const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1'; // write trigger on database to clear all user sets
+const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1'; // write trigger on database to clear all set words
 const remove_set_words = 'DELETE FROM "Memorichuelas"."SetWords" WHERE "setID" = $1';
 const add_set_word = 'INSERT INTO "Memorichuelas"."SetWords"("setID", "wordID") VALUES ($1, $2)';
 const fetch_user_sets = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "userID" = $1';
@@ -30,7 +30,7 @@ const create_set = 'INSERT INTO "Memorichuelas"."Sets"("userID", name) VALUES ($
 const update_set_name = 'UPDATE "Memorichuelas"."Sets" SET name = $2 WHERE "setID" = $1';
 const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
-//pool database connection
+// pool database connection
 const pool = new Pool({
     host: process.env.POSTGRES_HOST,
     database: process.env.POSTGRES_DB,
@@ -39,31 +39,31 @@ const pool = new Pool({
 });
 const client = await pool.connect();
 
-//express server
+// express server
 const app = express();
 const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
-//monitor thread
+// monitor thread
 const monitor = new Worker("./monitor.js");
-const user_timeout_ms = 1800000; //30 minutes
+const user_timeout_ms = 1800000; // 30 minutes
 
-///functions
+// /functions
 function parseRow(str) {
     return str.substring(1, str.length - 1).replace(/"/g, "").split(",");
 }
 
-//database functions
+// database functions
 async function deactivateUser(userID) {
     await client.query(deactivate_user, [userID]);
 }
 
 monitor.on("message", async (message) => {
-    //user timeout logic
+    // user timeout logic
     let res = await client.query(fetch_active_users);
     for (let x of res.rows) {
-        //id and timestamp info
+        // id and timestamp info
         let data = parseRow(x.row);
         let userID = data[0];
         let timeStamp = new Date(data[1]);
@@ -198,9 +198,9 @@ async function setById(setID) {
 }
 
 async function updateSetWords(setID, wordArr) {
-    //delete words
+    // delete words
     await client.query(remove_set_words, [setID]);
-    //add words
+    // add words
     for (let wordID of wordArr)
         await client.query(add_set_word, [setID, wordID]);
 }
@@ -237,8 +237,8 @@ async function deleteUser(userID) {
     await client.query(remove_user, [userID]);
 }
 
-//http functions
-//account api
+// http functions
+// account api
 app.post('/api/account', async (req, res) => {
     console.log(req.body);
     let id = -0;
@@ -248,19 +248,19 @@ app.post('/api/account', async (req, res) => {
     let pass = -0;
     switch(action) {
         case 'logIn':
-            //check credentials
+            // check credentials
             id = await userID(req.body.username, parseInt(req.body.passkey));
-            //console.log(id);
+            // console.log(id);
             if (!id) {
                 res.status(400).json({error: 'invalid log in credentials!'});
             } else {
-                //check if user is active
+                // check if user is active
                 op = await userActive(id);
-                //console.log(op);
+                // console.log(op);
                 if (op) 
                     res.status(403).json({msg: 'user is already logged in!'});
                 else {
-                    //activate user
+                    // activate user
                     await logAction(id);
                     res.status(200).json({ID: id});
                 }
@@ -268,7 +268,7 @@ app.post('/api/account', async (req, res) => {
             break;
         case 'logOut':
             id = req.body.userID;
-            //check if user is active
+            // check if user is active
             op = await userActive(id);
             if (op) {
                 await deactivateUser(id);
@@ -278,23 +278,23 @@ app.post('/api/account', async (req, res) => {
             break;
         case 'info':
             id = req.body.userID;
-            //check if user is active
+            // check if user is active
             op = await userActive(id);
             if (op) {
-                //log action
+                // log action
                 await logAction(id);
                 let info = await userInfo(id);
                 res.status(200).json({info});
-                //console.log(info);
+                // console.log(info);
             } else
                 res.status(403).json({error: 'user has timed out!'});
             break;
         case 'create':
             user = req.body.username;
             pass = req.body.passkey;
-            //validate inputs
-            if (false) res.status(400).json({error: 'invalid credentials'}); //TODO: implement this
-            //check if username exists
+            // validate inputs
+            if (false) res.status(400).json({error: 'invalid credentials'}); // TODO: implement this
+            // check if username exists
             op = await usernameExists(user);
             if (op) 
                 res.status(400).json({error: 'username already exists!'});
@@ -318,13 +318,13 @@ app.post('/api/account', async (req, res) => {
             user = req.body.username;
             let active = await userActive(id);
             if (active) {
-                //validate username
+                // validate username
                 if (false) 
-                    res.status(400).json({error: 'invalid credentials'}); //TODO: implement this
-                //check if exists
+                    res.status(400).json({error: 'invalid credentials'}); // TODO: implement this
+                // check if exists
                 op = await usernameExists(user);
                 if (!op) {
-                    //log action
+                    // log action
                     await logAction(id);
                     await updateUsername(id, user);
                     res.status(200).json({msg: 'success!'});
@@ -348,13 +348,13 @@ app.post('/api/account', async (req, res) => {
     }
 });
 
-//dictionary api
+// dictionary api
 app.post('/api/dictionary', async (req, res) => {
     console.log(req.body);
     let id = req.body.userID;
     let action = req.body.action;
     let list = [];
-    //log action
+    // log action
     await logAction(id);
     switch(action) {
         case 'page':
@@ -378,9 +378,8 @@ app.post('/api/dictionary', async (req, res) => {
     }
 });
 
-//sets api
+// sets api
 app.post('/api/sets', async (req, res) => {
-    console.log("ho");
     console.log(req.body);
     let id = req.body.userID;
     let sID = -0;
@@ -388,7 +387,7 @@ app.post('/api/sets', async (req, res) => {
     let obj = null;
     let action = req.body.action;
     if (await userActive(id)) {
-        //log action
+        // log action
         await logAction(id);
         switch(action) {
             case 'sets':

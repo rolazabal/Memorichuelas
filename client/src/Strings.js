@@ -12,6 +12,7 @@ const strings = {
     name_text: ["Enter a name", "Nombra la colleccion"],
     sets_custom: ["Custom sets", "Collecciones personales"],
     sets_official: ["Official sets", "Colleciones oficiales"],
+	score: ["score", "puntuacion"],
     sort: ["Sort", "Sortear"],
     sort_alphi: ["A-Z", "A-Z"],
     sort_alphd: ["Z-A", "Z-A"],
@@ -52,7 +53,11 @@ const strings = {
     t_delete_acc_fail: ["Failed to delete account!", "No se puedo borrar la cuenta!"],
     t_user_timed_out: ["User timed out!", "Sesion expirada!"],
     t_block_login: ["User active on a different tab!", "Usuario activo en otra pestana!"],
-    t_error: ["Error", "Error"]
+    t_error: ["Error", "Error"],
+	t_create_set_success: ["Set created!", "Colleccion creada!"],
+	t_delete_set_success: ["Set deleted!", "Colleccion borrada!"],
+	t_change_setname_success: ["Changed set name!", "Nombre de colleccion cambiado!"],
+	t_change_setwords_success: ["Updated words in set!", "Palabras de colleccion actualizadas!"]
 };
 
 export default strings

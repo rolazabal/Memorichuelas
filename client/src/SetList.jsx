@@ -10,7 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 
-function Sets({lang, strings, userSets, setObj, getSets, setSetObj, createSet, deleteSet, setSetName, setSetWord}) {
+function SetList({lang, strings, userSets, createSet, deleteSet}) {
 	/// variables
 	const [createModal, setCreateModal] = useState(false);
 
@@ -85,4 +85,4 @@ function Sets({lang, strings, userSets, setObj, getSets, setSetObj, createSet, d
 	);
 }
 
-export default Sets
+export default SetList
