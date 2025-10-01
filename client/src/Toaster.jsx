@@ -16,7 +16,6 @@ function Toaster({lang, strings, toast, t_menu, toastType, setToast}) {
 				<Toast.Body>{strings.t_login_success[lang]}</Toast.Body>
 			</Toast>
 			<Toast
-			bg={'danger'}
 				bg={'danger'}
 				onClose={() => setToast(false)}
 				show={toast && toastType == t_menu.LOGIN_F}
