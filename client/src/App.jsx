@@ -250,14 +250,20 @@ function App() {
     }
   }
 
-  async function getSets() {
+  async function getSets(setList) {
+	if (setList) {
+		setData({
+			...data,
+			userSets: setList
+		});
+		return;
+	}
     let [sets, error] = await waitor.fetchUserSets(data.userID);
     if (error) {
       showToast(t_menu.ERR);
       return;
     }
     if (sets) {
-      console.log(sets);
       setData({
         ...data,
         userSets: sets
@@ -318,10 +324,10 @@ function App() {
     }
     if (set) {
       await getSets();
-      setData({
+      /*setData({
         ...data,
         setObj: set
-      });
+      });*/
       showToast(t_menu.SET_CREATE_S);
     } else {
       showToast(t_menu.TIMEOUT);

@@ -1,4 +1,3 @@
-import { createContext, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Dropdown, ListGroup, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
@@ -22,7 +21,7 @@ function Dictionary({lang, strings, wordObj, pageWords, setWordObj, getPage, get
     ///functions
     const submitSearch = event => {
         event.preventDefault();
-        search(document.getElementById("search").value);
+        search(document.getElementById("search_input").value);
     }
 
     function computeTable(columns) {
@@ -121,7 +120,7 @@ function Dictionary({lang, strings, wordObj, pageWords, setWordObj, getPage, get
                     <Col>
                         <Form onSubmit={submitSearch}>
                             <Stack direction='horizontal'>
-                                <Form.Control id="search" type="text" />
+                                <Form.Control id="search_input" type="text" />
                                 <Button type="submit">{strings.search[lang]}</Button>
                             </Stack>
                         </Form>

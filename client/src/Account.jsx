@@ -55,11 +55,11 @@ function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Are you sure?
+                        {strings.user_delete_text[lang]}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    You will not be able to recover your account or sets once deleted.
+                    {strings.user_delete_blurb[lang]}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant='danger' onClick={() => {deleteUser()}}>{strings.delete[lang]}</Button>

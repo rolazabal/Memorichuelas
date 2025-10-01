@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
+\restrict G8GeOUyXzqCxGP06fhqD4aAb89a0H4wws4jNd7EMQX1ddm1jZrZppdPCqHqBAcJ
+
+-- Dumped from database version 14.19 (Ubuntu 14.19-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.19 (Ubuntu 14.19-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -254,7 +256,7 @@ ALTER TABLE ONLY "Memorichuelas"."Users"
 --
 
 ALTER TABLE ONLY "Memorichuelas"."Credits"
-    ADD CONSTRAINT "Credits_fkey" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") NOT VALID;
+    ADD CONSTRAINT "Credits_fkey" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") MATCH FULL ON DELETE CASCADE NOT VALID;
 
 
 --
@@ -262,7 +264,7 @@ ALTER TABLE ONLY "Memorichuelas"."Credits"
 --
 
 ALTER TABLE ONLY "Memorichuelas"."Definitions"
-    ADD CONSTRAINT "Definitions_fkey" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") NOT VALID;
+    ADD CONSTRAINT "Definitions_fkey" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") MATCH FULL ON DELETE CASCADE NOT VALID;
 
 
 --
@@ -270,7 +272,7 @@ ALTER TABLE ONLY "Memorichuelas"."Definitions"
 --
 
 ALTER TABLE ONLY "Memorichuelas"."Examples"
-    ADD CONSTRAINT "Examples_fkey" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") NOT VALID;
+    ADD CONSTRAINT "Examples_fkey" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") MATCH FULL ON DELETE CASCADE NOT VALID;
 
 
 --
@@ -278,7 +280,7 @@ ALTER TABLE ONLY "Memorichuelas"."Examples"
 --
 
 ALTER TABLE ONLY "Memorichuelas"."SetWords"
-    ADD CONSTRAINT "SetWords_fkey1" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") NOT VALID;
+    ADD CONSTRAINT "SetWords_fkey1" FOREIGN KEY ("setID") REFERENCES "Memorichuelas"."Sets"("setID") MATCH FULL ON DELETE CASCADE NOT VALID;
 
 
 --
@@ -286,10 +288,20 @@ ALTER TABLE ONLY "Memorichuelas"."SetWords"
 --
 
 ALTER TABLE ONLY "Memorichuelas"."SetWords"
-    ADD CONSTRAINT "SetWords_fkey2" FOREIGN KEY ("setID") REFERENCES "Memorichuelas"."Sets"("setID") NOT VALID;
+    ADD CONSTRAINT "SetWords_fkey2" FOREIGN KEY ("wordID") REFERENCES "Memorichuelas"."Words"("wordID") MATCH FULL ON DELETE CASCADE NOT VALID;
+
+
+--
+-- Name: Sets Sets_fkey; Type: FK CONSTRAINT; Schema: Memorichuelas; Owner: ricar
+--
+
+ALTER TABLE ONLY "Memorichuelas"."Sets"
+    ADD CONSTRAINT "Sets_fkey" FOREIGN KEY ("userID") REFERENCES "Memorichuelas"."Users"("userID") MATCH FULL ON DELETE CASCADE NOT VALID;
 
 
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict G8GeOUyXzqCxGP06fhqD4aAb89a0H4wws4jNd7EMQX1ddm1jZrZppdPCqHqBAcJ
 

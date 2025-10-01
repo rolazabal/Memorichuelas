@@ -7,14 +7,14 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Stack from 'react-bootstrap/Stack';
-//import * as formik from 'formik';
-//import * as yup from 'yup';
+// import * as formik from 'formik';
+// import * as yup from 'yup';
 
 function Home({lang, strings, logIn, createAccount, loggedIn}) {
-    ///variables
+    /// variables
     const [createModal, setCreateModal] = useState(false);
 
-    ///functions
+    /// functions
     const submitLogin = event => {
         event.preventDefault();
         let username = document.getElementById("login_user").value;
