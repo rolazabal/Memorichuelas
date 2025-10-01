@@ -204,12 +204,12 @@ class Waitor {
         }
     }
 
-    async createSet(uID, name, words) {
+    async createSet(uID, name) {
         try {
             let res = await fetch('http://localhost:5050/api/sets', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'create', name: name, words: words, userID: uID})
+                body: JSON.stringify({action: 'create', name: name, userID: uID})
             });
             if (res.status < 300) {
                 res = await res.json();

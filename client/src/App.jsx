@@ -316,8 +316,8 @@ function App() {
     }
   }
 
-  async function createSet(name, words) {
-    let [set, error] = await waitor.createSet(data.userID, name, words);
+  async function createSet(name) {
+    let [set, error] = await waitor.createSet(data.userID, name);
     if (error) {
       showToast(t_menu.ERR);
       return;

@@ -7,8 +7,7 @@ import { Worker } from 'worker_threads';
 // queries
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_user_status = 'SELECT (active) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
-const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word ' + 
-    'JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
+// write db trigger to add official sets to this user
 const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
 const fetch_word = 'SELECT (name) FROM "Memorichuelas"."Words" WHERE "wordID" = $1';
 const fetch_definitions = 'SELECT (definition) FROM "Memorichuelas"."Definitions" WHERE "wordID" = $1';
@@ -20,16 +19,22 @@ const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE 
 const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
 const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
 const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1';
+const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
 const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1';
-const remove_set_words = 'DELETE FROM "Memorichuelas"."SetWords" WHERE "setID" = $1';
+const remove_set_word = 'DELETE FROM "Memorichuelas"."SetWords" WHERE "setID" = $1 AND "wordID" = $2';
 const add_set_word = 'INSERT INTO "Memorichuelas"."SetWords"("setID", "wordID") VALUES ($1, $2)';
-const fetch_user_sets = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "userID" = $1';
-const fetch_set = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "setID" = $1';
+const fetch_user_sets = 'SELECT (s."setID", name, score) FROM "Memorichuelas"."Sets" AS s ' +
+	'JOIN "Memorichuelas"."UserSets" AS us ON s."setID" = us."setID" WHERE NOT s.official AND us."userID" = $1';
+const fetch_official_sets = 'SELECT (s."setID, name, score") FROM "Memorichuelas"."Sets" AS s ' +
+	'JOIN "Memorichuelas"."UserSets" AS us ON s."setID" = us."setID" WHERE s.official AND us."userID" = $1';
 const create_set = 'INSERT INTO "Memorichuelas"."Sets"(name) VALUES ($1) RETURNING "setID"';
+const create_user_set = 'INSERT INTO "Memorichuelas"."UserSets"("setID", "userID") VALUES ($2, $1)';
 const update_set_name = 'UPDATE "Memorichuelas"."Sets" SET name = $2 WHERE "setID" = $1';
-
-const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
+const fetch_set_words = 'SELECT (w."wordID", name, score) FROM "Memorichuelas"."Words" AS w ' + 
+    'JOIN "Memorichuelas"."SetWords" AS sw ON w."wordID" = sw."wordID" WHERE "setID" = $1';
+const fetch_set = 'SELECT (s."setID", name, score) FROM "Memorichuelas"."Sets" AS s ' +
+	'JOIN "Memorichuelas"."UserSets" AS us ON s."setID" = us."setID" WHERE s."setID" = $1';
 
 // pool database connection
 const pool = new Pool({
@@ -211,8 +216,9 @@ async function updateSetName(setID, newName) {
 }
 
 async function createSet(userID, name) {
-    let res = await client.query(create_set, [userID, name]);
+    let res = await client.query(create_set, [name]);
     let id = parseInt(res.rows[0].setID);
+	res = await client.query(create_user_set, [userID, id]);
     return id;
 }
 
@@ -402,9 +408,7 @@ app.post('/api/sets', async (req, res) => {
                 break;
             case 'create':
                 let name = req.body.name;
-                list = req.body.words;
                 sID = await createSet(id, name);
-                await updateSetWords(sID, list);
                 obj = await setById(sID);
                 res.status(200).json({set: obj});
                 break;

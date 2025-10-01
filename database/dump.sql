@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 4vAfmeFu0VxHwYecbFQLFex8YfyzQeQWHAGmW7yWeDzI85cYrC59WvkVeaOcsxd
+\restrict 1hjyp3rbyowZnLQucMTfiidAQmTxY5J5DBTvTiYITDOnwlCTtfaTnoujxzrE6TT
 
 -- Dumped from database version 14.19 (Ubuntu 14.19-0ubuntu0.22.04.1)
 -- Dumped by pg_dump version 14.19 (Ubuntu 14.19-0ubuntu0.22.04.1)
@@ -32,14 +32,15 @@ ALTER SCHEMA "Memorichuelas" OWNER TO ricar;
 --
 
 CREATE FUNCTION "Memorichuelas".del_orphan_set() RETURNS trigger
-    LANGUAGE plpgsql STABLE
+    LANGUAGE plpgsql
     AS $$BEGIN
-	DELETE FROM "Memorichuelas"."Sets" s 
-	WHERE NOT s.official AND s."setID" = OLD."setID" 
+	DELETE FROM "Memorichuelas"."Sets" s
+	WHERE NOT s.official AND s."setID" = OLD."setID"
 	AND NOT EXISTS(
-		SELECT * FROM "Memorichuelas"."UserSets" us 
+		SELECT * FROM "Memorichuelas"."UserSets" us
 		WHERE us."setID" = OLD."setID"
 	);
+	RETURN NULL;
 END;$$;
 
 
@@ -297,6 +298,13 @@ CREATE TRIGGER us_after_del AFTER DELETE ON "Memorichuelas"."UserSets" FOR EACH 
 
 
 --
+-- Name: TRIGGER us_after_del ON "UserSets"; Type: COMMENT; Schema: Memorichuelas; Owner: ricar
+--
+
+COMMENT ON TRIGGER us_after_del ON "Memorichuelas"."UserSets" IS 'delete sets belonging to deleted user';
+
+
+--
 -- Name: Credits Credits_fkey; Type: FK CONSTRAINT; Schema: Memorichuelas; Owner: ricar
 --
 
@@ -356,5 +364,5 @@ ALTER TABLE ONLY "Memorichuelas"."UserSets"
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 4vAfmeFu0VxHwYecbFQLFex8YfyzQeQWHAGmW7yWeDzI85cYrC59WvkVeaOcsxd
+\unrestrict 1hjyp3rbyowZnLQucMTfiidAQmTxY5J5DBTvTiYITDOnwlCTtfaTnoujxzrE6TT
 
