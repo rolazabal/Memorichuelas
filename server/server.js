@@ -7,7 +7,6 @@ import { Worker } from 'worker_threads';
 // queries
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_user_status = 'SELECT (active) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
-const fetch_set_ids = 'SELECT "setID" FROM "Memorichuelas"."Sets" WHERE "userID" = $1'; // get all user's set's ids as array
 const fetch_set_words = 'SELECT (word."wordID", name, score) FROM "Memorichuelas"."Words" AS word ' + 
     'JOIN "Memorichuelas"."SetWords" AS setword ON word."wordID" = setword."wordID" WHERE "setID" = $1';
 const create_user = 'INSERT INTO "Memorichuelas"."Users"(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
@@ -20,14 +19,16 @@ const deactivate_user = 'UPDATE "Memorichuelas"."Users" SET active = false, time
 const fetch_user_info = 'SELECT (name, date) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
 const update_user_name = 'UPDATE "Memorichuelas"."Users" SET name = $2 WHERE "userID" = $1';
 const username_total = 'SELECT COUNT(*) FROM "Memorichuelas"."Users" GROUP BY name HAVING name = $1';
-const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1'; // write trigger on database to clear all user sets
-const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1'; // write trigger on database to clear all set words
+const remove_user = 'DELETE FROM "Memorichuelas"."Users" WHERE "userID" = $1';
+
+const remove_set = 'DELETE FROM "Memorichuelas"."Sets" WHERE "setID" = $1';
 const remove_set_words = 'DELETE FROM "Memorichuelas"."SetWords" WHERE "setID" = $1';
 const add_set_word = 'INSERT INTO "Memorichuelas"."SetWords"("setID", "wordID") VALUES ($1, $2)';
 const fetch_user_sets = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "userID" = $1';
 const fetch_set = 'SELECT ("setID", name, score) FROM "Memorichuelas"."Sets" WHERE "setID" = $1';
-const create_set = 'INSERT INTO "Memorichuelas"."Sets"("userID", name) VALUES ($1, $2) RETURNING "setID"';
+const create_set = 'INSERT INTO "Memorichuelas"."Sets"(name) VALUES ($1) RETURNING "setID"';
 const update_set_name = 'UPDATE "Memorichuelas"."Sets" SET name = $2 WHERE "setID" = $1';
+
 const regex_words = 'SELECT ("wordID", name) FROM "Memorichuelas"."Words" WHERE name LIKE $1';
 
 // pool database connection
