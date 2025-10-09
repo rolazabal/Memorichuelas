@@ -17,15 +17,16 @@ Our national dialect of Spanish is one such practice and very few online resourc
 
 Version 0.1.7 of `Memorichuelas` aims to implement all functionality except set management and quiz games, which means about 1/2 of the app's overall functionality is implemented.
 
+`Memorichuelas` uses a layered architecture with 3 layers:
+
 ### Frontend
-`Memorichuelas` uses `React` and `Vite`.
+`React`, and `Vite`.
 
 ### Backend
-`Memorichuelas` uses `Node.js`.
+`Node.js`, and `express.js`.
 
 ### Database
-
-`Memorichuelas` uses `PostgreSQL`.
+`PostgreSQL`.
 
 See the [0.1.3 release page][prot] for more info on that specific implementation, a new design is currently in the works.
 

@@ -55,7 +55,7 @@ app.use(express.json());
 const monitor = new Worker("./monitor.js");
 const user_timeout_ms = 1800000; // 30 minutes
 
-// /functions
+/// functions
 function parseRow(str) {
     return str.substring(1, str.length - 1).replace(/"/g, "").split(",");
 }
@@ -86,7 +86,10 @@ monitor.on("message", async (message) => {
 
 async function userActive(userID) {
     let res = await client.query(fetch_user_status, [userID]);
-    let active = res.rows[0].active;
+	console.log(res.rows);
+    let active = (res.rows.length > 0);
+	// if (res.rows != []) 
+	// active = res.rows[0].active;
     if (!active) return false;
     return active;
 }
@@ -175,11 +178,11 @@ async function setById(setID) {
     if (res.length == 0)
         return set;
     let words = [];
-    let info = parseRow(res.row);
+    let data = parseRow(res.row);
     set = {
-        setID: parseInt(info[0]),
-        name: info[1],
-        score: parseFloat(info[2]),
+        setID: parseInt(data[0]),
+        name: data[1],
+        score: parseFloat(data[2]),
         words: words
     };
     res = await client.query(fetch_set_words, [setID]);
@@ -367,6 +370,7 @@ app.post('/api/dictionary', async (req, res) => {
         case 'page':
             let letter = req.body.letter;
             list = await dictionaryPage(letter);
+			console.log(list);
             res.status(200).json({words: list});
             break;
         case 'word':

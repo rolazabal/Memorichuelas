@@ -1,63 +1,81 @@
-const strings = {
-    language: ["Language", "Lenguaje"],
-    about_title: ["About", "Inicio"],
-    about_blurb: [
-        "Personalized vocabulary learning using sets of words. Users can create and select sets and words from our dictionary to learn interactively.", 
-        "Aprendizaje de vocabulario personalizado utilizando colecciones de palabras. Como usuario, podras crear y seleccionar collectiones y palabras de nuestro diccionario para aprender de forma interactiva."
-    ],
-    dictionary_title: ["Dictionary", "Diccionario"],
-    sets_title: ["Sets", "Collecciones"],
-    set_create_text: ["Create a set", "Crear una colleccion"],
-    name: ["Name", "Nombre"],
-    name_text: ["Enter a name", "Nombra la colleccion"],
-    sets_custom: ["Custom sets", "Collecciones personales"],
-    sets_official: ["Official sets", "Colleciones oficiales"],
-	score: ["score", "puntuacion"],
-    sort: ["Sort", "Sortear"],
-    sort_alphi: ["A-Z", "A-Z"],
-    sort_alphd: ["Z-A", "Z-A"],
-    sort_scorei: ["Score increasing", "Score"],
-    sort_scored: ["Score decreasing", "Score"],
-    user_title: ["Account", "Cuenta"],
-    create: ["Create", "Crear"],
-    user_create_text: ["Create an account", "Crea una cuenta"],
-    user_delete_text: ["Are you sure?", "Estas seguro?"],
-    user_delete_blurb: ["You will not be able to recover your account or sets once deleted.", "No vas a poder recuperar tu cuenta ni tus collecciones despues de completar esta accion."],
-    login: ["Log in", "Entrar"],
-    logout: ["Log out", "Salir"],
-    login_text: ["Or log in to continue:", "O inicia una sesion para continuar:"],
-    username: ["Username", "Nombre de usuario"],
-    username_text: ["Enter a username", "Entra nombre de usuario"],
-    passkey: ["Passkey", "Contrasena numerica"],
-    passkey_text: ["Enter a passkey", "Entra contrasena numerica"],
-    change_name: ["Change username", "Cambiar nombre de usuario"],
-    change_name_text: ["Enter new username", "Entra nombre de usuario nuevo"],
-    user_information: ["Account info", "Informacion sobre la cuenta"],
-    user_date: ["Date created", "Fecha creada"],
-    user_delete: ["Delete account", "Borrar cuenta"],
-    update: ["Update", "Actualizar"],
-    back: ["Back", "Regresar"],
-    definition: ["Definition(s):", "Definicion(es):"],
-    example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
-    search: ["Search", "Buscar"],
-    delete: ["Delete", "Borrar"],
-    t_success: ["Success!", "Exito!"],
-    t_fail: ["Oops!", "Ups!"],
-    t_login_success: ["Logged in!", "Sesion iniciada!"],
-    t_login_fail: ["Log in failed!" , "No se pudo iniciar la session!"],
-    t_logout_success: ["Logged out!", "Sesion cerrada!"],
-    t_create_acc_fail: ["Failed to create account!", "No se pudo crear la cuenta!"],
-    t_change_name_success: ["Username changed!", "Nombre de usuario cambiado!"],
-    t_name_exists: ["Username is already in use!", "Nombre de usuario ya esta en uso!"],
-    t_delete_acc_success: ["Account deleted!", "Cuenta borrada!"],
-    t_delete_acc_fail: ["Failed to delete account!", "No se puedo borrar la cuenta!"],
-    t_user_timed_out: ["User timed out!", "Sesion expirada!"],
-    t_block_login: ["User active on a different tab!", "Usuario activo en otra pestana!"],
-    t_error: ["Error", "Error"],
-	t_create_set_success: ["Set created!", "Colleccion creada!"],
-	t_delete_set_success: ["Set deleted!", "Colleccion borrada!"],
-	t_change_setname_success: ["Changed set name!", "Nombre de colleccion cambiado!"],
-	t_change_setwords_success: ["Updated words in set!", "Palabras de colleccion actualizadas!"]
-};
+class Tome {
 
-export default strings
+	static langOptions = {
+		english: 0,
+		spanish: 1
+	};
+
+	static strings = {
+		language: ["Language", "Lenguaje"],
+		about_title: ["About", "Inicio"],
+		about_blurb: [
+			"Personalized vocabulary learning using sets of words. Users can create and select sets and words from our dictionary to learn interactively.", 
+			"Aprendizaje de vocabulario personalizado utilizando colecciones de palabras. Como usuario, podras crear y seleccionar collectiones y palabras de nuestro diccionario para aprender de forma interactiva."
+		],
+		dictionary_title: ["Dictionary", "Diccionario"],
+		sets_title: ["Sets", "Collecciones"],
+		set_create_text: ["Create a set", "Crear una colleccion"],
+		name: ["Name", "Nombre"],
+		name_text: ["Enter a name", "Nombra la colleccion"],
+		sets_custom: ["Custom sets", "Collecciones personales"],
+		sets_official: ["Official sets", "Colleciones oficiales"],
+		score: ["score", "puntuacion"],
+		sort: ["Sort", "Sortear"],
+		sort_alphi: ["A-Z", "A-Z"],
+		sort_alphd: ["Z-A", "Z-A"],
+		sort_scorei: ["Score increasing", "Score"],
+		sort_scored: ["Score decreasing", "Score"],
+		user_title: ["Account", "Cuenta"],
+		create: ["Create", "Crear"],
+		user_create_text: ["Create an account", "Crea una cuenta"],
+		user_delete_text: ["Are you sure?", "Estas seguro?"],
+		user_delete_blurb: ["You will not be able to recover your account or sets once deleted.", "No vas a poder recuperar tu cuenta ni tus collecciones despues de completar esta accion."],
+		login: ["Log in", "Entrar"],
+		logout: ["Log out", "Salir"],
+		login_text: ["Or log in to continue:", "O inicia una sesion para continuar:"],
+		username: ["Username", "Nombre de usuario"],
+		username_text: ["Enter a username", "Entra nombre de usuario"],
+		passkey: ["Passkey", "Contrasena numerica"],
+		passkey_text: ["Enter a passkey", "Entra contrasena numerica"],
+		change_name: ["Change username", "Cambiar nombre de usuario"],
+		change_name_text: ["Enter new username", "Entra nombre de usuario nuevo"],
+		user_information: ["Account info", "Informacion sobre la cuenta"],
+		user_date: ["Date created", "Fecha creada"],
+		user_delete: ["Delete account", "Borrar cuenta"],
+		update: ["Update", "Actualizar"],
+		back: ["Back", "Regresar"],
+		definition: ["Definition(s):", "Definicion(es):"],
+		example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
+		search: ["Search", "Buscar"],
+		delete: ["Delete", "Borrar"],
+		t_success: ["Success!", "Exito!"],
+		t_fail: ["Oops!", "Ups!"],
+		t_login_success: ["Logged in!", "Sesion iniciada!"],
+		t_login_fail: ["Log in failed!" , "No se pudo iniciar la session!"],
+		t_logout_success: ["Logged out!", "Sesion cerrada!"],
+		t_create_acc_fail: ["Failed to create account!", "No se pudo crear la cuenta!"],
+		t_change_name_success: ["Username changed!", "Nombre de usuario cambiado!"],
+		t_name_exists: ["Username is already in use!", "Nombre de usuario ya esta en uso!"],
+		t_delete_acc_success: ["Account deleted!", "Cuenta borrada!"],
+		t_delete_acc_fail: ["Failed to delete account!", "No se puedo borrar la cuenta!"],
+		t_user_timed_out: ["User timed out!", "Sesion expirada!"],
+		t_block_login: ["User active on a different tab!", "Usuario activo en otra pestana!"],
+		t_error: ["Error", "Error"],
+		t_create_set_success: ["Set created!", "Colleccion creada!"],
+		t_delete_set_success: ["Set deleted!", "Colleccion borrada!"],
+		t_change_setname_success: ["Changed set name!", "Nombre de colleccion cambiado!"],
+		t_change_setwords_success: ["Updated words in set!", "Palabras de colleccion actualizadas!"]
+	};
+
+	lang;
+	
+	constructor(opt) {
+		this.lang = Tome.langOptions[opt];
+	}
+	
+	get(key) {
+		return Tome.strings[key][this.lang];
+	}
+}
+
+export default Tome

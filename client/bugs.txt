@@ -1,1 +1,0 @@
-1- toasts refresh page when they timeout, closing modals and clearing forms

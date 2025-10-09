@@ -1,49 +1,55 @@
-import { ListGroup, Row } from 'react-bootstrap';
-import { useState } from 'react';
+import { ListGroup } from 'react-bootstrap';
+import { useState, useContext, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Stack from 'react-bootstrap/Stack';
+import { LocContext } from './../context/LocContext.jsx';
 
-function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
-    ///variables
+function Account({info, getInfo, logOut, changeUsername, deleteUser}) {
+
+	const { strings } = useContext(LocContext);
     const [createModal, setCreateModal] = useState(false);
 
-    ///functions
     const submitChange = event => {
         event.preventDefault();
         let username = document.getElementById("change_name").value;
         changeUsername(username);
     }
 
+	useEffect(() => {
+        getInfo();
+    }, []);
+
     return (
         <>
-            <Card.Title>{strings.user_title[lang]}</Card.Title>
+            <Card.Title>{strings.get('user_title')}</Card.Title>
             <ListGroup style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
                 <ListGroup.Item>
-                    <Card.Text>{strings.change_name[lang]}</Card.Text>
+                    <Card.Text>{strings.get('change_name')}</Card.Text>
                     <Form onSubmit={submitChange}>
                         <Stack direction="horizontal" gap={3}>
-                            <Form.Control id="change_name" type="username" placeholder={strings.change_name_text[lang]} />
-                            <Button type="submit">{strings.update[lang]}</Button>
+                            <Form.Control id="change_name" type="username" placeholder={strings.get('change_name_text')} />
+                            <Button type="submit">{strings.get('update')}</Button>
                         </Stack>
                     </Form>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                    <Card.Text>{strings.user_information[lang]}</Card.Text>
+                    <Card.Text>{strings.get('user_information')}</Card.Text>
                     <Card.Text>
-                        {strings.username[lang]}: {info != null ? info.name : ''}
+                        {strings.get('username')}: {info != null ? info.name : ''}
                         <br />
-                        {strings.user_date[lang]}: {info != null ? info.date : ''}
+                        {strings.get('user_date')}: {info != null ? info.date : ''}
                     </Card.Text>
                     <Stack direction="horizontal">
-                        <Button onClick={() => {logOut(false)}}>{strings.logout[lang]}</Button>
-                        <Button className="ms-auto" variant="danger" onClick={() => {setCreateModal(true)}}>{strings.user_delete[lang]}</Button>
+                        <Button onClick={() => {logOut(false)}}>{strings.get('logout')}</Button>
+                        <Button className="ms-auto" variant="danger" 
+							onClick={() => {setCreateModal(true)}}
+						>
+							{strings.get('user_delete')}
+						</Button>
                     </Stack>
-                    <Modal>
-                        {/*are you sure you want to delete account?*/}
-                    </Modal>
                 </ListGroup.Item>
             </ListGroup>
             <Modal
@@ -55,14 +61,14 @@ function Account({lang, strings, info, logOut, changeUsername, deleteUser}) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {strings.user_delete_text[lang]}
+                        {strings.get('user_delete_text')}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {strings.user_delete_blurb[lang]}
+                    {strings.get('user_delete_blurb')}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant='danger' onClick={() => {deleteUser()}}>{strings.delete[lang]}</Button>
+                    <Button variant='danger' onClick={() => {deleteUser()}}>{strings.get('delete')}</Button>
                 </Modal.Footer>
             </Modal>
         </>
