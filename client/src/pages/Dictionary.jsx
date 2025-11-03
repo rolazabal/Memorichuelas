@@ -63,14 +63,14 @@ const PageList = ({letter, list, setLetter, getWord}) => {
 
 function Dictionary({ID}) {
 
-	const dictAPI = 'http://localhost:5050/api/dictionary';
-
     const [list, setList] = useState([]);
     const [word, setWord] = useState(null);
     const [pageLetter, setPageLetter] = useState(alph[0]);
     
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
+
+    	const dictAPI = 'http://localhost:5050/api/dictionary';
 
     const submitSearch = async (data) => {
         let query = data.get("search_input");

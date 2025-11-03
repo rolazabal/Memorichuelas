@@ -88,8 +88,6 @@ async function userActive(userID) {
     let res = await client.query(fetch_user_status, [userID]);
 	console.log(res.rows);
     let active = (res.rows.length > 0);
-	// if (res.rows != []) 
-	// active = res.rows[0].active;
     if (!active) return false;
     return active;
 }
@@ -249,6 +247,10 @@ async function deleteUser(userID) {
 
 // http functions
 // account api
+// get -> info, login
+// put -> username, logout
+// post -> create acc
+// delete -> delete
 app.post('/api/account', async (req, res) => {
     console.log(req.body);
     let id = -0;
@@ -359,6 +361,7 @@ app.post('/api/account', async (req, res) => {
 });
 
 // dictionary api
+// get -> page, search, word
 app.post('/api/dictionary', async (req, res) => {
     console.log(req.body);
     let id = req.body.userID;
@@ -390,6 +393,10 @@ app.post('/api/dictionary', async (req, res) => {
 });
 
 // sets api
+// get -> sets, set
+// post -> create
+// delete -> delete
+// put -> name, words
 app.post('/api/sets', async (req, res) => {
     console.log(req.body);
     let id = req.body.userID;
