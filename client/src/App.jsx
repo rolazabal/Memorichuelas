@@ -99,7 +99,7 @@ function App() {
 
 	const [page, setPage] = useState(pages.SETS);
 
-	const [userID, setUserID] = useState(-1);
+	const [userID, setUserID] = useState(42);
 
 	const loadLocal = () => {
 		console.log("reload");
@@ -118,37 +118,6 @@ function App() {
 	window.onload = function() { loadLocal() };
 
 	const { strings, setStrings } = useContext(LocContext);
-
-	const [fakeSet, setFakeSet] = useState({
-		setID: 300,
-		name: "comidas",
-		score: 0.25,
-		words: [
-			{
-				wordID: 500,
-				name: "A",
-				score: 1.00
-			},
-			{
-				wordID: 444,
-				name: "B",
-				score: 0.25
-			}
-		]
-	});
-
-	const [fakeSetList, setFakeSetList] = useState([
-		{
-			setID: 300,
-			name: "comidas",
-			score: 0.25
-		},
-		{
-			setID: 301,
-			name: "frases",
-			score: 1.00
-		}
-	]);
 
 	return (
 		<Container fluid style={{display: "block", height: "100%", width: "100%"}}>

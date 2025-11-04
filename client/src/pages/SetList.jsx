@@ -40,18 +40,24 @@ function SetList({sets, getSets, create, edit}) {
 		<Row>
 			<Form action={submitCreate}>
 				<Stack direction='horizontal'>
-					<Form.Control name="create_name" type="text" placeholder={strings.get("name_text")} />
-					<Button type="submit">+</Button>
+					<Form.Control name="create_name" type="text" placeholder={strings.get("name_text")} style={{width: "50%"}}/>
+					<Button type="submit" style={{width: "50%"}}>{strings.get("create")}</Button>
 				</Stack>
 			</Form>
 		</Row>
 		{sets != null && sets.map((set, index) => 
 			<Row key={index}>
 				<Stack direction="horizontal">
-					<h3>
-						{set.name}, {strings.get("score")}:  {set.score}
-					</h3>
-					<Button onClick={() => {edit(set.setID)}}>edit</Button>
+					<Button
+						variant="light"
+						className="ms-auto"
+						style={{width: "100%"}}
+						onClick={() => {edit(set.setID)}}
+					>
+						<h4>
+							{set.name}, {strings.get("score")}: {set.score}
+						</h4>
+					</Button>
 				</Stack>
 			</Row>
 		)}

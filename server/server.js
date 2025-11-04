@@ -3,7 +3,7 @@ import cors from 'cors';
 import { Pool } from 'pg';
 import { Worker } from 'worker_threads';
 
-// /variables
+// variables
 // queries
 const fetch_user = 'SELECT ("userID") FROM "Memorichuelas"."Users" WHERE name = $1 AND passkey = $2';
 const fetch_user_status = 'SELECT (active) FROM "Memorichuelas"."Users" WHERE "userID" = $1';
@@ -247,10 +247,94 @@ async function deleteUser(userID) {
 
 // http functions
 // account api
-// get -> info, login
-// put -> username, logout
-// post -> create acc
-// delete -> delete
+/*
+app.get('/api/account', (req, res) => {
+	username = req.body.username;
+	passkey = parseInt(req.body.passkey);
+	id = userID(username, passkey);
+	if (!id) {
+		res.status(404).json({msg: 'user not found.'});
+		return;
+	}
+	if (userActive(id)) {
+		res.status(403).json({msg: 'user is active.'});
+		return;
+	}
+	logAction(id);
+	res.status(200).json({ID: id});
+});
+
+app.get('/api/account/:id', (req, res) => {
+	id = parseInt(req.params.id);
+	if (!userActive(id)) {
+		res.status(403).json({msg: 'user timed out.'});
+		return;
+	}
+	logAction(id);
+	obj = userInfo(id);
+	res.status(200).json({info: obj});
+});
+
+app.delete('/api/account/:id', (req, res) => {
+	id = req.params.id;
+	if (!userActive(id)) {
+		res.status(403).json({msg: 'user timed out.'});
+		return;
+	}
+	deleteUser(id);
+	res.status(200).json({msg: 'user deleted.'});
+});
+
+app.put('/api/account/:id', (req, res) => {
+	id = req.params.id;
+	if (!userActive(id)) {
+		res.status(403).json({msg: 'user timed out.'});
+		return;
+	}
+	deactivateUser(id);
+	res.status(200).json({msg: 'user logged out.'});
+});
+
+app.put('/api/account/:id/username', (req, res) => {
+	id = req.params.id;
+	if (!userActive(id)) {
+		res.status(403).json({msg: 'user timed out.'});
+		return;
+	}
+	username = req.body.username;
+	if (username == "") {
+		res.status(400).json({msg: 'invalid username.'});
+		return;
+	}
+	if (usernameExists(username)) {
+		res.status(400).json({msg: 'username is in use.'});
+		return;
+	}
+	logAction(id);
+	updateUsername(id, username);
+	res.status(200).json({msg: 'username updated.'});
+});
+
+app.post('/api/account/', (req, res) => {
+	username = req.body.username;
+	passkey = parseInt(req.body.passkey);
+	if (username == "") {
+		res.status(400).json({msg: 'invalid username.'});
+		return;
+	}
+	if (passkey > 99999999 || passkey < 1) {
+		res.status(400).json({msg: 'invalid passkey.'});
+		return;
+	}
+	if (usernameExists(username)) {
+		res.status(400).json({msg: 'username is in use.'});
+		return;
+	}
+	createUser(username, passkey);
+	res.status(200).json({msg: 'user created.'});
+});
+*/
+
 app.post('/api/account', async (req, res) => {
     console.log(req.body);
     let id = -0;

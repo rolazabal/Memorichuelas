@@ -48,6 +48,7 @@ class Tome {
 		example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
 		search: ["Search", "Buscar"],
 		delete: ["Delete", "Borrar"],
+		play: ["Play", "Jugar"],
 		t_success: ["Success!", "Exito!"],
 		t_fail: ["Oops!", "Ups!"],
 		t_login_success: ["Logged in!", "Sesion iniciada!"],
