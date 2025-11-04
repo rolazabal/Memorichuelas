@@ -21,10 +21,10 @@ function Home({logIn, createAccount, ID}) {
     }
     
     const submitCreate = (data) => {
-        setCreateModal(false);
         let username = data.get("create_user");
         let passkey = data.get("create_pass");
         createAccount(username, passkey);
+        setCreateModal(false);
     }
 
     return (

@@ -99,7 +99,7 @@ function App() {
 
 	const [page, setPage] = useState(pages.SETS);
 
-	const [userID, setUserID] = useState(42);
+	const [userID, setUserID] = useState(-1);
 
 	const loadLocal = () => {
 		console.log("reload");
