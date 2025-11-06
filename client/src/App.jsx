@@ -10,7 +10,7 @@ import Stack from 'react-bootstrap/Stack';
 import Tome from './Strings.js';
 import Home from './pages/Home.jsx';
 import Account from './pages/Account.jsx';
-import Dictionary from './pages/Dictionary.jsx';
+import DictionaryWizard from './pages/DictionaryWizard.jsx';
 import SetWizard from './pages/SetWizard.jsx';
 import { LocContext } from './context/LocContext.jsx';
 import { use } from 'react';
@@ -19,75 +19,6 @@ import { ToastContext } from './context/ToastContext.jsx';
 function App() {
 
 	const verStr = "0.1.8d";
-
-	const accAPI = 'http://localhost:5050/api/account';
-
-	const { toasts, showToast } = useContext(ToastContext);
-
-	async function logIn(user, pass) {
-		try {
-			let res = await fetch(accAPI, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({action: 'logIn', username: user, passkey: pass})
-			});
-			if (res.status < 300) {
-				res = await res.json();
-				let id = await res.ID;
-				setUserID(id);
-				setPage(pages.SETS);
-				localStorage.setItem('userID', id);
-				showToast(toasts.LOGIN_S);
-			} else {
-				switch(res.status) {
-					case 403:
-						showToast(toasts.LOGIN_BLOCK);
-						break;
-					default:
-						showToast(toasts.LOGIN_F);
-						break;
-				}
-			}
-		} catch(error) {
-			showToast(toasts.ERR);
-		}
-	}
-
-	async function logOut(silent) {
-		try {
-			await fetch(accAPI, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({action: 'logOut', userID: userID})
-			});
-			setUserID(-1);
-			localStorage.removeItem('userID');
-			if (!silent)
-				showToast(toasts.LOGOUT_S);
-		} catch(error) {
-			showToast(toasts.ERR);
-		}
-	}
-
-	async function createAccount(user, pass) {
-		try {
-			let res = await fetch(accAPI, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({action: 'create', username: user, passkey: pass})
-			});
-			if (res.status < 300)
-				logIn(user, pass);
-			else {
-				if (res.json().error == 'username already exists!') {
-					showToast(toasts.USERNAME_F);
-				} else
-					showToast(toasts.ACC_CREATE_F);
-			}
-		} catch(error) {
-			showToast(toasts.ERR);
-		}
-	}
 
 	const pages = {
 		HOME: 0,
@@ -98,7 +29,7 @@ function App() {
 	};
 
 	const [page, setPage] = useState(pages.SETS);
-	const [userID, setUserID] = useState(42);
+	const [userID, setUserID] = useState(-1);
 
 	const loadLocal = () => {
 		console.log("reload");
@@ -117,11 +48,93 @@ function App() {
 	window.onload = function() { loadLocal() };
 
 	const { strings, setStrings } = useContext(LocContext);
+	const { toasts, showToast } = useContext(ToastContext);
+	
+	const accAPI = 'http://localhost:5050/api/account';
+
+	async function logIn(user, pass) {
+		try {
+			let res = await fetch(accAPI, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({username: user, passkey: pass})
+			});
+			if (res.status == 200) {
+				res = await res.json();
+				let id = await res.user_id;
+				setUserID(id);
+				setPage(pages.SETS);
+				localStorage.setItem('userID', id);
+				showToast(toasts.LOGIN_S);
+			} else {
+				switch(res.status) {
+					case 403:
+						showToast(toasts.LOGIN_BLOCK);
+						break;
+					default:
+						showToast(toasts.LOGIN_F);
+						break;
+				}
+			}
+		} catch(error) { showToast(toasts.ERR); }
+	}
+
+	async function logOut() {
+		try {
+			await fetch(accAPI + "/" + userID, {
+				method: 'PUT'
+			});
+			setUserID(-1);
+			localStorage.removeItem('userID');
+			showToast(toasts.LOGOUT_S);
+			setPage(pages.HOME);
+		} catch(error) { showToast(toasts.ERR); }
+	}
+	
+	async function deleteUser() {
+                try {
+                        let res = await fetch(accAPI + "/" + userID, {
+                                method: 'DELETE'
+                        });
+                        if (res.status == 200) {
+                                setUserID(-1);
+				localStorage.removeItem('userID');
+                                showToast(toasts.ACC_DEL_S);
+				setPage(pages.HOME);
+                        } else {
+                                showToast(toasts.TIMEOUT);
+                        }
+                } catch(error) { showToast(toasts.ERR); }
+        }
+
+	async function createAccount(user, pass) {
+		try {
+			let res = await fetch(accAPI, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({username: user, passkey: pass})
+			});
+			if (res.status == 200)
+				logIn(user, pass);
+			else {
+				res = await res.json();
+				switch (res.msg) {
+					case 'username is in use.':
+						showToast(toasts.USERNAME_TAKEN);
+						break;
+					default:
+						showToast(toasts.ACC_CREATE_F);
+						break;
+				}
+			}
+		} catch(error) { showToast(toasts.ERR); }
+	}
+
 
 	return (
 		<Container fluid style={{display: "block", height: "100%", width: "100%"}}>
 			<Row>
-				<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+				<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary" onSelect={(eventKey) => setPage(eventKey)}>
 					<Stack direction="horizontal">
 						<Navbar.Brand>Memorichuelas</Navbar.Brand>
 						<Dropdown>
@@ -141,11 +154,11 @@ function App() {
 					<Navbar.Toggle aria-controls="responsive-navbar-nav" />
 					<Navbar.Collapse id="responsive-navbar-nav">
 						<Nav className="me-auto">
-							<Nav.Link eventKey="1" onClick={() => setPage(pages.HOME)}>{strings.get('about_title')}</Nav.Link>
-							<Nav.Link eventKey="2" onClick={() => setPage(pages.DICTIONARY)}>{strings.get('dictionary_title')}</Nav.Link>
+							<Nav.Link eventKey={pages.HOME}>{strings.get('about_title')}</Nav.Link>
+							<Nav.Link eventKey={pages.DICTIONARY}>{strings.get('dictionary_title')}</Nav.Link>
 							{userID != -1 && <>
-								<Nav.Link eventKey="3" onClick={() => setPage(pages.SETS)}>{strings.get('sets_title')}</Nav.Link>
-								<Nav.Link eventKey="4" onClick={() => setPage(pages.SETTINGS)}>{strings.get('user_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.SETS}>{strings.get('sets_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.SETTINGS}>{strings.get('user_title')}</Nav.Link>
 							</>}
 						</Nav>
 					</Navbar.Collapse>
@@ -159,7 +172,7 @@ function App() {
 							logIn={(name, pass) => logIn(name, pass)} 
 							createAccount={(name, pass) => createAccount(name, pass)} 
 						/>}
-						{page == pages.DICTIONARY && <Dictionary
+						{page == pages.DICTIONARY && <DictionaryWizard
 							ID={userID}
 						/>}
 						{page == pages.SETS && <SetWizard
@@ -167,7 +180,8 @@ function App() {
 						/>}
 						{page == pages.SETTINGS && <Account
 							ID={userID}
-							logOut={() => logOut(false)}
+							logOut={() => logOut()}
+							del={() => deleteUser()}
 						/>}
 					</Card.Body>
 				</Card>

@@ -2,9 +2,9 @@ import { Pool } from 'pg';
 import dict from '../database/dict.js';
 
 // queries
-const add_word = 'INSERT INTO "Memorichuelas"."Words"(name) VALUES ($1) RETURNING "wordID"';
-const add_definition = 'INSERT INTO "Memorichuelas"."Definitions"("wordID", definition) VALUES ($1, $2)';
-const add_example = 'INSERT INTO "Memorichuelas"."Examples"("wordID", example) VALUES ($1, $2)';
+const add_word = 'INSERT INTO words(name) VALUES ($1) RETURNING word_id';
+const add_definition = 'INSERT INTO definitions(word_id, definition) VALUES ($1, $2)';
+const add_example = 'INSERT INTO examples(word_id, example) VALUES ($1, $2)';
 
 // pool
 const pool = new Pool({
@@ -33,10 +33,10 @@ const buildDictDB = async() => {
     console.log("Building database!");
     for (let x of words) {
         let word = buildWordObject(x);
-        console.log("adding " + word.name);
+        // console.log("adding " + word.name);
         let res = await client.query(add_word, [word.name]);
         // console.log("word success!");
-        let id = res.rows[0].wordID;
+        let id = res.rows[0].word_id;
         // add defintions and examples
         for (let y in word.defs)
             await client.query(add_definition, [id, word.defs[y]]);

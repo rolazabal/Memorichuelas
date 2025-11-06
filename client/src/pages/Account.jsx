@@ -6,77 +6,60 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Stack from 'react-bootstrap/Stack';
 import { LocContext } from './../context/LocContext.jsx';
+import { ToastContext } from './../context/ToastContext.jsx';
 
-function Account({ID, logOut}) {
+function Account({ID, logOut, del}) {
 
 	const [info, setInfo] = useState(null);
-
-	const { strings } = useContext(LocContext);
 	const [createModal, setCreateModal] = useState(false);
 
+	const { strings } = useContext(LocContext);
+	const { toasts, showToast } = useContext(ToastContext);
+	
 	const accAPI = 'http://localhost:5050/api/account';
-
-	async function deleteUser() {
-		try {
-			let res = await fetch(accAPI, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({action: 'delete', userID: ID})
-			});
-			if (res.status < 300) {
-				clearData();
-				showToast(toasts.ACC_DEL_S);
-			} else {
-				showToast(toasts.TIMEOUT);
-				logOut(true);
-			}
-		} catch(error) {
-			showToast(toasts.ERR);
-		}
-	}
 
 	async function getInfo() {
 		try {
-			let res = await fetch(accAPI, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({action: 'info', userID: ID})
+			let res = await fetch(accAPI + "/" + ID, {
+				method: 'GET'
 			});
-			if (res.status < 300) {
+			if (res.status == 200) {
 				res = await res.json();
 				let obj = res.info;
 				setInfo(obj);
-			} else
+			} else {
 				showToast(toasts.TIMEOUT);
-				logOut(true);
-		} catch(error) {
-			showToast(toasts.ERR);
-		}
+			}
+		} catch(error) { showToast(toasts.ERR); }
 	}
 
 	async function changeName(user) {
 		try {
-			let res = await fetch(accAPI, {
-				method: 'POST',
+			let res = await fetch(accAPI + "/" + ID + "/username", {
+				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({action: 'updateName', userID: ID, username: user})
+				body: JSON.stringify({username: user})
 			});
-			if (res.status < 300) {
+			if (res.status == 200) {
 				await getInfo();
 				showToast(toasts.USERNAME_S);
+			} else if (res.status == 403) {
+				showToast(toasts.TIMEOUT);
 			} else {
-				if (res.status == 403) {
-					showToast(toasts.TIMEOUT);
-					logOut(true);
+				res = await res.json();
+				switch (res.msg) {
+					case 'username is in use.':
+						showToast(toasts.USERNAME_TAKEN);
+						break;
+					default:
+						showToast(toasts.USERNAME_F);
+						break;
 				}
-				showToast(toasts.USERNAME_F);
 			}
-		} catch(error) {
-			showToast(toasts.ERR);
-		}
+		} catch(error) { showToast(toasts.ERR); }
 	}
 
-	const submitChange = event => {
+	const handleChange = (data) => {
 		let username = data.get("change_name");
 		changeName(username);
 	}
@@ -91,7 +74,7 @@ function Account({ID, logOut}) {
 			<ListGroup style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
 				<ListGroup.Item>
 					<Card.Text>{strings.get('change_name')}</Card.Text>
-					<Form action={submitChange}>
+					<Form action={handleChange}>
 						<Stack direction="horizontal" gap={3}>
 							<Form.Control name="change_name" type="username" placeholder={strings.get('change_name_text')} />
 							<Button type="submit">{strings.get('update')}</Button>
@@ -100,11 +83,11 @@ function Account({ID, logOut}) {
 				</ListGroup.Item>
 				<ListGroup.Item>
 					<Card.Text>{strings.get('user_information')}</Card.Text>
-					<Card.Text>
-						{strings.get('username')}: {info != null ? info.name : ''}
+					{info != null && <Card.Text>
+						{strings.get("username")}: {info.name}
 						<br />
-						{strings.get('user_date')}: {info != null ? info.date : ''}
-					</Card.Text>
+						{strings.get('user_date')}: {info.date}
+					</Card.Text>}
 					<Stack direction="horizontal">
 						<Button onClick={() => {logOut(false)}}>{strings.get('logout')}</Button>
 						<Button className="ms-auto" variant="danger" 
@@ -131,7 +114,7 @@ function Account({ID, logOut}) {
 					{strings.get('user_delete_blurb')}
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant='danger' onClick={() => {deleteUser()}}>{strings.get('delete')}</Button>
+					<Button variant='danger' onClick={del}>{strings.get('delete')}</Button>
 				</Modal.Footer>
 			</Modal>
 		</>

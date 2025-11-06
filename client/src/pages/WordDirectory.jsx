@@ -40,23 +40,23 @@ function WordDirectory({ID, view, api}) {
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
 	
-	function getPage(letter) {
+	async function getPage(letter) {
 		try {
-			let res = fetch(api + "/" + letter, {
+			let res = await fetch(api + "/" + letter + "/" + ID, {
 				method: 'GET'
 			});
-			res = res.json();
+			res = await res.json();
 			let words = res.words;
 			setList(words);
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
-	function search(query) {
+	async function search(query) {
 		try {
-			let res = fetch(api + "/?search=" + query, {
+			let res = await fetch(api + "/search/" + query + "/" + ID, {
 				method: 'GET'
 			});
-			res = res.json();
+			res = await res.json();
 			let words = res.words;
 			setList(words);
 		} catch(error) { showToast(toasts.ERR); }
@@ -104,8 +104,8 @@ function WordDirectory({ID, view, api}) {
 					</Pagination>
 				</Row>
 				{table.map((row) => <Row>
-					{row.map((entry) => <Col id={parseInt(entry[0])} onClick={view(parseInt(entry[0]))}>
-						{entry[1]}
+					{row.map((entry) => <Col name={entry.word_id} onClick={() => view(entry.word_id)}>
+						{entry.name}
 					</Col>)}
 				</Row>)}
 			</Container>

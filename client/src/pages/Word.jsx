@@ -1,16 +1,27 @@
-function Word({uID, wID, api}) {
+import { Dropdown, ListGroup, Row, Col } from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import Stack from 'react-bootstrap/Stack';
+import Form from 'react-bootstrap/Form';
+import Pagination from 'react-bootstrap/Pagination';
+import { useState, useEffect, useContext } from 'react';
+import { LocContext } from './../context/LocContext.jsx';
+import { ToastContext } from './../context/ToastContext.jsx';
+
+function Word({uID, wID, close, api}) {
 
 	const [word, setWord] = useState(null);
 
 	const { strings } = useContext(LocContext);
         const { toasts, showToast } = useContext(ToastContext);
 
-	function getWord(id) {
+	async function getWord(id) {
 		try {
-			let res = fetch(api + "/word/" + id, {
+			let res = await fetch(api + "/word/" + id + "/" + uID, {
 				method: 'GET'
 			});
-			res = res.json();
+			res = await res.json();
 			let word = res.word;
 			setWord(word);
 		} catch(error) { showToast(toasts.ERR); }
@@ -24,17 +35,17 @@ function Word({uID, wID, api}) {
 		<>
 			<Row>
 				<Card.Title>
-					{strings.get("dictionary_title")}
+					<Stack direction="horizontal">
+						{strings.get("dictionary_title")}
+						<Button variant="secondary" className="ms-auto" onClick={close}>
+							{strings.get("back")}
+						</Button>
+					</Stack>
 				</Card.Title>
 			</Row>
 			<Container style={{padding: "0", maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
 				{word != null && <>
-					<Stack direction="horizontal">
-						<h2>{word.name}</h2>
-						<Button className="ms-auto" onClick={async () => {await setWord(null)}}>
-							{strings.get("back")}
-						</Button>
-					</Stack>
+					<h2>{word.name}</h2>
 					{word.defs.length > 0 && <ul>
 						{word.defs.map((def) => <li>
 							{def}

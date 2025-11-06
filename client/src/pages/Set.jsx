@@ -86,7 +86,7 @@ function Set({ID, sID, close, add, api}) {
 			<Row>
 				<Stack direction='horizontal'>
 					<Card.Title>{set.name}</Card.Title>
-					<Button className="ms-auto" onClick={close}>{strings.get("back")}</Button>
+					<Button variant="secondary" className="ms-auto" onClick={close}>{strings.get("back")}</Button>
 				</Stack>
 			</Row>
 			<Row>

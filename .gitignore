@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# database connection
-/server/.env
+# database and server port
+server/.env

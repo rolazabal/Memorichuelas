@@ -132,7 +132,7 @@ function Dictionary({ID}) {
 			{word == null && <Col>
 				<Form action={submitSearch}>
 					<Stack direction='horizontal'>
-						<Form.Control id="search_input" type="text" />
+						<Form.Control name="search_input" type="text" />
 						<Button type="submit">{strings.get('search')}</Button>
 					</Stack>
 				</Form>

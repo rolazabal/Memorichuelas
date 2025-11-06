@@ -71,11 +71,20 @@ function Toaster({toast}) {
 			<Toast
 				bg={'danger'}
 				onClose={() => setShow(false)}
-				show={show && type == toasts.USERNAME_F}
+				show={show && type == toasts.USERNAME_TAKEN}
 				delay={del} autohide
 			>
 				<Toast.Header>{strings.get('t_fail')}</Toast.Header>
 				<Toast.Body>{strings.get('t_name_exists')}</Toast.Body>
+			</Toast>
+			<Toast
+				bg={'danger'}
+				onClose={() => setShow(false)}
+				show={show && type == toasts.USERNAME_F}
+				delay={del} autohide
+			>
+				<Toast.Header>{strings.get('t_fail')}</Toast.Header>
+				<Toast.Body>{strings.get('t_name_invalid')}</Toast.Body>
 			</Toast>
 			<Toast
 				bg={'success'}

@@ -20,15 +20,15 @@ function DictionaryWizard({ID}) {
 			setMode(modes.WORD);
 	}, [wordID]);
 
-	dictAPI = 'http://localhost:5050/api/dictionary';
+	const dictAPI = 'http://localhost:5050/api/dictionary';
 
 	return (
 		<>
 			{mode == modes.DIRECTORY &&
-				<WordDirectory ID={ID} view={(id) => {setWordID(id)}} api={dictAPI} />
+				<WordDirectory ID={ID} view={(id) => setWordID(id)} api={dictAPI} />
 			}
 			{mode == modes.WORD &&
-				<Word uID={ID} wID={wordID} api={dictAPI} />
+				<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />
 			}
 		</>
 	);

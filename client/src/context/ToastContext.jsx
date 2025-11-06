@@ -13,6 +13,7 @@ export const ToastContextProvider = ({ children }) => {
 		ACC_CREATE_F: 3,
 		USERNAME_S: 4,
 		USERNAME_F: 5,
+	    	USERNAME_TAKEN: 17,
 		ACC_DEL_S: 6,
 		ACC_DEL_F: 7,
 		TIMEOUT: 8,

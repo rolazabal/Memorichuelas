@@ -57,6 +57,7 @@ class Tome {
 		t_create_acc_fail: ["Failed to create account!", "No se pudo crear la cuenta!"],
 		t_change_name_success: ["Username changed!", "Nombre de usuario cambiado!"],
 		t_name_exists: ["Username is already in use!", "Nombre de usuario ya esta en uso!"],
+		t_name_invalid: ["Username is invalid!", "Nombre de usuario no valido!"],
 		t_delete_acc_success: ["Account deleted!", "Cuenta borrada!"],
 		t_delete_acc_fail: ["Failed to delete account!", "No se puedo borrar la cuenta!"],
 		t_user_timed_out: ["User timed out!", "Sesion expirada!"],
