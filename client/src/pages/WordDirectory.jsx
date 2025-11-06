@@ -95,14 +95,14 @@ function WordDirectory({ID, view, api}) {
 					</Form>
 				</Col>
 			</Row>
-			<Container style={{padding: "0", maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
-				<Row>
+				<Row style={{overflowX: "auto"}}>
 					<Pagination size="md">
 						{alph.map((c) => <Pagination.Item key={c} active={c == page} onClick={() => setPage(c)}>
 							{c}
 						</Pagination.Item>)}
 					</Pagination>
 				</Row>
+			<Container style={{padding: "0", maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
 				{table.map((row) => <Row>
 					{row.map((entry) => <Col name={entry.word_id} onClick={() => view(entry.word_id)}>
 						{entry.name}

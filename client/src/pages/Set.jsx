@@ -8,6 +8,7 @@ import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
@@ -90,15 +91,13 @@ function Set({ID, sID, close, add, view, api}) {
 				</Stack>
 			</Row>
 			<Row>
-				<ul>
-					{set.words.map((word) => <li>
-						<Button onClick={() => view(word.word_id)}>{word.name}</Button>
-						<Button onClick={() => removeWord(word.word_id)}>d</Button>
-					</li>)}
-					<li>
-						<Button onClick={add}>add</Button>
-					</li>
-				</ul>
+				<p style={{fontSize: "2em"}}>
+					{set.words.map((word) => <>
+						<a onClick={() => view(word.word_id)}>{word.name}</a>
+						<FontAwesomeIcon icon="fa-solid fa-trash" onClick={() => removeWord(word.word_id)} />{", "} 
+					</>)}
+					<FontAwesomeIcon icon="fa-solid fa-plus" onClick={add} />
+				</p>
 			</Row>
 			<Row>
 				<Stack direction='horizontal'>

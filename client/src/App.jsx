@@ -6,6 +6,8 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Card from 'react-bootstrap/Card';
 import Stack from 'react-bootstrap/Stack';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Tome from './Strings.js';
 import Home from './pages/Home.jsx';
@@ -18,7 +20,7 @@ import { ToastContext } from './context/ToastContext.jsx';
 
 function App() {
 
-	const verStr = "0.1.8";
+	const verStr = "0.1.9d";
 
 	const pages = {
 		HOME: 0,
@@ -28,7 +30,7 @@ function App() {
 		GAME: 4
 	};
 
-	const [page, setPage] = useState(pages.HOME);
+	const [page, setPage] = useState(pages.SETS);
 	const [userID, setUserID] = useState(-1);
 
 	const loadLocal = () => {
@@ -134,18 +136,18 @@ function App() {
 	return (
 		<Container fluid style={{display: "block", height: "100%", width: "100%"}}>
 			<Row>
-				<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary" onSelect={(eventKey) => setPage(eventKey)}>
+				<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
 					<Stack direction="horizontal">
 						<Navbar.Brand>Memorichuelas</Navbar.Brand>
 						<Dropdown>
 							<Dropdown.Toggle id="lang-dropdown">
-								{strings.get('language')}
+								<FontAwesomeIcon icon="fa-solid fa-earth-americas" />	
 							</Dropdown.Toggle>
 							<Dropdown.Menu>
-								<Dropdown.Item onClick={() => setStrings(new Tome('spanish'))}>
+								<Dropdown.Item onClick={(e) => setStrings(new Tome('spanish'))}>
 									Espanol
 								</Dropdown.Item>
-								<Dropdown.Item onClick={() => setStrings(new Tome('english'))}>
+								<Dropdown.Item onClick={(e) => setStrings(new Tome('english'))}>
 									English
 								</Dropdown.Item>
 							</Dropdown.Menu>
@@ -153,12 +155,12 @@ function App() {
 					</Stack>
 					<Navbar.Toggle aria-controls="responsive-navbar-nav" />
 					<Navbar.Collapse id="responsive-navbar-nav">
-						<Nav className="me-auto">
-							<Nav.Link eventKey={pages.HOME}>{strings.get('about_title')}</Nav.Link>
-							<Nav.Link eventKey={pages.DICTIONARY}>{strings.get('dictionary_title')}</Nav.Link>
+						<Nav className="me-auto" activeKey={page}>
+							<Nav.Link eventKey={pages.HOME} onClick={() => setPage(pages.HOME)}>{strings.get('about_title')}</Nav.Link>
+							<Nav.Link eventKey={pages.DICTIONARY} onClick={() => setPage(pages.DICTIONARY)}>{strings.get('dictionary_title')}</Nav.Link>
 							{userID != -1 && <>
-								<Nav.Link eventKey={pages.SETS}>{strings.get('sets_title')}</Nav.Link>
-								<Nav.Link eventKey={pages.SETTINGS}>{strings.get('user_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.SETS} onClick={() => setPage(pages.SETS)}>{strings.get('sets_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.SETTINGS} onClick={() => setPage(pages.SETTINGS)}>{strings.get('user_title')}</Nav.Link>
 							</>}
 						</Nav>
 					</Navbar.Collapse>

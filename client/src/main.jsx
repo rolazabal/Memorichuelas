@@ -5,6 +5,10 @@ import App from './App.jsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { LocContextProvider } from './context/LocContext.jsx';
 import { ToastContextProvider } from './context/ToastContext.jsx';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEarthAmericas, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faEarthAmericas, faTrash, faPlus);
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>
@@ -14,4 +18,4 @@ createRoot(document.getElementById('root')).render(
 			</ToastContextProvider>
 		</LocContextProvider>
 	</StrictMode>,
-)
+);
