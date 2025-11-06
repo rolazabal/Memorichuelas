@@ -24,8 +24,8 @@ const regex_words = "SELECT word_id, name FROM words WHERE name LIKE $1 GROUP BY
 const remove_set = 'DELETE FROM sets WHERE "set_id" = $1';
 const remove_set_word = 'DELETE FROM setwords WHERE "set_id" = $1 AND "word_id" = $2';
 const add_set_word = 'INSERT INTO setwords("set_id", "word_id") VALUES ($1, $2)';
-const fetch_user_sets = 'SELECT (s."set_id", name, score) FROM sets AS s ' +
-	'JOIN usersets AS us ON s."set_id" = us."set_id" WHERE NOT s.official AND us."user_id" = $1';
+const fetch_user_sets = 'SELECT s.set_id, name, us.score FROM sets s ' +
+	'JOIN usersets us ON s.set_id = us.set_id WHERE NOT s.official AND us.user_id = $1 GROUP BY s.set_id, name, us.score';
 const fetch_official_sets = 'SELECT (s."set_id, name, score") FROM sets AS s ' +
 	'JOIN usersets AS us ON s."set_id" = us."set_id" WHERE s.official AND us."user_id" = $1';
 const create_set = 'INSERT INTO sets(name) VALUES ($1) RETURNING "set_id"';
@@ -33,8 +33,9 @@ const create_user_set = 'INSERT INTO usersets("set_id", "user_id") VALUES ($2, $
 const update_set_name = 'UPDATE sets SET name = $2 WHERE "set_id" = $1';
 const fetch_set_words = 'SELECT (w."word_id", name, score) FROM words AS w ' + 
     'JOIN setwords AS sw ON w."word_id" = sw."word_id" WHERE "set_id" = $1';
-const fetch_set = 'SELECT (s."set_id", name, score) FROM sets AS s ' +
-	'JOIN usersets AS us ON s."set_id" = us."set_id" WHERE s."set_id" = $1';
+const fetch_set = 'SELECT s.set_id, name, us.score FROM sets s JOIN usersets us ' +
+	'ON s.set_id = us.set_id WHERE us.user_id = $1 AND s.set_id = $2 ' +
+	'GROUP BY s.set_id, name, us.score';
 
 // pool database connection
 const pool = new Pool({
@@ -167,6 +168,30 @@ async function userSets(user_id) {
     return sets;
 }
 
+async function getSet(user_id, set_id) {
+	let res = await client.query(fetch_set, [user_id, set_id]);
+	if (res.rowCount == 0)
+		return null;
+	res = res.rows[0];
+	set = {
+		set_id: res.set_id,
+		name: res.name,
+		score: res.score,
+		words: []
+	};
+	res = await client.query(fetch_set_words, [set_id]);
+	for (let x of res.rows) {
+		let word = {
+			word_id: x.word_id,
+			name: x.name,
+			score: x.score
+		};
+		set.words.push(word);
+	}
+	return set;
+}
+
+/*
 async function setById(set_id) {
     let res = await client.query(fetch_set, [set_id]);
     res = res.rows[0];
@@ -201,6 +226,7 @@ async function setById(set_id) {
     };
     return set;
 }
+*/
 
 async function updateSetWords(set_id, wordArr) {
     await client.query(remove_set_words, [set_id]);
@@ -213,10 +239,10 @@ async function updateSetName(set_id, newName) {
 }
 
 async function createSet(user_id, name) {
-    let res = await client.query(create_set, [name]);
-    let id = parseInt(res.rows[0].set_id);
+	let res = await client.query(create_set, [name]);
+	let id = parseInt(res.rows[0].set_id);
 	res = await client.query(create_user_set, [user_id, id]);
-    return id;
+	return id;
 }
 
 async function deleteSet(set_id) {
@@ -342,7 +368,7 @@ app.get(dictAPI + '/:page{/:user_id}', async (req, res) => {
 	let list = await dictionarySearch(page);
 	console.log(list);
 	if (user_id != undefined && user_id != -1)
-		logAction(user_id);
+		await logAction(user_id);
 	res.status(200).json({words: list});
 });
 
@@ -358,7 +384,7 @@ app.get(dictAPI + '/search/:query{/:user_id}', async (req, res) => {
 	}
 	console.log(list);
 	if (user_id != undefined && user_id != -1)
-		logAction(user_id);
+		await logAction(user_id);
 	res.status(200).json({words: list});
 });
 
@@ -370,7 +396,7 @@ app.get(dictAPI + '/word/:word_id{/:user_id}', async (req, res) => {
 	let obj = await wordByID(word_id);
 	console.log(obj);
 	if (user_id != undefined && user_id != -1)
-		logAction(user_id);
+		await logAction(user_id);
 	res.status(200).json({word: obj});
 });
 
@@ -379,6 +405,49 @@ app.get(dictAPI + '/word/:word_id{/:user_id}', async (req, res) => {
 // post -> create
 // delete -> delete
 // put -> name, words
+const setAPI = '/api/sets';
+
+app.get(setAPI + '/:user_id', async (req, res) => {
+	let id = req.params.user_id;
+	let list = await userSets(id);
+	await logAction(id);
+	res.status(200).json({sets: list});
+});
+
+app.get(setAPI + '/:user_id/:set_id', async (req, res) => {
+	let user_id = req.params.user_id;
+	let set_id = req.params.set_id;
+	let obj = await getSet(user_id, set_id);
+	await logAction(user_id);
+	res.status(200).json({set: obj});
+});
+
+app.post(setAPI + '/:user_id', async (req, res) => {
+	let user_id = req.params.user_id;
+	let name = req.body.name;
+	s_id = await createSet(user_id, name);
+	res.status(200).json({set_id: s_id});
+});
+
+app.put(setAPI + '/:set_id/name', async (req, res) => {
+	let id = req.params.set_id;
+	let name = req.body.name;
+	;
+});
+
+app.post(setAPI + '/:set_id/word', async (req, res) => {
+	let id = req.params.set_id;
+	let w_id = req.body.word_id;
+	;
+});
+
+app.delete(setAPI + '/:set_id', async (req, res) => {
+	let id = req.params.set_id;
+	await deleteSet(id);
+	res.status(200).json({msg: 'set deleted.'});
+});
+
+/*
 app.post('/api/sets', async (req, res) => {
     console.log(req.body);
     let id = req.body.user_id;
@@ -432,6 +501,7 @@ app.post('/api/sets', async (req, res) => {
     } else
         res.status(403).json({error: 'user has timed out!'});
 });
+*/
 
 app.listen(PORT, () => {
    console.log(`Server is running on port ${PORT}`);
