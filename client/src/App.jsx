@@ -18,7 +18,7 @@ import { ToastContext } from './context/ToastContext.jsx';
 
 function App() {
 
-	const verStr = "0.1.8d";
+	const verStr = "0.1.8";
 
 	const pages = {
 		HOME: 0,
@@ -28,7 +28,7 @@ function App() {
 		GAME: 4
 	};
 
-	const [page, setPage] = useState(pages.SETS);
+	const [page, setPage] = useState(pages.HOME);
 	const [userID, setUserID] = useState(-1);
 
 	const loadLocal = () => {

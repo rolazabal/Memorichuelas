@@ -15,7 +15,7 @@ Our national dialect of Spanish is one such practice and very few online resourc
 
 ## Implementation
 
-Version 0.1.7 of `Memorichuelas` aims to implement all functionality except set management and quiz games, which means about 1/2 of the app's overall functionality is implemented.
+Version 0.1.8 of `Memorichuelas` aims to implement all functionality except some set management, and quiz games, meaning that ~1/2 of the app's overall functionality is implemented.
 
 `Memorichuelas` uses a layered architecture with 3 layers:
 

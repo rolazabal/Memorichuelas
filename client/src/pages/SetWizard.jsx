@@ -17,6 +17,7 @@ function SetWizard({ID}) {
 
 	const [mode, setMode] = useState(modes.SET);
 	const [setID, setSetID] = useState(null);
+	const [wordID, setWordID] = useState(null);
 
 	const setAPI = 'http://localhost:5050/api/sets';
 	const dictAPI = 'http://localhost:5050/api/dictionary';
@@ -28,15 +29,29 @@ function SetWizard({ID}) {
 			setMode(modes.LIST);
 	}, [setID]);
 
+	useEffect(() => {
+		if (wordID == null) {
+			if (mode == modes.WORD)
+				setMode(modes.SET);
+		} else if (mode == modes.SET) {
+			setMode(modes.WORD);
+		} else if (mode == modes.PICKER) {
+			setMode(modes.SET);
+		}
+	}, [wordID]);
+
 	return (<>
 		{mode == modes.LIST &&
-			<SetList ID={ID} view={(id) => {setSetID(id)}} api={setAPI} />
+			<SetList ID={ID} view={(id) => setSetID(id)} api={setAPI} />
 		}
 		{mode == modes.SET &&
-			<Set ID={ID} sID={setID} close={() => {setSetID(null)}} add={() => {setMode(modes.PICKER)}} api={setAPI}/>
+			<Set ID={ID} sID={setID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />
+		}
+		{mode == modes.WORD &&
+			<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />
 		}
 		{mode == modes.PICKER &&
-			<h1>Pick words</h1>
+			<WordDirectory ID={ID} view={(wID) => setWordID(wID)} api={dictAPI} />
 		}
 	</>);
 }

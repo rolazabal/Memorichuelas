@@ -12,7 +12,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
-function Set({ID, sID, close, add, api}) {
+function Set({ID, sID, close, add, view, api}) {
 	
 	const [set, setSet] = useState(null);
 	const [fakeSet, setFakeSet] = useState({
@@ -21,12 +21,12 @@ function Set({ID, sID, close, add, api}) {
                 score: 0.25,
                 words: [
                         {
-                                wordID: 500,
+                                word_id: 500,
                                 name: "A",
                                 score: 1.00
                         },
                         {
-                                wordID: 444,
+                                word_id: 444,
                                 name: "B",
                                 score: 0.25
                         }
@@ -92,8 +92,8 @@ function Set({ID, sID, close, add, api}) {
 			<Row>
 				<ul>
 					{set.words.map((word) => <li>
-						{word.name}
-						<Button onClick={() => removeWord(word.wordID)}>d</Button>
+						<Button onClick={() => view(word.word_id)}>{word.name}</Button>
+						<Button onClick={() => removeWord(word.word_id)}>d</Button>
 					</li>)}
 					<li>
 						<Button onClick={add}>add</Button>
