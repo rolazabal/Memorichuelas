@@ -26,7 +26,7 @@ function SetWizard({ID}) {
 			setMode(modes.SET);
 		else
 			setMode(modes.LIST);
-	}, [set]);
+	}, [setID]);
 
 	return (<>
 		{mode == modes.LIST &&

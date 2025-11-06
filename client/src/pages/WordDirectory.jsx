@@ -17,8 +17,8 @@ function WordDirectory({ID, view, api}) {
         	'Y', 'Z'
 	];
 	const displayCols = 2;
-	const table = [];
 
+	const [table, setTable] = useState([]);
 	const [list, setList] = useState(null);
 	const [page, setPage] = useState(alph[0]);
 
@@ -73,7 +73,7 @@ function WordDirectory({ID, view, api}) {
 
 	useEffect(() => {
 		if (list != null)
-			table = computeTable(displayCols);
+			setTable(computeTable(displayCols));
 	}, [list]);
 
 	return (

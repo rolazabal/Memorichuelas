@@ -80,8 +80,9 @@ function Set({ID, sID, close, add, api}) {
 		get();
 	}, []);
 
+	if (set == null) return;
 	return(
-		{set != null && <>
+		<>
 			<Row>
 				<Stack direction='horizontal'>
 					<Card.Title>{set.name}</Card.Title>
@@ -106,7 +107,7 @@ function Set({ID, sID, close, add, api}) {
 					<Button style={{width: "33%"}}>{strings.get("play")}</Button>
 				</Stack>
 			</Row>
-		</>}
+		</>
 	);
 }
 
