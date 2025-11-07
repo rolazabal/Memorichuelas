@@ -37,61 +37,97 @@ function Set({ID, sID, close, add, view, api}) {
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
 
-	function get() {
-		setSet(fakeSet);
+	async function getSet() {
+		try {
+			let res = await fetch(api + '/' + ID + '/' + sID, {
+					method: 'GET'
+			});
+			if (res.status == 200) {
+				res = await res.json();
+				let set = res.set;
+				console.log(set);
+				setSet(set);
+			} else if (res.status == 403) {
+				showToast(toasts.TIMEOUT);
+			}
+		} catch(error) { showToast(toasts.ERR); }
 	}
 
-	function deleteSet() {
+	async function deleteSet() {
 		try {
-			let res = fetch(api + "/" + ID + "/" + sID, {
+			let res = await fetch(api + "/" + ID + "/" + sID, {
 				method: 'DELETE'
 			});
 			if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
 				return;
 			}
+			res = await res.json();
 			showToast(toasts.SEL_DEL_S);
 			close();
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
-	function rename(name) {
+	async function rename(name) {
 		try {
-			let res = fetch(api + "/" + ID + "/" + sID, {
+			let res = await fetch(api + "/" + ID + "/" + sID + "/name", {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({name: name})
 			});
-			if (res == 403) {
+			res = await res.json();
+			if (res.status == 403) {
+				showToast(toasts.ERR);
+				return;
+			} else if (res.status == 400) {
 				showToast(toasts.ERR);
 				return;
 			}
-			res = res.json();
-			let set = res.set;
-			setSet(set);
+			setSet(null);
 			showToast(toasts.SET_NAME_S);
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
-	function removeWord() {
-		;
+	async function addWord(w_id) {
+		try {
+			let res = await fetch(api + '/' + ID + '/' + sID + '/word', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({word_id: w_id})
+			});
+		} catch(error) { showToast(toasts.ERR); }
+	}
+
+	async function removeWord(w_id) {
+		try {
+			let res = await fetch(api + '/' + ID + '/' + sID + '/' + w_id, {
+				method: 'DELETE'
+			});
+			if (res.status == 200) {
+				res = await res.json();
+				setSet(null);
+			} else if (res.status == 403) {
+				showToast(toasts.TIMEOUT);
+			}
+		} catch(error) { showToast(toasts.ERR); }
 	}
 
 	useEffect(() => {
-		get();
-	}, []);
+		if (set == null)
+			getSet();
+	}, [set]);
 
-	if (set == null) return;
 	return(
 		<>
-			<Row>
+		{set != null && <>
+			<Row style={{height: "6%"}}>
 				<Stack direction='horizontal'>
 					<Card.Title>{set.name}</Card.Title>
 					<Button variant="secondary" className="ms-auto" onClick={close}>{strings.get("back")}</Button>
 				</Stack>
 			</Row>
-			<Row>
-				<p style={{fontSize: "2em"}}>
+			<Row style={{height: "88%"}}>
+				<p style={{fontSize: "1.5em"}}>
 					{set.words.map((word) => <>
 						<a onClick={() => view(word.word_id)}>{word.name}</a>
 						<FontAwesomeIcon icon="fa-solid fa-trash" onClick={() => removeWord(word.word_id)} />{", "} 
@@ -99,14 +135,14 @@ function Set({ID, sID, close, add, view, api}) {
 					<FontAwesomeIcon icon="fa-solid fa-plus" onClick={add} />
 				</p>
 			</Row>
-			<Row>
+			<Row style={{height: "6%"}}>
 				<Stack direction='horizontal'>
 					<Button variant="danger" style={{width: "33%"}} onClick={() => deleteSet()}>{strings.get("delete")}</Button>
-					<h2 style={{width: "33%"}}>score: {set.score}</h2>
-					<Button style={{width: "33%"}}>{strings.get("play")}</Button>
+					<h2 style={{width: "33%"}}>{strings.get("score")}: {set.score}</h2>
+					<Button variant="success" style={{width: "33%"}}>{strings.get("play")}</Button>
 				</Stack>
 			</Row>
-		</>
+		</>}</>
 	);
 }
 

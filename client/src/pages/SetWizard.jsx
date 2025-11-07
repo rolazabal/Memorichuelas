@@ -15,7 +15,7 @@ function SetWizard({ID}) {
 		PICKER: 3
 	};
 
-	const [mode, setMode] = useState(modes.SET);
+	const [mode, setMode] = useState(modes.LIST);
 	const [setID, setSetID] = useState(null);
 	const [wordID, setWordID] = useState(null);
 

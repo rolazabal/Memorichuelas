@@ -8,6 +8,7 @@ import Pagination from 'react-bootstrap/Pagination';
 import { useState, useEffect, useContext } from 'react';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function WordDirectory({ID, view, api}) {
 
@@ -89,7 +90,7 @@ function WordDirectory({ID, view, api}) {
 						<Stack direction="horizontal">
 							<Form.Control name="search_input" type="text" />
 							<Button type="submit">
-								{strings.get("search")}
+								<FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
 							</Button>
 						</Stack>
 					</Form>
@@ -102,7 +103,7 @@ function WordDirectory({ID, view, api}) {
 						</Pagination.Item>)}
 					</Pagination>
 				</Row>
-			<Container style={{padding: "0", maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
+			<Container style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
 				{table.map((row) => <Row>
 					{row.map((entry) => <Col name={entry.word_id} onClick={() => view(entry.word_id)}>
 						{entry.name}

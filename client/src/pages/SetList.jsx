@@ -8,6 +8,7 @@ import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
@@ -31,30 +32,24 @@ function SetList({ID, view, api}) {
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
 
-	function getSets() {
-		setSets(fakeSets);
-		return;
+	async function getSets() {
 		try {
-			let res = fetch(api + "/" + ID, {
+			let res = await fetch(api + "/" + ID, {
 				method: 'GET'
 			});
 			if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
 				return;
 			}
-			res = res.json();
+			res = await res.json();
 			let sets = res.sets;
 			setSets(sets);
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
-	function create(name) {
-		let temp = {setID: 200, name: name, score: 0.00}
-		setFakeSets([...fakeSets, temp]);
-		view(temp.setID);
-		return;
+	async function create(name) {
 		try {
-			let res = fetch(api + "/" + ID, {
+			let res = await fetch(api + "/" + ID, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({name: name})
@@ -63,8 +58,8 @@ function SetList({ID, view, api}) {
 				showToast(toasts.TIMEOUT);
 				return;
 			}
-			res = res.json();
-			let id = res.setID;
+			res = await res.json();
+			let id = res.set_id;
 			view(id);
 		} catch(error) { showToast(toasts.ERR); }
 	}
@@ -95,7 +90,9 @@ function SetList({ID, view, api}) {
 			<Form action={handleCreate}>
 				<Stack direction='horizontal'>
 					<Form.Control name="create_name" type="text" placeholder={strings.get("name_text")} style={{width: "50%"}}/>
-					<Button type="submit" style={{width: "50%"}}>{strings.get("create")}</Button>
+					<Button type="submit" style={{width: "50%"}}>
+						<FontAwesomeIcon icon="fa-solid fa-plus" />
+					</Button>
 				</Stack>
 			</Form>
 		</Row>
@@ -106,9 +103,9 @@ function SetList({ID, view, api}) {
 						variant="light"
 						className="ms-auto"
 						style={{width: "100%"}}
-						onClick={() => {view(set.setID)}}
+						onClick={() => {view(set.set_id)}}
 					>
-						<h4>
+						<h4 style={{float: "left"}}>
 							{set.name}, {strings.get("score")}: {set.score}
 						</h4>
 					</Button>
