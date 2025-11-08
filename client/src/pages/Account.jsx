@@ -89,12 +89,12 @@ function Account({ID, logOut, del}) {
 						{strings.get('user_date')}: {info.date}
 					</Card.Text>}
 					<Stack direction="horizontal">
-						<Button onClick={() => {logOut(false)}}>{strings.get('logout')}</Button>
-						<Button className="ms-auto" variant="danger" 
+						<Button variant="danger" 
 							onClick={() => {setCreateModal(true)}}
 						>
 							{strings.get('user_delete')}
 						</Button>
+						<Button variant="secondary" className="ms-auto" onClick={() => {logOut(false)}}>{strings.get('logout')}</Button>
 					</Stack>
 				</ListGroup.Item>
 			</ListGroup>

@@ -30,7 +30,7 @@ function App() {
 		GAME: 4
 	};
 
-	const [page, setPage] = useState(pages.SETS);
+	const [page, setPage] = useState(pages.HOME);
 	const [userID, setUserID] = useState(-1);
 
 	const loadLocal = () => {
@@ -65,7 +65,6 @@ function App() {
 				res = await res.json();
 				let id = await res.user_id;
 				setUserID(id);
-				setPage(pages.SETS);
 				localStorage.setItem('userID', id);
 				showToast(toasts.LOGIN_S);
 			} else {
@@ -140,7 +139,7 @@ function App() {
 					<Stack direction="horizontal">
 						<Navbar.Brand>Memorichuelas</Navbar.Brand>
 						<Dropdown>
-							<Dropdown.Toggle id="lang-dropdown">
+							<Dropdown.Toggle id="lang-dropdown" title={strings.get("language")}>
 								<FontAwesomeIcon icon="fa-solid fa-earth-americas" />	
 							</Dropdown.Toggle>
 							<Dropdown.Menu>
@@ -166,7 +165,7 @@ function App() {
 					</Navbar.Collapse>
 				</Navbar>
 			</Row>
-			<Row style={{height: "80vh", backgroundColor: "gray"}}>
+			<Row style={{height: "80vh", backgroundColor: "#7cd4e2"}}>
 				<Card style={{width: "90%", maxHeight: "100%", marginLeft: "auto", marginRight: "auto"}}>
 					<Card.Body style={{overflow: "hidden", margin: ".5%"}}>
 						{page == pages.HOME && <Home
@@ -189,7 +188,7 @@ function App() {
 				</Card>
 			</Row>
 			<Row style={{height: "10vh", backgroundColor: "#7cd4e2"}}>
-				Ricardo Olazabal @ 2026 // {verStr}
+				<p>{verStr} @ 2026 Ricardo Olazabal - <a href="https://github.com/rolazabal">github.com/rolazabal</a></p>
 			</Row>
 		</Container>
 	)

@@ -149,6 +149,15 @@ function Toaster({toast}) {
 				<Toast.Header>{strings.get('t_success')}</Toast.Header>
 				<Toast.Body>{strings.get('t_delete_set_success')}</Toast.Body>
 			</Toast>
+	    		<Toast
+                                bg={'danger'}
+                                onClose={() => setShow(false)}
+                                show={show && type == toasts.SET_NAME_F}
+                                delay={del} autohide
+                        >
+                                <Toast.Header>{strings.get('t_fail')}</Toast.Header>
+                                <Toast.Body>{strings.get('t_setname_invalid')}</Toast.Body>
+                        </Toast>
 			<Toast
 				bg={'success'}
 				onClose={() => setShow(false)}

@@ -37,13 +37,15 @@ function SetList({ID, view, api}) {
 			let res = await fetch(api + "/" + ID, {
 				method: 'GET'
 			});
-			if (res.status == 403) {
+			if (res.status == 200) {
+				res = await res.json();
+				let sets = res.sets;
+				setSets(sets);
+			} else if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
-				return;
+			} else {
+				showToast(toasts.SET_NAME_F);
 			}
-			res = await res.json();
-			let sets = res.sets;
-			setSets(sets);
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
@@ -54,13 +56,15 @@ function SetList({ID, view, api}) {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({name: name})
 			});
-			if (res.status == 403) {
+			if (res.status == 200) {
+				res = await res.json();
+				let id = res.set_id;
+				view(id);
+			} else if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
-				return;
+			} else {
+				showToast(toasts.SET_NAME_F);
 			}
-			res = await res.json();
-			let id = res.set_id;
-			view(id);
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
@@ -76,10 +80,12 @@ function SetList({ID, view, api}) {
 	return (<>
 		<Row>
 			<Stack direction="horizontal">    
-				<Card.Title>{strings.get("sets_title")}</Card.Title>
-				<Tabs 
+				<Card.Title style={{width: "50%"}}>{strings.get("sets_title")}</Card.Title>
+				<Tabs
+					style={{width: "50%"}}
 					defaultActiveKey="custom"
 					className="ms-auto"
+					fill
 				>
 					<Tab eventKey="custom" title={strings.get("sets_custom")}></Tab>
 					<Tab eventKey="official" title={strings.get("sets_official")}></Tab>
@@ -90,7 +96,7 @@ function SetList({ID, view, api}) {
 			<Form action={handleCreate}>
 				<Stack direction='horizontal'>
 					<Form.Control name="create_name" type="text" placeholder={strings.get("name_text")} style={{width: "50%"}}/>
-					<Button type="submit" style={{width: "50%"}}>
+					<Button title={strings.get("create")} type="submit" style={{width: "50%"}}>
 						<FontAwesomeIcon icon="fa-solid fa-plus" />
 					</Button>
 				</Stack>

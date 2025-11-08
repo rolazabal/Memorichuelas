@@ -13,18 +13,19 @@ export const ToastContextProvider = ({ children }) => {
 		ACC_CREATE_F: 3,
 		USERNAME_S: 4,
 		USERNAME_F: 5,
-	    	USERNAME_TAKEN: 17,
-		ACC_DEL_S: 6,
-		ACC_DEL_F: 7,
-		TIMEOUT: 8,
-		LOGIN_BLOCK: 9,
-		ERR: 10,
-		SET_CREATE_S: 11,
-		SET_DEL_S: 12,
-		SET_NAME_S: 13,
-		SET_WORDS_S: 14,
-		SET_WORD_EXISTS: 15,
-		SET_FULL: 16
+	    	USERNAME_TAKEN: 6,
+		ACC_DEL_S: 7,
+		ACC_DEL_F: 8,
+		TIMEOUT: 9,
+		LOGIN_BLOCK: 10,
+		ERR: 11,
+		SET_CREATE_S: 12,
+		SET_DEL_S: 13,
+		SET_NAME_S: 14,
+	    	SET_NAME_F: 15,
+		SET_WORDS_S: 16,
+		SET_WORD_EXISTS: 17,
+		SET_FULL: 18
 	};
 
     const [toast, setToast] = useState(toasts.ERR);

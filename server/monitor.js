@@ -1,15 +1,14 @@
 import { parentPort } from 'worker_threads';
 
-const sleepSeconds = 60;
+const time = 3600000; // 1 hour
 
-function sleep(s) {
-    let mstos = 1000;
+function sleep(ms) {
     return new Promise((res) => {
-        setTimeout(res, s * mstos);
+        setTimeout(res, ms);
     });
 }
 
 while(true) {
-    await sleep(sleepSeconds);
+    await sleep(time);
     parentPort.postMessage("check!");
 }

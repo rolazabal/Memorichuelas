@@ -4,6 +4,7 @@ import SetList from './SetList.jsx';
 import Set from './Set.jsx';
 import WordDirectory from './WordDirectory.jsx';
 import Word from './Word.jsx';
+import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
 function SetWizard({ID}) {
@@ -19,9 +20,29 @@ function SetWizard({ID}) {
 	const [setID, setSetID] = useState(null);
 	const [wordID, setWordID] = useState(null);
 
+	const { strings } = useContext(LocContext);
+	const { toasts, showToast } = useContext(ToastContext);
+
 	const setAPI = 'http://localhost:5050/api/sets';
 	const dictAPI = 'http://localhost:5050/api/dictionary';
 	
+	async function addWord(w_id) {
+                try {
+                        let res = await fetch(setAPI + '/' + ID + '/' + setID + '/word', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({word_id: w_id})
+                        });
+                        if (res.status == 200) {
+                                res = await res.json();
+			} else if (res.status == 403) {
+                                showToast(toasts.TIMEOUT);
+                        } else {
+                                showToast(toasts.ERR);
+                        }
+                } catch(error) { showToast(toasts.ERR); }
+        }
+
 	useEffect(() => {
 		if (setID != null)
 			setMode(modes.SET);
@@ -30,12 +51,16 @@ function SetWizard({ID}) {
 	}, [setID]);
 
 	useEffect(() => {
+		async function add() {
+			await addWord(wordID);
+		}
 		if (wordID == null) {
 			if (mode == modes.WORD)
 				setMode(modes.SET);
 		} else if (mode == modes.SET) {
 			setMode(modes.WORD);
 		} else if (mode == modes.PICKER) {
+			add();
 			setMode(modes.SET);
 		}
 	}, [wordID]);

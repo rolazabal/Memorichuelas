@@ -48,6 +48,7 @@ class Tome {
 		example: ["Example sentence(s):", "Ejemplo(s) de uso:"],
 		search: ["Search", "Buscar"],
 		delete: ["Delete", "Borrar"],
+		add: ["Add", "Anadir"],
 		play: ["Play", "Jugar"],
 		t_success: ["Success!", "Exito!"],
 		t_fail: ["Oops!", "Ups!"],
@@ -66,6 +67,7 @@ class Tome {
 		t_create_set_success: ["Set created!", "Colleccion creada!"],
 		t_delete_set_success: ["Set deleted!", "Colleccion borrada!"],
 		t_change_setname_success: ["Changed set name!", "Nombre de colleccion cambiado!"],
+		t_setname_invalid: ["Set name cannot be empty!", "Nombre de colleccion no valido!"],
 		t_change_setwords_success: ["Updated words in set!", "Palabras de colleccion actualizadas!"]
 	};
 

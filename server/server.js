@@ -29,8 +29,8 @@ const fetch_official_sets = 'SELECT (s."set_id, name, score") FROM sets AS s ' +
 const create_set = 'INSERT INTO sets(name) VALUES ($1) RETURNING "set_id"';
 const create_user_set = 'INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)';
 const update_set_name = 'UPDATE sets SET name = $2 WHERE "set_id" = $1';
-const fetch_set_words = 'SELECT (w."word_id", name, score) FROM words AS w ' + 
-	'JOIN setwords AS sw ON w."word_id" = sw."word_id" WHERE "set_id" = $1';
+const fetch_set_words = 'SELECT w.word_id, name, score FROM words w ' + 
+	'JOIN setwords sw ON w.word_id = sw.word_id WHERE set_id = $1 GROUP BY w.word_id, name, score';
 const fetch_set = 'SELECT s.set_id, name, us.score FROM sets s JOIN usersets us ' +
 	'ON s.set_id = us.set_id WHERE us.user_id = $1 AND s.set_id = $2 ' +
 	'GROUP BY s.set_id, name, us.score';
@@ -52,7 +52,7 @@ app.use(express.json());
 
 // monitor thread =============================================================
 const monitor = new Worker("./monitor.js");
-const user_timeout_ms = 60000; // 30 minutes = 1800000
+const user_timeout_ms = 43200000; // 12 hours
 
 // helper functions ===========================================================
 function parseRow(str) {
@@ -85,7 +85,7 @@ monitor.on("message", async (message) => {
 
 async function userActive(user_id) {
 	let res = await client.query(fetch_user_status, [user_id]);
-	console.log(res.rows);
+	// console.log(res.rows);
 	if (res.rows.length > 0)
 		return res.rows[0].active;
 	return false;
@@ -176,6 +176,7 @@ async function getSet(user_id, set_id) {
 		words: []
 	};
 	res = await client.query(fetch_set_words, [set_id]);
+	console.log(res);
 	for (let x of res.rows) {
 		let word = {
 			word_id: x.word_id,
@@ -233,8 +234,9 @@ app.put(accAPI, async (req, res) => {
 		return;
 	}
 	if (await userActive(id)) {
-		res.status(403).json({msg: 'user is active.'});
-		return;
+		// res.status(403).json({msg: 'user is active.'});
+		// return;
+		// bypass active check for testing purposes
 	}
 	await logAction(id);
 	res.status(200).json({user_id: id});
@@ -430,8 +432,10 @@ app.put(setAPI + '/:user_id/:set_id/name', async (req, res) => {
 
 // add word
 app.post(setAPI + '/:user_id/:set_id/word', async (req, res) => {
+	console.log("add word");
 	console.log(req.params);
 	console.log(req.body);
+	console.log("/\\ body");
 	let u_id = req.params.user_id;
 	if (!(await userActive(u_id))) {
 		res.status(403).json({msg: 'user timed out.'});

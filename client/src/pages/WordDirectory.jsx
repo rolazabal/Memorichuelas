@@ -59,6 +59,7 @@ function WordDirectory({ID, view, api}) {
 			});
 			res = await res.json();
 			let words = res.words;
+			setPage(null);
 			setList(words);
 		} catch(error) { showToast(toasts.ERR); }
 	}
@@ -69,7 +70,8 @@ function WordDirectory({ID, view, api}) {
 	}
 
 	useEffect(() => {
-		getPage(page);
+		if (alph.includes(page))
+			getPage(page);
 	}, [page])
 
 	useEffect(() => {
@@ -88,8 +90,8 @@ function WordDirectory({ID, view, api}) {
 				<Col>
 					<Form action={handleSearch}>
 						<Stack direction="horizontal">
-							<Form.Control name="search_input" type="text" />
-							<Button type="submit">
+							<Form.Control name="search_input" type="text" placeholder={strings.get("search")} />
+							<Button title={strings.get("search")} type="submit">
 								<FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
 							</Button>
 						</Stack>

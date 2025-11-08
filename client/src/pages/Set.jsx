@@ -49,6 +49,8 @@ function Set({ID, sID, close, add, view, api}) {
 				setSet(set);
 			} else if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
+			} else {
+				showToast(toasts.ERR);
 			}
 		} catch(error) { showToast(toasts.ERR); }
 	}
@@ -58,13 +60,15 @@ function Set({ID, sID, close, add, view, api}) {
 			let res = await fetch(api + "/" + ID + "/" + sID, {
 				method: 'DELETE'
 			});
-			if (res.status == 403) {
+			if (res.status == 200) {
+				res = await res.json();
+				showToast(toasts.SEL_DEL_S);
+				close();
+			} else if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
-				return;
+			} else {
+				showToast(toasts.ERR);
 			}
-			res = await res.json();
-			showToast(toasts.SEL_DEL_S);
-			close();
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
@@ -75,16 +79,15 @@ function Set({ID, sID, close, add, view, api}) {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({name: name})
 			});
-			res = await res.json();
-			if (res.status == 403) {
+			if (res.status == 200) {
+				res = await res.json();
+				setSet(null);
+				showToast(toasts.SET_NAME_S);
+			} else if (res.status == 403) {
 				showToast(toasts.ERR);
-				return;
-			} else if (res.status == 400) {
+			} else {
 				showToast(toasts.ERR);
-				return;
 			}
-			setSet(null);
-			showToast(toasts.SET_NAME_S);
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
@@ -95,6 +98,13 @@ function Set({ID, sID, close, add, view, api}) {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({word_id: w_id})
 			});
+			if (res.status == 200) {
+				res = await res.json();	
+			} else if (res.status == 403) {
+				showToast(toasts.TIMEOUT);
+			} else {
+				showToast(toasts.ERR);
+			}
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
@@ -108,6 +118,8 @@ function Set({ID, sID, close, add, view, api}) {
 				setSet(null);
 			} else if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
+			} else {
+				showToast(toasts.ERR);
 			}
 		} catch(error) { showToast(toasts.ERR); }
 	}
@@ -120,25 +132,30 @@ function Set({ID, sID, close, add, view, api}) {
 	return(
 		<>
 		{set != null && <>
-			<Row style={{height: "6%"}}>
+			<Row style={{height: "15%"}}>
 				<Stack direction='horizontal'>
 					<Card.Title>{set.name}</Card.Title>
 					<Button variant="secondary" className="ms-auto" onClick={close}>{strings.get("back")}</Button>
 				</Stack>
 			</Row>
-			<Row style={{height: "88%"}}>
-				<p style={{fontSize: "1.5em"}}>
+			<Row style={{height: "68%"}}>
+				<p style={{fontSize: "1.3em"}}>
 					{set.words.map((word) => <>
 						<a onClick={() => view(word.word_id)}>{word.name}</a>
-						<FontAwesomeIcon icon="fa-solid fa-trash" onClick={() => removeWord(word.word_id)} />{", "} 
+						<Button variant="light" title={strings.get("delete")} onClick={() => removeWord(word.word_id)}>
+							<FontAwesomeIcon icon="fa-solid fa-trash" />
+						</Button>{", "} 
 					</>)}
-					<FontAwesomeIcon icon="fa-solid fa-plus" onClick={add} />
+					<Button variant="light" title={strings.get("add")} onClick={add}>
+						<FontAwesomeIcon icon="fa-solid fa-plus" />
+					</Button>
 				</p>
 			</Row>
-			<Row style={{height: "6%"}}>
+			<hr />
+			<Row style={{height: "10%"}}>
 				<Stack direction='horizontal'>
 					<Button variant="danger" style={{width: "33%"}} onClick={() => deleteSet()}>{strings.get("delete")}</Button>
-					<h2 style={{width: "33%"}}>{strings.get("score")}: {set.score}</h2>
+					<p style={{width: "33%", fontSize: "1.3em"}}>{strings.get("score")}: {set.score}</p>
 					<Button variant="success" style={{width: "33%"}}>{strings.get("play")}</Button>
 				</Stack>
 			</Row>
