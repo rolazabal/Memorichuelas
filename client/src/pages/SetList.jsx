@@ -15,19 +15,13 @@ import { ToastContext } from './../context/ToastContext.jsx';
 
 function SetList({ID, view, api}) {
 
+	const modes = {
+		CUSTOM: 0,
+		OFFICIAL: 1
+	};
+
+	const [mode, setMode] = useState(modes.CUSTOM);
 	const [sets, setSets] = useState(null);
-	const [fakeSets, setFakeSets] = useState([
-                {
-                        setID: 300,
-                        name: "comidas",
-                        score: 0.25
-                },
-                {
-                        setID: 301,
-                        name: "frases",
-                        score: 1.00
-                }
-        ]);
 
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
@@ -85,14 +79,15 @@ function SetList({ID, view, api}) {
 					style={{width: "50%"}}
 					defaultActiveKey="custom"
 					className="ms-auto"
+					onSelect={(eventKey) => setMode(eventKey)}
 					fill
 				>
-					<Tab eventKey="custom" title={strings.get("sets_custom")}></Tab>
-					<Tab eventKey="official" title={strings.get("sets_official")}></Tab>
+					<Tab eventKey={modes.CUSTOM} title={strings.get("sets_custom")}></Tab>
+					<Tab eventKey={modes.OFFICIAL} title={strings.get("sets_official")}></Tab>
 				</Tabs>
 			</Stack>
 		</Row>
-		<Row>
+		{mode == modes.CUSTOM && <Row>
 			<Form action={handleCreate}>
 				<Stack direction='horizontal'>
 					<Form.Control name="create_name" type="text" placeholder={strings.get("name_text")} style={{width: "50%"}}/>
@@ -101,7 +96,7 @@ function SetList({ID, view, api}) {
 					</Button>
 				</Stack>
 			</Form>
-		</Row>
+		</Row>}
 		{sets != null && sets.map((set, index) => 
 			<Row key={index}>
 				<Stack direction="horizontal">

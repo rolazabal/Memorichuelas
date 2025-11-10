@@ -22,10 +22,8 @@ const regex_words = "SELECT word_id, name FROM words WHERE name LIKE $1 GROUP BY
 const remove_set = 'DELETE FROM sets WHERE "set_id" = $1';
 const remove_setword = 'DELETE FROM setwords WHERE set_id = $1 AND word_id = $2';
 const create_setword = 'INSERT INTO setwords(set_id, word_id) VALUES ($1, $2)';
-const fetch_user_sets = 'SELECT s.set_id, name, us.score FROM sets s ' +
-	'JOIN usersets us ON s.set_id = us.set_id WHERE NOT s.official AND us.user_id = $1 GROUP BY s.set_id, name, us.score';
-const fetch_official_sets = 'SELECT (s."set_id, name, score") FROM sets AS s ' +
-	'JOIN usersets AS us ON s."set_id" = us."set_id" WHERE s.official AND us."user_id" = $1';
+const fetch_sets = 'SELECT s.set_id, name, us.score FROM sets s ' +
+	'JOIN usersets us ON s.set_id = us.set_id WHERE s.official = $2 AND us.user_id = $1 GROUP BY s.set_id, name, us.score';
 const create_set = 'INSERT INTO sets(name) VALUES ($1) RETURNING "set_id"';
 const create_user_set = 'INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)';
 const update_set_name = 'UPDATE sets SET name = $2 WHERE "set_id" = $1';
@@ -60,10 +58,6 @@ function parseRow(str) {
 }
 
 // database functions =========================================================
-async function deactivateUser(user_id) {
-	await client.query(deactivate_user, [user_id]);
-}
-
 monitor.on("message", async (message) => {
 	// user timeout logic
 	let res = await client.query(fetch_active_users);
@@ -82,6 +76,10 @@ monitor.on("message", async (message) => {
 	}
 	console.log(message);
 });
+
+async function deactivateUser(user_id) {
+	await client.query(deactivate_user, [user_id]);
+}
 
 async function userActive(user_id) {
 	let res = await client.query(fetch_user_status, [user_id]);
@@ -112,6 +110,25 @@ async function usernameExists(username) {
 	return (count != undefined);
 }
 
+async function userInfo(user_id) {
+	let res = await client.query(fetch_user_info, [user_id]);
+	res = res.rows[0].row;
+	let list = parseRow(res);
+	let info = {
+		name: list[0], 
+		date: list[1]
+	};
+	return info;
+}
+
+async function updateUsername(user_id, username) {
+	await client.query(update_user_name, [user_id, username]);
+}
+
+async function deleteUser(user_id) {
+	await client.query(remove_user, [user_id]);
+}
+
 async function wordByID(word_id) {
 	let res = await client.query(fetch_word, [word_id]);
 	console.log(res.rows);
@@ -138,19 +155,8 @@ async function dictionarySearch(string) {
 	return list;
 }
 
-async function userInfo(user_id) {
-	let res = await client.query(fetch_user_info, [user_id]);
-	res = res.rows[0].row;
-	let list = parseRow(res);
-	let info = {
-		name: list[0], 
-		date: list[1]
-	};
-	return info;
-}
-
-async function userSets(user_id) {
-	let res = await client.query(fetch_user_sets, [user_id]);
+async function getSets(user_id, official) {
+	let res = await client.query(fetch_sets, [user_id, official]);
 	let sets = [];
 	if (res.rowCount == 0)
 		return sets;
@@ -212,14 +218,6 @@ async function deleteSetWord(set_id, word_id) {
 	await client.query(remove_setword, [set_id, word_id]);
 }
 
-async function updateUsername(user_id, username) {
-	await client.query(update_user_name, [user_id, username]);
-}
-
-async function deleteUser(user_id) {
-	await client.query(remove_user, [user_id]);
-}
-
 // account api ================================================================
 const accAPI = '/api/account';
 
@@ -232,11 +230,6 @@ app.put(accAPI, async (req, res) => {
 	if (!id) {
 		res.status(404).json({msg: 'user not found.'});
 		return;
-	}
-	if (await userActive(id)) {
-		// res.status(403).json({msg: 'user is active.'});
-		// return;
-		// bypass active check for testing purposes
 	}
 	await logAction(id);
 	res.status(200).json({user_id: id});
@@ -366,7 +359,7 @@ app.get(dictAPI + '/word/:word_id{/:user_id}', async (req, res) => {
 // sets api ===================================================================
 const setAPI = '/api/sets';
 
-// get sets
+// get custom sets
 app.get(setAPI + '/:user_id', async (req, res) => {
 	console.log(req.params);
 	let id = req.params.user_id;
@@ -374,7 +367,19 @@ app.get(setAPI + '/:user_id', async (req, res) => {
 		res.status(403).json({msg: 'user timed out.'});
 		return;
 	}
-	let list = await userSets(id);
+	let list = await getSets(id, false);
+	await logAction(id);
+	res.status(200).json({sets: list});
+});
+
+// get official sets
+app.get(setAPI + '/:user_id/memorichuelas', async (req, res) => {
+	let id = req.params.user_id;
+	if (!(await userActive(id))) {
+		res.status(403).json({msg: 'user timed out.'});
+		return;
+	}
+	let list = await getSets(id, true);
 	await logAction(id);
 	res.status(200).json({sets: list});
 });
@@ -472,6 +477,11 @@ app.delete(setAPI + '/:user_id/:set_id', async (req, res) => {
 	let s_id = req.params.set_id;
 	await deleteSet(s_id);
 	res.status(200).json({msg: 'set deleted.'});
+});
+
+// update word score
+app.put(setAPI + '/:user_id/:set_id', async (req, res) => {
+	; // update individually or as a whole?
 });
 
 // start server ===============================================================

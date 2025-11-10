@@ -8,6 +8,7 @@ import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import Modal from 'react-bootstrap/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { LocContext } from './../context/LocContext.jsx';
@@ -16,26 +17,15 @@ import { ToastContext } from './../context/ToastContext.jsx';
 function Set({ID, sID, close, add, view, api}) {
 	
 	const [set, setSet] = useState(null);
-	const [fakeSet, setFakeSet] = useState({
-                setID: 300,
-                name: "comidas",
-                score: 0.25,
-                words: [
-                        {
-                                word_id: 500,
-                                name: "A",
-                                score: 1.00
-                        },
-                        {
-                                word_id: 444,
-                                name: "B",
-                                score: 0.25
-                        }
-                ]
-        });
+	const [deleteModal, setDeleteModal] = useState(false);
+	const [nameModal, setNameModal] = useState(false);
 
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
+
+	const handleName = (data) => {
+		;
+	};
 
 	async function getSet() {
 		try {
@@ -129,12 +119,14 @@ function Set({ID, sID, close, add, view, api}) {
 			getSet();
 	}, [set]);
 
-	return(
-		<>
+	return(<>
 		{set != null && <>
 			<Row style={{height: "15%"}}>
 				<Stack direction='horizontal'>
 					<Card.Title>{set.name}</Card.Title>
+					<Button title="change name">
+						<FontAwesomeIcon icon="fa-solid fa-pencil" />
+					</Button>
 					<Button variant="secondary" className="ms-auto" onClick={close}>{strings.get("back")}</Button>
 				</Stack>
 			</Row>
@@ -159,8 +151,48 @@ function Set({ID, sID, close, add, view, api}) {
 					<Button variant="success" style={{width: "33%"}}>{strings.get("play")}</Button>
 				</Stack>
 			</Row>
-		</>}</>
-	);
+		</>}
+		<Modal
+			size="lg"
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+			show={!nameModal && deleteModal}
+			onHide{() => setDeleteModal(false)}
+		>
+			<Modal.Header closeButton>
+				<Modal.Title>
+					Title
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				Body
+			</Modal.body>
+			<Modal.Footer>
+				<Button>
+				</Button>
+			</Modal.Footer>
+		</Modal>
+		<Modal
+			size="lg"
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+			show={!deleteModal && nameModal}
+			onHide{() => setNameModal(false)}
+		>
+			<Modal.Header closeButton>
+				<Modal.Title>
+					Title
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				Body
+			</Modal.body>
+			<Modal.Footer>
+				<Button>
+				</Button>
+			</Modal.Footer>
+		</Modal>
+	</>);
 }
 
 export default Set
