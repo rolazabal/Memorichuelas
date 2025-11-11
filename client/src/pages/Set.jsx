@@ -21,10 +21,6 @@ function Set({ID, sID, close, add, view, api}) {
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
 
-	const handleName = (data) => {
-		;
-	};
-
 	async function getSet() {
 		try {
 			let res = await fetch(api + '/' + ID + '/' + sID, {
@@ -70,9 +66,10 @@ function Set({ID, sID, close, add, view, api}) {
 			if (res.status == 200) {
 				res = await res.json();
 				setSet(null);
+				setNameModal(false);
 				showToast(toasts.SET_NAME_S);
 			} else if (res.status == 403) {
-				showToast(toasts.ERR);
+				showToast(toasts.TIMEOUT);
 			} else {
 				showToast(toasts.ERR);
 			}
@@ -111,6 +108,11 @@ function Set({ID, sID, close, add, view, api}) {
 			}
 		} catch(error) { showToast(toasts.ERR); }
 	}
+
+	const handleName = (data) => {
+		let name = data.get("change_name");
+		rename(name);
+	};
 
 	useEffect(() => {
 		if (set == null)
@@ -191,14 +193,16 @@ function Set({ID, sID, close, add, view, api}) {
 					{strings.get("set_rename_text")}
 				</Modal.Title>
 			</Modal.Header>
-			<Modal.Body>
-				Body
-			</Modal.Body>
-			<Modal.Footer>
-				<Button>
-					{strings.get("rename")}
-				</Button>
-			</Modal.Footer>
+			<Form action={handleName}>
+				<Modal.Body>
+					<Form.Control name="change_name" type="text" placeholder={strings.get("set_rename_text")} />
+				</Modal.Body>
+				<Modal.Footer>
+					<Button type="submit">
+						{strings.get("rename")}
+					</Button>
+				</Modal.Footer>
+			</Form>
 		</Modal>
 		<Modal
 			size="lg"

@@ -83,9 +83,9 @@ BEGIN
     INSERT INTO UserSets (user_id, set_id) (
         SELECT user_id, set_id FROM (
             SELECT user_id FROM inserted
-        ) CROSS JOIN (
+        ) u CROSS JOIN (
             SELECT set_id FROM Sets WHERE official
-        )
+        ) s
     );
     RETURN NULL;
 END;
@@ -101,9 +101,9 @@ BEGIN
     INSERT INTO UserSets (user_id, set_id) (
         SELECT user_id, set_id FROM (
             SELECT user_id FROM Users
-        ) CROSS JOIN (
+        ) u CROSS JOIN (
             SELECT set_id FROM inserted WHERE official
-        )
+        ) s
     );
     RETURN NULL;
 END;
