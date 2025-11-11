@@ -29,9 +29,9 @@ const create_user_set = 'INSERT INTO usersets("set_id", "user_id") VALUES ($2, $
 const update_set_name = 'UPDATE sets SET name = $2 WHERE "set_id" = $1';
 const fetch_set_words = 'SELECT w.word_id, name, score FROM words w ' + 
 	'JOIN setwords sw ON w.word_id = sw.word_id WHERE set_id = $1 GROUP BY w.word_id, name, score';
-const fetch_set = 'SELECT s.set_id, name, us.score FROM sets s JOIN usersets us ' +
+const fetch_set = 'SELECT s.set_id, name, us.score, s.official FROM sets s JOIN usersets us ' +
 	'ON s.set_id = us.set_id WHERE us.user_id = $1 AND s.set_id = $2 ' +
-	'GROUP BY s.set_id, name, us.score';
+	'GROUP BY s.set_id, name, us.score, s.official';
 
 // pool database connection ===================================================
 const pool = new Pool({
@@ -179,6 +179,7 @@ async function getSet(user_id, set_id) {
 		set_id: res.set_id,
 		name: res.name,
 		score: res.score,
+        isOfficial: res.official,
 		words: []
 	};
 	res = await client.query(fetch_set_words, [set_id]);

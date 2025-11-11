@@ -1,13 +1,10 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Dropdown, ListGroup, Row, Col } from 'react-bootstrap';
-import Container from 'react-bootstrap/Container';
+import { Row, Col } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import Form from 'react-bootstrap/Form';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
 import Modal from 'react-bootstrap/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -19,6 +16,7 @@ function Set({ID, sID, close, add, view, api}) {
 	const [set, setSet] = useState(null);
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [nameModal, setNameModal] = useState(false);
+	const [shareModal, setShareModal] = useState(false);
 
 	const { strings } = useContext(LocContext);
 	const { toasts, showToast } = useContext(ToastContext);
@@ -124,29 +122,37 @@ function Set({ID, sID, close, add, view, api}) {
 			<Row style={{height: "15%"}}>
 				<Stack direction='horizontal'>
 					<Card.Title>{set.name}</Card.Title>
-					<Button title="change name">
-						<FontAwesomeIcon icon="fa-solid fa-pencil" />
-					</Button>
+                    {!set.isOfficial && <>
+					    <Button title={strings.get("rename")} onClick={() => setNameModal(true)}>
+						    <FontAwesomeIcon icon="fa-solid fa-pencil" />
+					    </Button>
+					    <Button title={strings.get("share")} onClick={() => setShareModal(true)}>
+						    <FontAwesomeIcon icon="fa-solid fa-share-nodes" />
+					    </Button>
+                    </>}
 					<Button variant="secondary" className="ms-auto" onClick={close}>{strings.get("back")}</Button>
 				</Stack>
 			</Row>
 			<Row style={{height: "68%"}}>
 				<p style={{fontSize: "1.3em"}}>
-					{set.words.map((word) => <>
+					{set.words.map((word, index, words) => <>
 						<a onClick={() => view(word.word_id)}>{word.name}</a>
-						<Button variant="light" title={strings.get("delete")} onClick={() => removeWord(word.word_id)}>
+						{!set.isOfficial && <Button variant="light" title={strings.get("delete")} onClick={() => removeWord(word.word_id)}>
 							<FontAwesomeIcon icon="fa-solid fa-trash" />
-						</Button>{", "} 
+						</Button>}
+                        {words.length - 1 != index && ", "} 
 					</>)}
-					<Button variant="light" title={strings.get("add")} onClick={add}>
+					{!set.isOfficial && <Button variant="light" title={strings.get("add")} onClick={add}>
 						<FontAwesomeIcon icon="fa-solid fa-plus" />
-					</Button>
+					</Button>}
 				</p>
 			</Row>
 			<hr />
 			<Row style={{height: "10%"}}>
 				<Stack direction='horizontal'>
-					<Button variant="danger" style={{width: "33%"}} onClick={() => deleteSet()}>{strings.get("delete")}</Button>
+					{!set.isOfficial && <Button variant="danger" style={{width: "33%"}} onClick={() => setDeleteModal(true)}>
+                        {strings.get("delete")}
+                    </Button>}
 					<p style={{width: "33%", fontSize: "1.3em"}}>{strings.get("score")}: {set.score}</p>
 					<Button variant="success" style={{width: "33%"}}>{strings.get("play")}</Button>
 				</Stack>
@@ -156,19 +162,20 @@ function Set({ID, sID, close, add, view, api}) {
 			size="lg"
 			aria-labelledby="contained-modal-title-vcenter"
 			centered
-			show={!nameModal && deleteModal}
-			onHide{() => setDeleteModal(false)}
+			show={!nameModal && !shareModal && deleteModal}
+			onHide={() => setDeleteModal(false)}
 		>
 			<Modal.Header closeButton>
 				<Modal.Title>
-					Title
+					{strings.get("user_delete_text")}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				Body
-			</Modal.body>
+				{strings.get("set_delete_blurb")}
+			</Modal.Body>
 			<Modal.Footer>
-				<Button>
+				<Button variant="danger" onClick={() => deleteSet()}>
+					{strings.get("delete")}
 				</Button>
 			</Modal.Footer>
 		</Modal>
@@ -176,21 +183,38 @@ function Set({ID, sID, close, add, view, api}) {
 			size="lg"
 			aria-labelledby="contained-modal-title-vcenter"
 			centered
-			show={!deleteModal && nameModal}
-			onHide{() => setNameModal(false)}
+			show={!deleteModal && !shareModal && nameModal}
+			onHide={() => setNameModal(false)}
 		>
 			<Modal.Header closeButton>
 				<Modal.Title>
-					Title
+					{strings.get("set_rename_text")}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				Body
-			</Modal.body>
+			</Modal.Body>
 			<Modal.Footer>
 				<Button>
+					{strings.get("rename")}
 				</Button>
 			</Modal.Footer>
+		</Modal>
+		<Modal
+			size="lg"
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+			show={!deleteModal && !nameModal && shareModal}
+			onHide={() => setShareModal(false)}
+		>
+			<Modal.Header closeButton>
+				<Modal.Title>
+					{strings.get("set_share_text")}
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				{sID}
+			</Modal.Body>
 		</Modal>
 	</>);
 }

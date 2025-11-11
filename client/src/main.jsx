@@ -6,9 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { LocContextProvider } from './context/LocContext.jsx';
 import { ToastContextProvider } from './context/ToastContext.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEarthAmericas, faTrash, faPlus, faMagnifyingGlass, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faEarthAmericas, faTrash, faPlus, faMagnifyingGlass, faPencil, faShareNodes, faClone } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faEarthAmericas, faTrash, faPlus, faMagnifyingGlass, faPencil);
+library.add(faEarthAmericas, faTrash, faPlus, faMagnifyingGlass, faPencil, faShareNodes, faClone);
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>

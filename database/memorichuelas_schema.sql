@@ -77,3 +77,39 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS us_after_del ON UserSets;
 CREATE TRIGGER us_after_del AFTER DELETE ON UserSets
 FOR EACH ROW EXECUTE FUNCTION del_orphan_set();
+
+CREATE OR REPLACE FUNCTION welcome_set() RETURNS trigger AS $$
+BEGIN
+    INSERT INTO UserSets (user_id, set_id) (
+        SELECT user_id, set_id FROM (
+            SELECT user_id FROM inserted
+        ) CROSS JOIN (
+            SELECT set_id FROM Sets WHERE official
+        )
+    );
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS u_after_in on Users;
+CREATE TRIGGER u_after_in AFTER INSERT ON Users
+REFERENCING NEW TABLE AS inserted
+FOR EACH STATEMENT EXECUTE FUNCTION welcome_set();
+
+CREATE OR REPLACE FUNCTION in_official_set() RETURNS trigger AS $$
+BEGIN
+    INSERT INTO UserSets (user_id, set_id) (
+        SELECT user_id, set_id FROM (
+            SELECT user_id FROM Users
+        ) CROSS JOIN (
+            SELECT set_id FROM inserted WHERE official
+        )
+    );
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS s_after_in on Sets;
+CREATE TRIGGER s_after_in AFTER INSERT ON Sets
+REFERENCING NEW TABLE AS inserted
+FOR EACH STATEMENT EXECUTE FUNCTION in_official_set();

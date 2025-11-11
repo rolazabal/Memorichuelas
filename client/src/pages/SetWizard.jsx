@@ -16,7 +16,13 @@ function SetWizard({ID}) {
 		PICKER: 3
 	};
 
+    const listModes = {
+        CUSTOM: 0,
+        OFFICIAL: 1
+    };
+
 	const [mode, setMode] = useState(modes.LIST);
+    const [listMode, setListMode] = useState(listModes.CUSTOM);
 	const [setID, setSetID] = useState(null);
 	const [wordID, setWordID] = useState(null);
 
@@ -67,7 +73,7 @@ function SetWizard({ID}) {
 
 	return (<>
 		{mode == modes.LIST &&
-			<SetList ID={ID} view={(id) => setSetID(id)} api={setAPI} />
+			<SetList ID={ID} view={(id) => setSetID(id)} api={setAPI} modes={listModes} mode={listMode} setMode={setListMode} />
 		}
 		{mode == modes.SET &&
 			<Set ID={ID} sID={setID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />

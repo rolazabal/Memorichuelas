@@ -1,10 +1,8 @@
-import { Dropdown, ListGroup, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
-import Form from 'react-bootstrap/Form';
-import Pagination from 'react-bootstrap/Pagination';
 import { useState, useEffect, useContext } from 'react';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
