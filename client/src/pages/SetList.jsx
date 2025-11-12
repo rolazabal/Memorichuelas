@@ -50,8 +50,8 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 			});
 			if (res.status == 200) {
 				res = await res.json();
-				let id = res.set_id;
-				view(id);
+				let s_id = res.set_id;
+				view(s_id);
 			} else if (res.status == 403) {
 				showToast(toasts.TIMEOUT);
 			} else {
@@ -60,10 +60,32 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 		} catch(error) { showToast(toasts.ERR); }
 	}
 
+    async function clone(set_id) {
+        try {
+            let res = await fetch(api + '/' + ID + '/clone/' + set_id, {
+                method: 'POST'
+            });
+            if (res.status == 200) {
+                res = await res.json();
+                let s_id = res.set_id;
+                view(s_id);
+            } else if (res.status == 403) {
+                showToast(toasts.TIMEOUT);
+            } else {
+                showToast(toasts.ERR);            
+            }
+        } catch(error) { showToast(toasts.ERR); }
+    }
+
 	const handleCreate = (data) => {
 		let name = data.get("create_name");
 		create(name);
-	}
+	};
+
+    const handleClone = (data) => {
+        let id = data.get("clone_id");
+        clone(id);
+    };
 
 	useEffect(() => {
         if (sets == null) {
@@ -132,14 +154,16 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 					{strings.get("set_clone_text")}
 				</Modal.Title>
 			</Modal.Header>
-			<Modal.Body>
-				Enter a set ID to clone
-			</Modal.Body>
-			<Modal.Footer>
-				<Button>
-					{strings.get("clone")}
-				</Button>
-			</Modal.Footer>
+            <Form action={handleClone}>
+			    <Modal.Body>
+				    <Form.Control name="clone_id" type="number" placeholder={strings.get("set_clone_text")} />
+			    </Modal.Body>
+			    <Modal.Footer>
+				    <Button type="submit">
+					    {strings.get("clone")}
+				    </Button>
+			    </Modal.Footer>
+            </Form>
 		</Modal>
 	</>);
 }

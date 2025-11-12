@@ -25,8 +25,9 @@ const create_setword = 'INSERT INTO setwords(set_id, word_id) VALUES ($1, $2)';
 const fetch_sets = 'SELECT s.set_id, name, us.score FROM sets s ' +
 	'JOIN usersets us ON s.set_id = us.set_id WHERE s.official = $2 AND us.user_id = $1 GROUP BY s.set_id, name, us.score';
 const create_set = 'INSERT INTO sets(name) VALUES ($1) RETURNING set_id';
-const create_set_clone = '';
-const create_setword_clone = '';
+const create_set_clone = 'INSERT INTO sets(name) (SELECT name FROM sets WHERE set_id = $1) RETURNING set_id';
+const create_setword_clone = 'INSERT INTO setwords(set_id, word_id) (SELECT s.set_id, w.word_id FROM ' +
+    '(SELECT set_id FROM sets WHERE set_id = $1) s CROSS JOIN (SELECT word_id FROM setwords WHERE set_id = $2) w)';
 const create_user_set = 'INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)';
 const update_set_name = 'UPDATE sets SET name = $2 WHERE "set_id" = $1';
 const fetch_set_words = 'SELECT w.word_id, name, score FROM words w ' + 
@@ -210,7 +211,11 @@ async function createSet(user_id, name) {
 }
 
 async function cloneSet(user_id, set_id) {
-	;
+	let res = await client.query(create_set_clone, [set_id]);
+    let clone_id = parseInt(res.rows[0].set_id);
+    res = await client.query(create_setword_clone, [clone_id, set_id]);
+    res = await client.query(create_user_set, [user_id, clone_id]);
+    return clone_id;
 }
 
 async function deleteSet(set_id) {
@@ -431,8 +436,8 @@ app.post(setAPI + '/:user_id/clone/:set_id', async (req, res) => {
 		return;
 	}
 	let set_id = req.params.set_id;
-	await cloneSet(user_id, set_id);
-	res.status(200).json({msg: 'set cloned.'});
+	let clone_id = await cloneSet(user_id, set_id);
+	res.status(200).json({set_id: clone_id});
 });
 
 // change name
