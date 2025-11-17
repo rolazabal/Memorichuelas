@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Dropdown, Row } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
@@ -6,7 +6,6 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Card from 'react-bootstrap/Card';
 import Stack from 'react-bootstrap/Stack';
-import NavDropdown from 'react-bootstrap/NavDropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Tome from './Strings.js';
@@ -15,7 +14,6 @@ import Account from './pages/Account.jsx';
 import DictionaryWizard from './pages/DictionaryWizard.jsx';
 import SetWizard from './pages/SetWizard.jsx';
 import { LocContext } from './context/LocContext.jsx';
-import { use } from 'react';
 import { ToastContext } from './context/ToastContext.jsx';
 
 function App() {

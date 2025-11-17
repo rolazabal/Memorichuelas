@@ -85,7 +85,7 @@ async function deactivateUser(user_id) {
 }
 
 async function userActive(user_id) {
-	let res = await client.query(fetch_user_status, [user_id]);
+	let res = await client.query('SELECT (active) FROM users WHERE "user_id" = $1', [user_id]);
 	// console.log(res.rows);
 	if (res.rows.length > 0)
 		return res.rows[0].active;
@@ -97,14 +97,14 @@ async function logAction(user_id) {
 }
 
 async function user_id(username, passkey) {
-	let res = await client.query(fetch_user, [username, passkey]);
+	let res = await client.query('SELECT ("user_id") FROM users WHERE name = $1 AND passkey = $2', [username, passkey]);
 	if (res.rows.length == 0) return -0;
 	let id = res.rows[0].user_id;
 	return id;
 }
 
 async function createUser(username, passkey) {
-	await client.query(create_user, [username, passkey]);
+	await client.query('INSERT INTO users(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)', [username, passkey]);
 }
 
 async function usernameExists(username) {
@@ -114,7 +114,7 @@ async function usernameExists(username) {
 }
 
 async function userInfo(user_id) {
-	let res = await client.query(fetch_user_info, [user_id]);
+	let res = await client.query('SELECT (name, date) FROM users WHERE "user_id" = $1', [user_id]);
 	res = res.rows[0].row;
 	let list = parseRow(res);
 	let info = {
@@ -129,14 +129,14 @@ async function updateUsername(user_id, username) {
 }
 
 async function deleteUser(user_id) {
-	await client.query(remove_user, [user_id]);
+	await client.query('DELETE FROM users WHERE "user_id" = $1', [user_id]);
 }
 
 async function wordByID(word_id) {
-	let res = await client.query(fetch_word, [word_id]);
+	let res = await client.query('SELECT name FROM words WHERE word_id = $1', [word_id]);
 	console.log(res.rows);
 	let name = res.rows[0].name;
-	res = await client.query(fetch_definitions, [word_id]);
+	res = await client.query('SELECT definition FROM definitions WHERE word_id = $1', [word_id]);
 	let defs = [];
 	for (let x of res.rows)
 	defs.push(x.definition);
@@ -206,7 +206,7 @@ async function updateSetName(set_id, newName) {
 async function createSet(user_id, name) {
 	let res = await client.query(create_set, [name]);
 	let id = parseInt(res.rows[0].set_id);
-	res = await client.query(create_user_set, [user_id, id]);
+	res = await client.query('INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)', [user_id, id]);
 	return id;
 }
 
@@ -214,7 +214,7 @@ async function cloneSet(user_id, set_id) {
 	let res = await client.query(create_set_clone, [set_id]);
     let clone_id = parseInt(res.rows[0].set_id);
     res = await client.query(create_setword_clone, [clone_id, set_id]);
-    res = await client.query(create_user_set, [user_id, clone_id]);
+    res = await client.query('INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)', [user_id, clone_id]);
     return clone_id;
 }
 
