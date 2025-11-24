@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
-function Set({ID, sID, close, add, view, api}) {
+function Set({ID, sID, wID, close, add, view, api}) {
 	
 	const [set, setSet] = useState(null);
 	const [deleteModal, setDeleteModal] = useState(false);
@@ -19,7 +19,7 @@ function Set({ID, sID, close, add, view, api}) {
 	const [shareModal, setShareModal] = useState(false);
 
 	const { strings } = useContext(LocContext);
-	const { toasts, showToast } = useContext(ToastContext);
+	const { showToast } = useContext(ToastContext);
 
 	async function getSet() {
 		try {
@@ -31,12 +31,13 @@ function Set({ID, sID, close, add, view, api}) {
 				let set = res.set;
 				console.log(set);
 				setSet(set);
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
 			} else {
-				showToast(toasts.ERR);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function deleteSet() {
@@ -46,14 +47,15 @@ function Set({ID, sID, close, add, view, api}) {
 			});
 			if (res.status == 200) {
 				res = await res.json();
-				showToast(toasts.SEL_DEL_S);
+				showToast("success", "t_delete_set_success");
 				close();
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
 			} else {
-				showToast(toasts.ERR);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function rename(name) {
@@ -67,13 +69,14 @@ function Set({ID, sID, close, add, view, api}) {
 				res = await res.json();
 				setSet(null);
 				setNameModal(false);
-				showToast(toasts.SET_NAME_S);
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
+				showToast("success", "t_change_setname_success");
 			} else {
-				showToast(toasts.ERR);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function addWord(w_id) {
@@ -83,14 +86,13 @@ function Set({ID, sID, close, add, view, api}) {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({word_id: w_id})
 			});
-			if (res.status == 200) {
-				res = await res.json();	
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
-			} else {
-				showToast(toasts.ERR);
+			if (res.status != 200) {
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function removeWord(w_id) {
@@ -99,14 +101,14 @@ function Set({ID, sID, close, add, view, api}) {
 				method: 'DELETE'
 			});
 			if (res.status == 200) {
-				res = await res.json();
 				setSet(null);
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
 			} else {
-				showToast(toasts.ERR);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
 	const handleName = (data) => {
@@ -120,6 +122,7 @@ function Set({ID, sID, close, add, view, api}) {
 	}, [set]);
 
 	return(<>
+		{wID}
 		{set != null && <>
 			<Row style={{height: "15%"}}>
 				<Stack direction='horizontal'>

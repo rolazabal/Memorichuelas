@@ -57,8 +57,8 @@ class Tome {
         set_clone_text: ["Enter a set ID to clone.", "Entra numero de colleccion para clonar."],
 		add: ["Add", "Anadir"],
 		play: ["Play", "Jugar"],
-		t_success: ["Success!", "Exito!"],
-		t_fail: ["Oops!", "Ups!"],
+		success: ["Success!", "Exito!"],
+		danger: ["Oops!", "Ups!"],
 		t_login_success: ["Logged in!", "Sesion iniciada!"],
 		t_login_fail: ["Log in failed!" , "No se pudo iniciar la session!"],
 		t_logout_success: ["Logged out!", "Sesion cerrada!"],
@@ -87,6 +87,7 @@ class Tome {
 	get(key) {
 		return Tome.strings[key][this.lang];
 	}
+
 }
 
 export default Tome

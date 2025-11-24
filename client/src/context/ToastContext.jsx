@@ -1,43 +1,43 @@
-import { createContext, useState } from 'react';
-
-import Toaster from './../Toaster.jsx';
-import Toast from './../Toast.js';
+import { createContext, useState, useContext } from 'react';
+import ToastContainer from 'react-bootstrap/ToastContainer';
+import Toast from 'react-bootstrap/Toast';
+import { LocContext } from './LocContext.jsx';
 
 export const ToastContext = createContext(null);
+
 export const ToastContextProvider = ({ children }) => {
 
-    const toasts = {
-		LOGIN_S: 0,
-		LOGIN_F: 1,
-		LOGOUT_S: 2,
-		ACC_CREATE_F: 3,
-		USERNAME_S: 4,
-		USERNAME_F: 5,
-	    	USERNAME_TAKEN: 6,
-		ACC_DEL_S: 7,
-		ACC_DEL_F: 8,
-		TIMEOUT: 9,
-		LOGIN_BLOCK: 10,
-		ERR: 11,
-		SET_CREATE_S: 12,
-		SET_DEL_S: 13,
-		SET_NAME_S: 14,
-	    	SET_NAME_F: 15,
-		SET_WORDS_S: 16,
-		SET_WORD_EXISTS: 17,
-		SET_FULL: 18
-	};
+    const [type, setType] = useState("");
+	const [msg, setMsg] = useState("");
+    const [show, setShow] = useState(false);
 
-    const [toast, setToast] = useState(toasts.ERR);
+    const showToast = (type, msg) => {
+        setType(type);
+		setMsg(msg);
+		setShow(true);
+    };
 
-    const showToast = (type) => {
-        setToast(new Toast(type))
-    }
+	const { strings } = useContext(LocContext);
     
     return (
-        <ToastContext.Provider value={{ toasts, showToast }}>
+        <ToastContext.Provider value={{ showToast }}>
             {children}
-            <Toaster toast={toast} />
+            <ToastContainer position={'top-end'} style={{zIndex: 1}}>
+				<Toast
+					bg={type}
+					onClose={() => setShow(false)}
+					show={show}
+					delay={50000}
+					autohide
+				>
+					<Toast.Header>{type != "" ? strings.get(type) : type}</Toast.Header>
+
+					{msg != "" && 
+						<Toast.Body>{typeof(msg) == typeof([""]) ? msg[strings.lang] : strings.get(msg)}</Toast.Body>
+					}
+				</Toast>
+			</ToastContainer>
         </ToastContext.Provider>
     );
+
 };

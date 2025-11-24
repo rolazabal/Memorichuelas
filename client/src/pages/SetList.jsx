@@ -19,7 +19,7 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 	const [cloneModal, setCloneModal] = useState(false);
 
 	const { strings } = useContext(LocContext);
-	const { toasts, showToast } = useContext(ToastContext);
+	const { showToast } = useContext(ToastContext);
 
 	async function getSets() {
 		try {
@@ -33,12 +33,13 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 				res = await res.json();
 				let sets = res.sets;
 				setSets(sets);
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
 			} else {
-				showToast(toasts.SET_NAME_F);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function create(name) {
@@ -52,12 +53,13 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 				res = await res.json();
 				let s_id = res.set_id;
 				view(s_id);
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
 			} else {
-				showToast(toasts.SET_NAME_F);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 
     async function clone(set_id) {
@@ -69,12 +71,13 @@ function SetList({ID, view, api, modes, mode, setMode}) {
                 res = await res.json();
                 let s_id = res.set_id;
                 view(s_id);
-            } else if (res.status == 403) {
-                showToast(toasts.TIMEOUT);
-            } else {
-                showToast(toasts.ERR);            
-            }
-        } catch(error) { showToast(toasts.ERR); }
+			} else {
+				res = await res.json();
+				showToast("danger", res.msg);
+			}
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
     }
 
 	const handleCreate = (data) => {

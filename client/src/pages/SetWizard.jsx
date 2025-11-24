@@ -27,27 +27,26 @@ function SetWizard({ID}) {
 	const [wordID, setWordID] = useState(null);
 
 	const { strings } = useContext(LocContext);
-	const { toasts, showToast } = useContext(ToastContext);
+	const { showToast } = useContext(ToastContext);
 
 	const setAPI = 'http://localhost:5050/api/sets';
 	const dictAPI = 'http://localhost:5050/api/dictionary';
 	
 	async function addWord(w_id) {
-                try {
-                        let res = await fetch(setAPI + '/' + ID + '/' + setID + '/word', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({word_id: w_id})
-                        });
-                        if (res.status == 200) {
-                                res = await res.json();
-			} else if (res.status == 403) {
-                                showToast(toasts.TIMEOUT);
-                        } else {
-                                showToast(toasts.ERR);
-                        }
-                } catch(error) { showToast(toasts.ERR); }
-        }
+		try {
+			let res = await fetch(setAPI + '/' + ID + '/' + setID + '/word', {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify({word_id: w_id})
+			});
+			if (res.status != 200) {
+				res = await res.json();
+				showToast("danger", res.msg);
+			}
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
+    }
 
 	useEffect(() => {
 		if (setID != null)
@@ -76,7 +75,7 @@ function SetWizard({ID}) {
 			<SetList ID={ID} view={(id) => setSetID(id)} api={setAPI} modes={listModes} mode={listMode} setMode={setListMode} />
 		}
 		{mode == modes.SET &&
-			<Set ID={ID} sID={setID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />
+			<Set ID={ID} sID={setID} wID={wordID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />
 		}
 		{mode == modes.WORD &&
 			<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />

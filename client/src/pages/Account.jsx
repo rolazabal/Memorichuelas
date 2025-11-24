@@ -14,7 +14,7 @@ function Account({ID, logOut, del}) {
 	const [createModal, setCreateModal] = useState(false);
 
 	const { strings } = useContext(LocContext);
-	const { toasts, showToast } = useContext(ToastContext);
+	const { showToast } = useContext(ToastContext);
 	
 	const accAPI = 'http://localhost:5050/api/account';
 
@@ -28,9 +28,12 @@ function Account({ID, logOut, del}) {
 				let obj = res.info;
 				setInfo(obj);
 			} else {
-				showToast(toasts.TIMEOUT);
+				res = await res.json();
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) {
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function changeName(user) {
@@ -42,21 +45,14 @@ function Account({ID, logOut, del}) {
 			});
 			if (res.status == 200) {
 				await getInfo();
-				showToast(toasts.USERNAME_S);
-			} else if (res.status == 403) {
-				showToast(toasts.TIMEOUT);
+				showToast("success", "t_change_name_success");
 			} else {
 				res = await res.json();
-				switch (res.msg) {
-					case 'username is in use.':
-						showToast(toasts.USERNAME_TAKEN);
-						break;
-					default:
-						showToast(toasts.USERNAME_F);
-						break;
-				}
+				showToast("danger", res.msg);
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) {
+			showToast("danger", "t_error");
+		}
 	}
 
 	const handleChange = (data) => {

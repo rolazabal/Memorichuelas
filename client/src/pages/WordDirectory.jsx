@@ -39,7 +39,7 @@ function WordDirectory({ID, view, api}) {
         }
 
 	const { strings } = useContext(LocContext);
-	const { toasts, showToast } = useContext(ToastContext);
+	const { showToast } = useContext(ToastContext);
 	
 	async function getPage(letter) {
 		try {
@@ -49,7 +49,9 @@ function WordDirectory({ID, view, api}) {
 			res = await res.json();
 			let words = res.words;
 			setList(words);
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) {
+			showToast("danger", "t_error");
+		}
 	}
 
 	async function search(query) {
@@ -61,7 +63,9 @@ function WordDirectory({ID, view, api}) {
 			let words = res.words;
 			setPage(null);
 			setList(words);
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) {
+			showToast("danger", "t_error");
+		}
 	}
 
 	const handleSearch = (data) => {

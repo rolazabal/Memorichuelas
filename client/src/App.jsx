@@ -8,7 +8,7 @@ import Card from 'react-bootstrap/Card';
 import Stack from 'react-bootstrap/Stack';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import Tome from './Strings.js';
+import Tome from './context/Strings.js';
 import Home from './pages/Home.jsx';
 import Account from './pages/Account.jsx';
 import DictionaryWizard from './pages/DictionaryWizard.jsx';
@@ -48,35 +48,9 @@ function App() {
 	window.onload = function() { loadLocal() };
 
 	const { strings, setStrings } = useContext(LocContext);
-	const { toasts, showToast } = useContext(ToastContext);
+	const { showToast } = useContext(ToastContext);
 	
 	const accAPI = 'http://localhost:5050/api/account';
-
-	async function logIn(user, pass) {
-		try {
-			let res = await fetch(accAPI, {
-				method: 'PUT',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({username: user, passkey: pass})
-			});
-			if (res.status == 200) {
-				res = await res.json();
-				let id = await res.user_id;
-				setUserID(id);
-				localStorage.setItem('userID', id);
-				showToast(toasts.LOGIN_S);
-			} else {
-				switch(res.status) {
-					case 403:
-						showToast(toasts.LOGIN_BLOCK);
-						break;
-					default:
-						showToast(toasts.LOGIN_F);
-						break;
-				}
-			}
-		} catch(error) { showToast(toasts.ERR); }
-	}
 
 	async function logOut() {
 		try {
@@ -85,50 +59,30 @@ function App() {
 			});
 			setUserID(-1);
 			localStorage.removeItem('userID');
-			showToast(toasts.LOGOUT_S);
+			showToast("success", "t_login_success");
 			setPage(pages.HOME);
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
 	
 	async function deleteUser() {
-                try {
-                        let res = await fetch(accAPI + "/" + userID, {
-                                method: 'DELETE'
-                        });
-                        if (res.status == 200) {
-                                setUserID(-1);
-				localStorage.removeItem('userID');
-                                showToast(toasts.ACC_DEL_S);
-				setPage(pages.HOME);
-                        } else {
-                                showToast(toasts.TIMEOUT);
-                        }
-                } catch(error) { showToast(toasts.ERR); }
-        }
-
-	async function createAccount(user, pass) {
 		try {
-			let res = await fetch(accAPI, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({username: user, passkey: pass})
+			let res = await fetch(accAPI + "/" + userID, {
+				method: 'DELETE'
 			});
-			if (res.status == 200)
-				logIn(user, pass);
-			else {
-				res = await res.json();
-				switch (res.msg) {
-					case 'username is in use.':
-						showToast(toasts.USERNAME_TAKEN);
-						break;
-					default:
-						showToast(toasts.ACC_CREATE_F);
-						break;
-				}
+			if (res.status == 200) {
+				setUserID(-1);
+				localStorage.removeItem('userID');
+				showToast("success", "t_delete_acc_success");
+				setPage(pages.HOME);
+			} else {
+				showToast("danger", "t_user_timed_out");
 			}
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
 	}
-
 
 	return (
 		<Container fluid style={{display: "block", height: "100%", width: "100%"}}>

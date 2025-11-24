@@ -7,16 +7,60 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Stack from 'react-bootstrap/Stack';
 import { LocContext } from './../context/LocContext.jsx';
+import { ToastContext } from './../context/ToastContext.jsx';
 
 function Home({logIn, createAccount, ID}) {
 
     const [createModal, setCreateModal] = useState(false);
+
     const { strings } = useContext(LocContext);
+	const { showToast } = useContext(ToastContext);
+
+	const accAPI = 'http://localhost:5050/api/account';
+
+	async function logIn(user, pass) {
+		try {
+			let res = await fetch(accAPI, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({username: user, passkey: pass})
+			});
+			if (res.status == 200) {
+				res = await res.json();
+				let id = await res.user_id;
+				setUserID(id);
+				localStorage.setItem('userID', id);
+				showToast("success", "t_login_success");
+			} else {
+				res = await res.json();
+				showToast("danger", res.msg);
+			}
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
+	}
+
+	async function createAccount(user, pass) {
+		try {
+			let res = await fetch(accAPI, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({username: user, passkey: pass})
+			});
+			if (res.status == 200) {
+				logIn(user, pass);
+			} else {
+				res = await res.json();
+				showToast("danger", res.msg);
+			}
+		} catch(error) { 
+			showToast("danger", "t_error");
+		}
+	}
 
     const submitLogin = (data) => {
         let username = data.get("login_user");
         let passkey = data.get("login_pass");
-		console.log("sumbit");
         logIn(username, passkey);
     }
     

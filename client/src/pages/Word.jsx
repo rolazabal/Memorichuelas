@@ -12,7 +12,7 @@ function Word({uID, wID, close, api}) {
 	const [word, setWord] = useState(null);
 
 	const { strings } = useContext(LocContext);
-        const { toasts, showToast } = useContext(ToastContext);
+    const { showToast } = useContext(ToastContext);
 
 	async function getWord(id) {
 		try {
@@ -22,7 +22,9 @@ function Word({uID, wID, close, api}) {
 			res = await res.json();
 			let word = res.word;
 			setWord(word);
-		} catch(error) { showToast(toasts.ERR); }
+		} catch(error) {
+			showToast("danger", "t_error");
+		}
 	}
 
 	useEffect(() => {

@@ -1,8 +1,10 @@
 import { createContext, useState } from 'react';
-import Tome from './../Strings.js';
+import Tome from './Strings.js';
 
 export const LocContext = createContext(null);
+
 export const LocContextProvider = ({ children }) => {
+
     const [strings, setStrings] = useState(new Tome('english'));
     
     return (
@@ -10,4 +12,5 @@ export const LocContextProvider = ({ children }) => {
             {children}
         </LocContext.Provider>
     );
+
 };

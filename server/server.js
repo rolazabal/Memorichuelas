@@ -3,39 +3,6 @@ import cors from 'cors';
 import { Pool } from 'pg';
 import { Worker } from 'worker_threads';
 
-// queries ====================================================================
-const fetch_user = 'SELECT ("user_id") FROM users WHERE name = $1 AND passkey = $2';
-const fetch_user_status = 'SELECT (active) FROM users WHERE "user_id" = $1';
-// write db trigger to add official sets to this user
-const create_user = 'INSERT INTO users(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)';
-const fetch_word = 'SELECT name FROM words WHERE word_id = $1';
-const fetch_definitions = 'SELECT definition FROM definitions WHERE word_id = $1';
-const fetch_examples = 'SELECT example FROM examples WHERE word_id = $1';
-const fetch_active_users = 'SELECT ("user_id", timestamp) FROM users WHERE active = true';
-const activate_user = 'UPDATE users SET active = true, timestamp = CURRENT_TIMESTAMP WHERE "user_id" = $1';
-const deactivate_user = 'UPDATE users SET active = false, timestamp = null WHERE "user_id" = $1';
-const fetch_user_info = 'SELECT (name, date) FROM users WHERE "user_id" = $1';
-const update_user_name = 'UPDATE users SET name = $2 WHERE "user_id" = $1';
-const username_total = 'SELECT COUNT(*) FROM users GROUP BY name HAVING name = $1';
-const remove_user = 'DELETE FROM users WHERE "user_id" = $1';
-const regex_words = "SELECT word_id, name FROM words WHERE name LIKE $1 GROUP BY 1";
-const remove_set = 'DELETE FROM sets WHERE "set_id" = $1';
-const remove_setword = 'DELETE FROM setwords WHERE set_id = $1 AND word_id = $2';
-const create_setword = 'INSERT INTO setwords(set_id, word_id) VALUES ($1, $2)';
-const fetch_sets = 'SELECT s.set_id, name, us.score FROM sets s ' +
-	'JOIN usersets us ON s.set_id = us.set_id WHERE s.official = $2 AND us.user_id = $1 GROUP BY s.set_id, name, us.score';
-const create_set = 'INSERT INTO sets(name) VALUES ($1) RETURNING set_id';
-const create_set_clone = 'INSERT INTO sets(name) (SELECT name FROM sets WHERE set_id = $1) RETURNING set_id';
-const create_setword_clone = 'INSERT INTO setwords(set_id, word_id) (SELECT s.set_id, w.word_id FROM ' +
-    '(SELECT set_id FROM sets WHERE set_id = $1) s CROSS JOIN (SELECT word_id FROM setwords WHERE set_id = $2) w)';
-const create_user_set = 'INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)';
-const update_set_name = 'UPDATE sets SET name = $2 WHERE "set_id" = $1';
-const fetch_set_words = 'SELECT w.word_id, name, score FROM words w ' + 
-	'JOIN setwords sw ON w.word_id = sw.word_id WHERE set_id = $1 GROUP BY w.word_id, name, score';
-const fetch_set = 'SELECT s.set_id, name, us.score, s.official FROM sets s JOIN usersets us ' +
-	'ON s.set_id = us.set_id WHERE us.user_id = $1 AND s.set_id = $2 ' +
-	'GROUP BY s.set_id, name, us.score, s.official';
-
 // pool database connection ===================================================
 const pool = new Pool({
 	host: process.env.POSTGRES_HOST,
@@ -63,7 +30,7 @@ function parseRow(str) {
 // database functions =========================================================
 monitor.on("message", async (message) => {
 	// user timeout logic
-	let res = await client.query(fetch_active_users);
+	let res = await client.query('SELECT ("user_id", timestamp) FROM users WHERE active = true');
 	for (let x of res.rows) {
 		// id and timestamp info
 		let data = parseRow(x.row);
@@ -81,7 +48,7 @@ monitor.on("message", async (message) => {
 });
 
 async function deactivateUser(user_id) {
-	await client.query(deactivate_user, [user_id]);
+	await client.query('UPDATE users SET active = false, timestamp = null WHERE "user_id" = $1', [user_id]);
 }
 
 async function userActive(user_id) {
@@ -93,7 +60,7 @@ async function userActive(user_id) {
 }
 
 async function logAction(user_id) {
-	await client.query(activate_user, [user_id]);
+	await client.query('UPDATE users SET active = true, timestamp = CURRENT_TIMESTAMP WHERE "user_id" = $1', [user_id]);
 }
 
 async function user_id(username, passkey) {
@@ -108,7 +75,7 @@ async function createUser(username, passkey) {
 }
 
 async function usernameExists(username) {
-	let res = await client.query(username_total, [username]);
+	let res = await client.query('SELECT COUNT(*) FROM users GROUP BY name HAVING name = $1', [username]);
 	let count = res.rows[0];
 	return (count != undefined);
 }
@@ -125,7 +92,7 @@ async function userInfo(user_id) {
 }
 
 async function updateUsername(user_id, username) {
-	await client.query(update_user_name, [user_id, username]);
+	await client.query('UPDATE users SET name = $2 WHERE "user_id" = $1', [user_id, username]);
 }
 
 async function deleteUser(user_id) {
@@ -140,7 +107,7 @@ async function wordByID(word_id) {
 	let defs = [];
 	for (let x of res.rows)
 	defs.push(x.definition);
-	res = await client.query(fetch_examples, [word_id]);
+	res = await client.query('SELECT example FROM examples WHERE word_id = $1', [word_id]);
 	let exs = [];
 	for (let y of res.rows)
 		exs.push(y.example);
@@ -153,13 +120,14 @@ async function wordByID(word_id) {
 }
 
 async function dictionarySearch(string) {
-	let res = await client.query(regex_words, [string]);
+	let res = await client.query('SELECT word_id, name FROM words WHERE name LIKE $1 GROUP BY 1', [string]);
 	let list = res.rows;
 	return list;
 }
 
 async function getSets(user_id, official) {
-	let res = await client.query(fetch_sets, [user_id, official]);
+	let res = await client.query('SELECT s.set_id, name, us.score FROM sets s ' +
+	'JOIN usersets us ON s.set_id = us.set_id WHERE s.official = $2 AND us.user_id = $1 GROUP BY s.set_id, name, us.score', [user_id, official]);
 	let sets = [];
 	if (res.rowCount == 0)
 		return sets;
@@ -174,7 +142,9 @@ async function getSets(user_id, official) {
 }
 
 async function getSet(user_id, set_id) {
-	let res = await client.query(fetch_set, [user_id, set_id]);
+	let res = await client.query('SELECT s.set_id, name, us.score, s.official FROM sets s JOIN usersets us ' +
+	'ON s.set_id = us.set_id WHERE us.user_id = $1 AND s.set_id = $2 ' +
+	'GROUP BY s.set_id, name, us.score, s.official', [user_id, set_id]);
 	if (res.rowCount == 0)
 		return null;
 	res = res.rows[0];
@@ -185,8 +155,9 @@ async function getSet(user_id, set_id) {
         isOfficial: res.official,
 		words: []
 	};
-	res = await client.query(fetch_set_words, [set_id]);
-	console.log(res);
+	res = await client.query('SELECT w.word_id, name, score FROM words w ' + 
+	'JOIN setwords sw ON w.word_id = sw.word_id WHERE set_id = $1 GROUP BY w.word_id, name, score', [set_id]);
+	console.log(res.statusCode);
 	for (let x of res.rows) {
 		let word = {
 			word_id: x.word_id,
@@ -200,38 +171,47 @@ async function getSet(user_id, set_id) {
 }
 
 async function updateSetName(set_id, newName) {
-	await client.query(update_set_name, [set_id, newName]);
+	await client.query('UPDATE sets SET name = $2 WHERE "set_id" = $1', [set_id, newName]);
 }
 
 async function createSet(user_id, name) {
-	let res = await client.query(create_set, [name]);
+	let res = await client.query('INSERT INTO sets(name) VALUES ($1) RETURNING set_id', [name]);
 	let id = parseInt(res.rows[0].set_id);
 	res = await client.query('INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)', [user_id, id]);
 	return id;
 }
 
 async function cloneSet(user_id, set_id) {
-	let res = await client.query(create_set_clone, [set_id]);
+	let res = await client.query('INSERT INTO sets(name) (SELECT name FROM sets WHERE set_id = $1) RETURNING set_id', [set_id]);
     let clone_id = parseInt(res.rows[0].set_id);
-    res = await client.query(create_setword_clone, [clone_id, set_id]);
+    res = await client.query('INSERT INTO setwords(set_id, word_id) (SELECT s.set_id, w.word_id FROM ' +
+    '(SELECT set_id FROM sets WHERE set_id = $1) s CROSS JOIN (SELECT word_id FROM setwords WHERE set_id = $2) w)', [clone_id, set_id]);
     res = await client.query('INSERT INTO usersets("set_id", "user_id") VALUES ($2, $1)', [user_id, clone_id]);
     return clone_id;
 }
 
 async function deleteSet(set_id) {
-	await client.query(remove_set, [set_id]);
+	await client.query('DELETE FROM sets WHERE "set_id" = $1', [set_id]);
 }
 
 async function createSetWord(set_id, word_id) {
-	await client.query(create_setword, [set_id, word_id]);
+	await client.query('INSERT INTO setwords(set_id, word_id) VALUES ($1, $2)', [set_id, word_id]);
 }
 
 async function deleteSetWord(set_id, word_id) {
-	await client.query(remove_setword, [set_id, word_id]);
+	await client.query('DELETE FROM setwords WHERE set_id = $1 AND word_id = $2', [set_id, word_id]);
 }
 
 // account api ================================================================
 const accAPI = '/api/account';
+
+const str = {
+	not_found: ['User does not exist!', 'Usuario no existe!'],
+	timed_out: ['User timed out!', 'Session expirada!'],
+	invalid_username: ['Invalid username!', 'Nombre de usuario invalido!'],
+	invalid_passkey: ['Invalid passkey!', 'Contraseña invalida!'],
+	unique_username: ['Username already exists!', 'Nombre de usuario ya existe!'],
+};
 
 // log in
 app.put(accAPI, async (req, res) => {
@@ -240,67 +220,80 @@ app.put(accAPI, async (req, res) => {
 	let passkey = parseInt(req.body.passkey);
 	let id = await user_id(username, passkey);
 	if (!id) {
-		res.status(404).json({msg: 'user not found.'});
+		res.status(404).json({msg: str.not_found});
+	console.log(res.statusCode);
 		return;
 	}
 	await logAction(id);
 	res.status(200).json({user_id: id});
+	console.log(res.statusCode);
 });
 
 // get info
 app.get(accAPI + '/:id', async (req, res) => {
 	let id = parseInt(req.params.id);
 	if (!(await userActive(id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
+	console.log(res.statusCode);
 		return;
 	}
 	let obj = await userInfo(id);
 	console.log(obj);
 	await logAction(id);
 	res.status(200).json({info: obj});
+	console.log(res.statusCode);
 });
 
 // delete user
 app.delete(accAPI + '/:id', async (req, res) => {
 	let id = req.params.id;
 	if (!(await userActive(id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
+	console.log(res.statusCode);
 		return;
 	}
 	await deleteUser(id);
-	res.status(200).json({msg: 'user deleted.'});
+	res.status(200);
+	console.log(res.statusCode);
 });
 
 // log out
 app.put(accAPI + '/:id', async (req, res) => {
 	let id = req.params.id;
 	if (!(await userActive(id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
+	console.log(res.statusCode);
 		return;
 	}
 	await deactivateUser(id);
-	res.status(200).json({msg: 'user logged out.'});
+	res.status(200);
+	console.log(res.statusCode);
 });
 
 // change username
 app.put(accAPI + '/:id/username', async (req, res) => {
+	console.log(req.body);
 	let id = req.params.id;
 	if (!(await userActive(id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
+	console.log(res.statusCode);
 		return;
 	}
 	let username = req.body.username;
 	if (username == "") {
-		res.status(400).json({msg: 'invalid username.'});
+		res.status(400).json({msg: str.invalid_username});
+	console.log(res.statusCode);
 		return;
 	}
 	if (await usernameExists(username)) {
-		res.status(400).json({msg: 'username is in use.'});
+		res.status(400).json({msg: str.unique_username});
+	console.log(res.statusCode);
 		return;
 	}
 	await updateUsername(id, username);
 	await logAction(id);
-	res.status(200).json({msg: 'username updated.'});
+	res.status(200);
+	console.log(res.statusCode);
 });
 
 // create user
@@ -309,19 +302,23 @@ app.post(accAPI, async (req, res) => {
 	let username = req.body.username;
 	let passkey = parseInt(req.body.passkey);
 	if (username == "") {
-		res.status(400).json({msg: 'invalid username.'});
+		res.status(400).json({msg: str.invalid_username});
+	console.log(res.statusCode);
 		return;
 	}
 	if (passkey > 99999999 || passkey < 1) {
-		res.status(400).json({msg: 'invalid passkey.'});
+		res.status(400).json({msg: str.invalid_passkey});
+	console.log(res.statusCode);
 		return;
 	}
 	if (await usernameExists(username)) {
-		res.status(400).json({msg: 'username is in use.'});
+		res.status(400).json({msg: str.unique_username});
+	console.log(res.statusCode);
 		return;
 	}
 	await createUser(username, passkey);
-	res.status(200).json({msg: 'user created.'});
+	res.status(200);
+	console.log(res.statusCode);
 });
 
 // dictionary api =============================================================
@@ -329,12 +326,10 @@ const dictAPI = '/api/dictionary'
 
 // get page
 app.get(dictAPI + '/:page{/:user_id}', async (req, res) => {
-	console.log(req.params);
 	let page = req.params.page;
 	let user_id = req.params.user_id;
 	page = page.toLowerCase() + '%';
 	let list = await dictionarySearch(page);
-	console.log(list);
 	if (user_id != undefined && user_id != -1)
 		await logAction(user_id);
 	res.status(200).json({words: list});
@@ -342,7 +337,6 @@ app.get(dictAPI + '/:page{/:user_id}', async (req, res) => {
 
 // search
 app.get(dictAPI + '/search/:query{/:user_id}', async (req, res) => {
-	console.log(req.params);
 	let query = req.params.query;
 	let user_id = req.params.user_id;
 	let list = [];
@@ -350,7 +344,6 @@ app.get(dictAPI + '/search/:query{/:user_id}', async (req, res) => {
 		query = '%' + query + '%';
 		list = await dictionarySearch(query);
 	}
-	console.log(list);
 	if (user_id != undefined && user_id != -1)
 		await logAction(user_id);
 	res.status(200).json({words: list});
@@ -358,11 +351,9 @@ app.get(dictAPI + '/search/:query{/:user_id}', async (req, res) => {
 
 // get word
 app.get(dictAPI + '/word/:word_id{/:user_id}', async (req, res) => {
-	console.log(req.params);
 	let word_id = req.params.word_id;
 	let user_id = req.params.user_id;
 	let obj = await wordByID(word_id);
-	console.log(obj);
 	if (user_id != undefined && user_id != -1)
 		await logAction(user_id);
 	res.status(200).json({word: obj});
@@ -373,7 +364,6 @@ const setAPI = '/api/sets';
 
 // get custom sets
 app.get(setAPI + '/:user_id', async (req, res) => {
-	console.log(req.params);
 	let id = req.params.user_id;
 	if (!(await userActive(id))) {
 		res.status(403).json({msg: 'user timed out.'});
@@ -398,7 +388,6 @@ app.get(setAPI + '/:user_id/memorichuelas', async (req, res) => {
 
 // get set
 app.get(setAPI + '/:user_id/:set_id', async (req, res) => {
-	console.log(req.params);
 	let user_id = req.params.user_id;
 	if (!(await userActive(user_id))) {
 		res.status(403).json({msg: 'user timed out.'});
@@ -412,8 +401,6 @@ app.get(setAPI + '/:user_id/:set_id', async (req, res) => {
 
 // create set
 app.post(setAPI + '/:user_id', async (req, res) => {
-	console.log(req.params);
-	console.log(req.body);
 	let user_id = req.params.user_id;
 	if (!(await userActive(user_id))) {
 		res.status(403).json({msg: 'user timed out.'});
@@ -461,10 +448,6 @@ app.put(setAPI + '/:user_id/:set_id/name', async (req, res) => {
 
 // add word
 app.post(setAPI + '/:user_id/:set_id/word', async (req, res) => {
-	console.log("add word");
-	console.log(req.params);
-	console.log(req.body);
-	console.log("/\\ body");
 	let u_id = req.params.user_id;
 	if (!(await userActive(u_id))) {
 		res.status(403).json({msg: 'user timed out.'});
