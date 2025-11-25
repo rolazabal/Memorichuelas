@@ -202,16 +202,18 @@ async function deleteSetWord(set_id, word_id) {
 	await client.query('DELETE FROM setwords WHERE set_id = $1 AND word_id = $2', [set_id, word_id]);
 }
 
-// account api ================================================================
-const accAPI = '/api/account';
-
+// API STRINGS ================================================================
 const str = {
 	not_found: ['User does not exist!', 'Usuario no existe!'],
 	timed_out: ['User timed out!', 'Session expirada!'],
 	invalid_username: ['Invalid username!', 'Nombre de usuario invalido!'],
 	invalid_passkey: ['Invalid passkey!', 'Contraseña invalida!'],
 	unique_username: ['Username already exists!', 'Nombre de usuario ya existe!'],
+	invalid_setname: ['Invalid set name!', 'Nombre invalido de colleccion!'],
 };
+
+// account api ================================================================
+const accAPI = '/api/account';
 
 // log in
 app.put(accAPI, async (req, res) => {
@@ -366,7 +368,7 @@ const setAPI = '/api/sets';
 app.get(setAPI + '/:user_id', async (req, res) => {
 	let id = req.params.user_id;
 	if (!(await userActive(id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let list = await getSets(id, false);
@@ -378,7 +380,7 @@ app.get(setAPI + '/:user_id', async (req, res) => {
 app.get(setAPI + '/:user_id/memorichuelas', async (req, res) => {
 	let id = req.params.user_id;
 	if (!(await userActive(id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let list = await getSets(id, true);
@@ -390,7 +392,7 @@ app.get(setAPI + '/:user_id/memorichuelas', async (req, res) => {
 app.get(setAPI + '/:user_id/:set_id', async (req, res) => {
 	let user_id = req.params.user_id;
 	if (!(await userActive(user_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let set_id = req.params.set_id;
@@ -403,12 +405,12 @@ app.get(setAPI + '/:user_id/:set_id', async (req, res) => {
 app.post(setAPI + '/:user_id', async (req, res) => {
 	let user_id = req.params.user_id;
 	if (!(await userActive(user_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let name = req.body.name;
 	if (name == "") {
-		res.status(400).json({msg: 'invalid name.'});
+		res.status(400).json({msg: str.invalid_setname});
 		return;
 	}
 	let s_id = await createSet(user_id, name);
@@ -419,7 +421,7 @@ app.post(setAPI + '/:user_id', async (req, res) => {
 app.post(setAPI + '/:user_id/clone/:set_id', async (req, res) => {
 	let user_id = req.params.user_id;
 	if (!(await userActive(user_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let set_id = req.params.set_id;
@@ -433,30 +435,30 @@ app.put(setAPI + '/:user_id/:set_id/name', async (req, res) => {
 	console.log(req.body);
 	let u_id = req.params.user_id;
 	if (!(await userActive(u_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let s_id = req.params.set_id;
 	let name = req.body.name;
 	if (name == "") {
-		res.status(400).json({msg: 'invalid name.'});
+		res.status(400).json({msg: str.invalid_setname});
 		return;
 	}
 	await updateSetName(s_id, name);
-	res.status(200).json({msg: 'set name updated.'});
+	res.status(200);
 });
 
 // add word
 app.post(setAPI + '/:user_id/:set_id/word', async (req, res) => {
 	let u_id = req.params.user_id;
 	if (!(await userActive(u_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let s_id = req.params.set_id;
 	let w_id = req.body.word_id;
 	await createSetWord(s_id, w_id);
-	res.status(200).json({msg: 'set word created.'});
+	res.status(200);
 });
 
 // delete word
@@ -464,13 +466,13 @@ app.delete(setAPI + '/:user_id/:set_id/:word_id', async (req, res) => {
 	console.log(req.params);
 	let u_id = req.params.user_id;
 	if (!(await userActive(u_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let s_id = req.params.set_id;
 	let w_id = req.params.word_id;
 	await deleteSetWord(s_id, w_id);
-	res.status(200).json({msg: 'set word deleted.'});
+	res.status(200);
 });
 
 // delete set
@@ -478,12 +480,12 @@ app.delete(setAPI + '/:user_id/:set_id', async (req, res) => {
 	console.log(req.params);
 	let u_id = req.params.user_id;
 	if (!(await userActive(u_id))) {
-		res.status(403).json({msg: 'user timed out.'});
+		res.status(403).json({msg: str.timed_out});
 		return;
 	}
 	let s_id = req.params.set_id;
 	await deleteSet(s_id);
-	res.status(200).json({msg: 'set deleted.'});
+	res.status(200);
 });
 
 // update word score

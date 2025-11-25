@@ -39,9 +39,7 @@ function SetWizard({ID}) {
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify({word_id: wordID})
 			});
-			if (res.status == 200) {
-				setWordID(null);
-			} else {
+			if (res.status != 200) {
 				res = await res.json();
 				showToast("danger", res.msg);
 			}
@@ -68,6 +66,7 @@ function SetWizard({ID}) {
 			setMode(modes.WORD);
 		} else if (mode == modes.PICKER) {
 			add();
+			setWordID(null);
 			setMode(modes.SET);
 		}
 	}, [wordID]);
@@ -77,7 +76,7 @@ function SetWizard({ID}) {
 			<SetList ID={ID} view={(id) => setSetID(id)} api={setAPI} modes={listModes} mode={listMode} setMode={setListMode} />
 		}
 		{mode == modes.SET &&
-			<Set ID={ID} sID={setID} wID={wordID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />
+			<Set ID={ID} sID={setID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />
 		}
 		{mode == modes.WORD &&
 			<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />

@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
-function Set({ID, sID, wID, close, add, view, api}) {
+function Set({ID, sID, close, add, view, api}) {
 	
 	const [set, setSet] = useState(null);
 	const [deleteModal, setDeleteModal] = useState(false);
@@ -67,9 +67,9 @@ function Set({ID, sID, wID, close, add, view, api}) {
 			});
 			if (res.status == 200) {
 				res = await res.json();
-				setSet(null);
 				setNameModal(false);
 				showToast("success", "t_change_setname_success");
+				setSet(null);
 			} else {
 				res = await res.json();
 				showToast("danger", res.msg);
@@ -106,7 +106,6 @@ function Set({ID, sID, wID, close, add, view, api}) {
 	}, [set]);
 
 	return(<>
-		{wID}
 		{set != null && <>
 			<Row style={{height: "15%"}}>
 				<Stack direction='horizontal'>

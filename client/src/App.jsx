@@ -84,6 +84,11 @@ function App() {
 		}
 	}
 
+	function changePage(p) {
+		setPage(p);
+		localStorage.setItem('page', p);
+	}
+
 	return (
 		<Container fluid style={{display: "block", height: "100%", width: "100%"}}>
 			<Row>
@@ -107,11 +112,11 @@ function App() {
 					<Navbar.Toggle aria-controls="responsive-navbar-nav" />
 					<Navbar.Collapse id="responsive-navbar-nav">
 						<Nav className="me-auto" activeKey={page}>
-							<Nav.Link eventKey={pages.HOME} onClick={() => setPage(pages.HOME)}>{strings.get('about_title')}</Nav.Link>
-							<Nav.Link eventKey={pages.DICTIONARY} onClick={() => setPage(pages.DICTIONARY)}>{strings.get('dictionary_title')}</Nav.Link>
+							<Nav.Link eventKey={pages.HOME} onClick={() => changePage(pages.HOME)}>{strings.get('about_title')}</Nav.Link>
+							<Nav.Link eventKey={pages.DICTIONARY} onClick={() => changePage(pages.DICTIONARY)}>{strings.get('dictionary_title')}</Nav.Link>
 							{userID != -1 && <>
-								<Nav.Link eventKey={pages.SETS} onClick={() => setPage(pages.SETS)}>{strings.get('sets_title')}</Nav.Link>
-								<Nav.Link eventKey={pages.SETTINGS} onClick={() => setPage(pages.SETTINGS)}>{strings.get('user_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.SETS} onClick={() => changePage(pages.SETS)}>{strings.get('sets_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.SETTINGS} onClick={() => changePage(pages.SETTINGS)}>{strings.get('user_title')}</Nav.Link>
 							</>}
 						</Nav>
 					</Navbar.Collapse>
