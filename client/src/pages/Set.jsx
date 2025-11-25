@@ -79,22 +79,6 @@ function Set({ID, sID, wID, close, add, view, api}) {
 		}
 	}
 
-	async function addWord(w_id) {
-		try {
-			let res = await fetch(api + '/' + ID + '/' + sID + '/word', {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({word_id: w_id})
-			});
-			if (res.status != 200) {
-				res = await res.json();
-				showToast("danger", res.msg);
-			}
-		} catch(error) { 
-			showToast("danger", "t_error");
-		}
-	}
-
 	async function removeWord(w_id) {
 		try {
 			let res = await fetch(api + '/' + ID + '/' + sID + '/' + w_id, {
@@ -140,6 +124,9 @@ function Set({ID, sID, wID, close, add, view, api}) {
 			</Row>
 			<Row style={{height: "68%"}}>
 				<p style={{fontSize: "1.3em"}}>
+					{!set.isOfficial && <Button variant="light" title={strings.get("add")} onClick={add}>
+						<FontAwesomeIcon icon="fa-solid fa-plus" />
+					</Button>}
 					{set.words.map((word, index, words) => <>
 						<a onClick={() => view(word.word_id)}>{word.name}</a>
 						{!set.isOfficial && <Button variant="light" title={strings.get("delete")} onClick={() => removeWord(word.word_id)}>
@@ -147,9 +134,6 @@ function Set({ID, sID, wID, close, add, view, api}) {
 						</Button>}
                         {words.length - 1 != index && ", "} 
 					</>)}
-					{!set.isOfficial && <Button variant="light" title={strings.get("add")} onClick={add}>
-						<FontAwesomeIcon icon="fa-solid fa-plus" />
-					</Button>}
 				</p>
 			</Row>
 			<hr />

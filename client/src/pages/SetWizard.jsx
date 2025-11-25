@@ -32,14 +32,16 @@ function SetWizard({ID}) {
 	const setAPI = 'http://localhost:5050/api/sets';
 	const dictAPI = 'http://localhost:5050/api/dictionary';
 	
-	async function addWord(w_id) {
+	async function addWord() {
 		try {
 			let res = await fetch(setAPI + '/' + ID + '/' + setID + '/word', {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify({word_id: w_id})
+					body: JSON.stringify({word_id: wordID})
 			});
-			if (res.status != 200) {
+			if (res.status == 200) {
+				setWordID(null);
+			} else {
 				res = await res.json();
 				showToast("danger", res.msg);
 			}
@@ -57,7 +59,7 @@ function SetWizard({ID}) {
 
 	useEffect(() => {
 		async function add() {
-			await addWord(wordID);
+			await addWord();
 		}
 		if (wordID == null) {
 			if (mode == modes.WORD)

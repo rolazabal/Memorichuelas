@@ -122,6 +122,7 @@ function App() {
 					<Card.Body style={{overflow: "hidden", margin: ".5%"}}>
 						{page == pages.HOME && <Home
 							ID={userID}
+							setID={setUserID}
 							logIn={(name, pass) => logIn(name, pass)} 
 							createAccount={(name, pass) => createAccount(name, pass)} 
 						/>}

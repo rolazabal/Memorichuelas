@@ -9,7 +9,7 @@ import Stack from 'react-bootstrap/Stack';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
-function Home({logIn, createAccount, ID}) {
+function Home({ID, setID, logIn, createAccount}) {
 
     const [createModal, setCreateModal] = useState(false);
 
@@ -28,7 +28,7 @@ function Home({logIn, createAccount, ID}) {
 			if (res.status == 200) {
 				res = await res.json();
 				let id = await res.user_id;
-				setUserID(id);
+				setID(id);
 				localStorage.setItem('userID', id);
 				showToast("success", "t_login_success");
 			} else {

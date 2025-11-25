@@ -221,7 +221,7 @@ app.put(accAPI, async (req, res) => {
 	let id = await user_id(username, passkey);
 	if (!id) {
 		res.status(404).json({msg: str.not_found});
-	console.log(res.statusCode);
+		console.log(res.statusCode);
 		return;
 	}
 	await logAction(id);
@@ -234,7 +234,7 @@ app.get(accAPI + '/:id', async (req, res) => {
 	let id = parseInt(req.params.id);
 	if (!(await userActive(id))) {
 		res.status(403).json({msg: str.timed_out});
-	console.log(res.statusCode);
+		console.log(res.statusCode);
 		return;
 	}
 	let obj = await userInfo(id);
