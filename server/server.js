@@ -71,7 +71,9 @@ async function user_id(username, passkey) {
 }
 
 async function createUser(username, passkey) {
-	await client.query('INSERT INTO users(name, passkey, date) VALUES ($1, $2, CURRENT_DATE)', [username, passkey]);
+	let res = await client.query('INSERT INTO users(name, passkey, date) VALUES ($1, $2, CURRENT_DATE) RETURNING user_id', [username, passkey]);
+	let id = parseInt(res.rows[0].user_id);
+	return id;
 }
 
 async function usernameExists(username) {
@@ -206,8 +208,12 @@ async function deleteSetWord(set_id, word_id) {
 const str = {
 	not_found: ['User does not exist!', 'Usuario no existe!'],
 	timed_out: ['User timed out!', 'Session expirada!'],
-	invalid_username: ['Invalid username!', 'Nombre de usuario invalido!'],
-	invalid_passkey: ['Invalid passkey!', 'Contraseña invalida!'],
+	empty_username: ['Invalid username!', 'Nombre de usuario invalido!'],
+	long_username: ['Username must be no longer than 10 characters!', ''],
+	empty_passkey: ['Passkey must not be empty!', 's'],
+	letters_passkey: ['Passkey must contain only numbers!', 'Contrasena solo debe contener numeros!'],
+	short_passkey: ['Passkey must be atleast 4 numbers long!', 's'],
+	long_passkey: ['Passkey must be no longer than 8 numbers!', 's'],
 	unique_username: ['Username already exists!', 'Nombre de usuario ya existe!'],
 	invalid_setname: ['Invalid set name!', 'Nombre invalido de colleccion!'],
 };
@@ -215,11 +221,31 @@ const str = {
 // account api ================================================================
 const accAPI = '/api/account';
 
+// helper methods
+async function validateUsername(username, res) {
+	if (username.length == 0) {
+		res.status(400).json({msg: str.empty_username});
+		console.log(res.statusCode);
+		return false;
+	}
+	if (username.length > 10) {
+		res.status(400).json({msg: str.long_username});
+		console.log(res.statusCode);
+		return false;
+	}
+	if (await usernameExists(username)) {
+		res.status(400).json({msg: str.unique_username});
+		console.log(res.statusCode);
+		return false;
+	}
+	return true;
+}
+
 // log in
 app.put(accAPI, async (req, res) => {
 	console.log(req.body);
 	let username = req.body.username;
-	let passkey = parseInt(req.body.passkey);
+	let passkey = req.body.passkey;
 	let id = await user_id(username, passkey);
 	if (!id) {
 		res.status(404).json({msg: str.not_found});
@@ -255,7 +281,7 @@ app.delete(accAPI + '/:id', async (req, res) => {
 		return;
 	}
 	await deleteUser(id);
-	res.status(200);
+	res.status(200).send();
 	console.log(res.statusCode);
 });
 
@@ -268,7 +294,7 @@ app.put(accAPI + '/:id', async (req, res) => {
 		return;
 	}
 	await deactivateUser(id);
-	res.status(200);
+	res.status(200).send();
 	console.log(res.statusCode);
 });
 
@@ -278,48 +304,52 @@ app.put(accAPI + '/:id/username', async (req, res) => {
 	let id = req.params.id;
 	if (!(await userActive(id))) {
 		res.status(403).json({msg: str.timed_out});
-	console.log(res.statusCode);
+		console.log(res.statusCode);
 		return;
 	}
 	let username = req.body.username;
-	if (username == "") {
-		res.status(400).json({msg: str.invalid_username});
-	console.log(res.statusCode);
-		return;
-	}
-	if (await usernameExists(username)) {
-		res.status(400).json({msg: str.unique_username});
-	console.log(res.statusCode);
+	let check = await validateUsername(username, res);
+	if (!check) {
 		return;
 	}
 	await updateUsername(id, username);
 	await logAction(id);
-	res.status(200);
+	res.status(200).send();
 	console.log(res.statusCode);
 });
 
 // create user
 app.post(accAPI, async (req, res) => {
 	console.log(req.body);
+	let passkey = req.body.passkey;
+	if (passkey.length == 0) {
+		res.status(400).json({msg: str.empty_passkey});
+		console.log(res.statusCode);
+		return;
+	}
+	if (/[^0-9]+/.test(passkey)) {
+		res.status(400).json({msg: str.letters_passkey});
+		console.log(res.statusCode);
+		return;
+	}
+	if (passkey.length < 4) {
+		res.status(400).json({msg: str.short_passkey});
+		console.log(res.statusCode);
+		return;
+	}
+	if (passkey.length > 8) {
+		res.status(400).json({msg: str.long_passkey});
+		console.log(res.statusCode);
+		return;
+	}
 	let username = req.body.username;
-	let passkey = parseInt(req.body.passkey);
-	if (username == "") {
-		res.status(400).json({msg: str.invalid_username});
-	console.log(res.statusCode);
+	let check = await validateUsername(username, res);
+	if (!check) {
 		return;
 	}
-	if (passkey > 99999999 || passkey < 1) {
-		res.status(400).json({msg: str.invalid_passkey});
-	console.log(res.statusCode);
-		return;
-	}
-	if (await usernameExists(username)) {
-		res.status(400).json({msg: str.unique_username});
-	console.log(res.statusCode);
-		return;
-	}
-	await createUser(username, passkey);
-	res.status(200);
+	let id = await createUser(username, passkey);
+	await logAction(id);
+	res.status(200).json({user_id: id});
 	console.log(res.statusCode);
 });
 
@@ -445,7 +475,7 @@ app.put(setAPI + '/:user_id/:set_id/name', async (req, res) => {
 		return;
 	}
 	await updateSetName(s_id, name);
-	res.status(200);
+	res.status(200).send();
 });
 
 // add word
@@ -458,7 +488,7 @@ app.post(setAPI + '/:user_id/:set_id/word', async (req, res) => {
 	let s_id = req.params.set_id;
 	let w_id = req.body.word_id;
 	await createSetWord(s_id, w_id);
-	res.status(200);
+	res.status(200).send();
 });
 
 // delete word
@@ -472,7 +502,7 @@ app.delete(setAPI + '/:user_id/:set_id/:word_id', async (req, res) => {
 	let s_id = req.params.set_id;
 	let w_id = req.params.word_id;
 	await deleteSetWord(s_id, w_id);
-	res.status(200);
+	res.status(200).send();
 });
 
 // delete set
@@ -485,7 +515,7 @@ app.delete(setAPI + '/:user_id/:set_id', async (req, res) => {
 	}
 	let s_id = req.params.set_id;
 	await deleteSet(s_id);
-	res.status(200);
+	res.status(200).send();
 });
 
 // update word score

@@ -33,7 +33,7 @@ export const ToastContextProvider = ({ children }) => {
 					<Toast.Header>{type != "" ? strings.get(type) : type}</Toast.Header>
 
 					{msg != "" && 
-						<Toast.Body>{typeof(msg) == typeof([""]) ? msg[strings.lang] : strings.get(msg)}</Toast.Body>
+						<Toast.Body>{typeof(msg) == typeof(['']) ? msg[strings.lang] : strings.get(msg)}</Toast.Body>
 					}
 				</Toast>
 			</ToastContainer>

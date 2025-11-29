@@ -25,6 +25,7 @@ function SetWizard({ID}) {
     const [listMode, setListMode] = useState(listModes.CUSTOM);
 	const [setID, setSetID] = useState(null);
 	const [wordID, setWordID] = useState(null);
+	const [page, setPage] = useState('A');
 
 	const { strings } = useContext(LocContext);
 	const { showToast } = useContext(ToastContext);
@@ -82,7 +83,7 @@ function SetWizard({ID}) {
 			<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />
 		}
 		{mode == modes.PICKER &&
-			<WordDirectory ID={ID} view={(wID) => setWordID(wID)} api={dictAPI} />
+			<WordDirectory ID={ID} page={page} setPage={setPage} view={(wID) => setWordID(wID)} api={dictAPI} />
 		}
 	</>);
 }

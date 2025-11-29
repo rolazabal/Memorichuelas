@@ -12,6 +12,7 @@ function DictionaryWizard({ID}) {
 
 	const [mode, setMode] = useState(modes.DIRECTORY);
 	const [wordID, setWordID] = useState(null);
+	const [page, setPage] = useState('A');
 
 	useEffect(() => {
 		if (wordID == null)
@@ -25,7 +26,7 @@ function DictionaryWizard({ID}) {
 	return (
 		<>
 			{mode == modes.DIRECTORY &&
-				<WordDirectory ID={ID} view={(id) => setWordID(id)} api={dictAPI} />
+				<WordDirectory ID={ID} page={page} setPage={setPage} view={(id) => setWordID(id)} api={dictAPI} />
 			}
 			{mode == modes.WORD &&
 				<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />

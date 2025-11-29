@@ -38,13 +38,15 @@ function Account({ID, logOut, del}) {
 
 	async function changeName(user) {
 		try {
+			console.log("farts");
 			let res = await fetch(accAPI + "/" + ID + "/username", {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({username: user})
 			});
+			console.log("farted", res.status);
 			if (res.status == 200) {
-				await getInfo();
+				setInfo(null);
 				showToast("success", "t_change_name_success");
 			} else {
 				res = await res.json();
@@ -55,14 +57,18 @@ function Account({ID, logOut, del}) {
 		}
 	}
 
-	const handleChange = (data) => {
+	const handleChange = async (e) => {
+		e.preventDefault();
+		const data = new FormData(e.target);
 		let username = data.get("change_name");
-		changeName(username);
+		await changeName(username);
 	}
 
 	useEffect(() => {
-		getInfo();
-	}, []);
+		if (info == null) {
+			getInfo();
+		}
+	}, [info]);
 
 	return (
 		<>
@@ -70,12 +76,12 @@ function Account({ID, logOut, del}) {
 			<ListGroup style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
 				<ListGroup.Item>
 					<Card.Text>{strings.get('change_name')}</Card.Text>
-					<Form action={handleChange}>
-						<Stack direction="horizontal" gap={3}>
-							<Form.Control name="change_name" type="username" placeholder={strings.get('change_name_text')} />
-							<Button type="submit">{strings.get('update')}</Button>
-						</Stack>
-					</Form>
+						<form onSubmit={handleChange}>
+							<Stack direction="horizontal" gap={3}>
+								<Form.Control name="change_name" type="username" placeholder={strings.get('change_name_text')} />
+								<Button type="submit">{strings.get('update')}</Button>
+							</Stack>
+						</form>
 				</ListGroup.Item>
 				<ListGroup.Item>
 					<Card.Text>{strings.get('user_information')}</Card.Text>
@@ -90,7 +96,7 @@ function Account({ID, logOut, del}) {
 						>
 							{strings.get('user_delete')}
 						</Button>
-						<Button variant="secondary" className="ms-auto" onClick={() => {logOut(false)}}>{strings.get('logout')}</Button>
+						<Button variant="secondary" className="ms-auto" onClick={() => logOut()}>{strings.get('logout')}</Button>
 					</Stack>
 				</ListGroup.Item>
 			</ListGroup>
@@ -110,11 +116,11 @@ function Account({ID, logOut, del}) {
 					{strings.get('user_delete_blurb')}
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant='danger' onClick={del}>{strings.get('delete')}</Button>
+					<Button variant='danger' onClick={() => del()}>{strings.get('delete')}</Button>
 				</Modal.Footer>
 			</Modal>
 		</>
-	)
+	);
 }
 
 export default Account

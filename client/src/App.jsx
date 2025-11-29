@@ -53,29 +53,29 @@ function App() {
 	const accAPI = 'http://localhost:5050/api/account';
 
 	async function logOut() {
+		setUserID(-1);
+		localStorage.removeItem('userID');
+		changePage(pages.HOME);
 		try {
 			await fetch(accAPI + "/" + userID, {
 				method: 'PUT'
 			});
-			setUserID(-1);
-			localStorage.removeItem('userID');
-			showToast("success", "t_login_success");
-			setPage(pages.HOME);
+			showToast("success", "t_logout_success");
 		} catch(error) { 
 			showToast("danger", "t_error");
 		}
 	}
 	
 	async function deleteUser() {
+		setUserID(-1);
+		localStorage.removeItem('userID');
+		changePage(pages.HOME);
 		try {
 			let res = await fetch(accAPI + "/" + userID, {
 				method: 'DELETE'
 			});
 			if (res.status == 200) {
-				setUserID(-1);
-				localStorage.removeItem('userID');
 				showToast("success", "t_delete_acc_success");
-				setPage(pages.HOME);
 			} else {
 				showToast("danger", "t_user_timed_out");
 			}
@@ -139,8 +139,8 @@ function App() {
 						/>}
 						{page == pages.SETTINGS && <Account
 							ID={userID}
-							logOut={() => logOut()}
-							del={() => deleteUser()}
+							logOut={logOut}
+							del={deleteUser}
 						/>}
 					</Card.Body>
 				</Card>

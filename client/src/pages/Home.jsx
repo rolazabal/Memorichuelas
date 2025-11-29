@@ -48,7 +48,11 @@ function Home({ID, setID, logIn, createAccount}) {
 				body: JSON.stringify({username: user, passkey: pass})
 			});
 			if (res.status == 200) {
-				logIn(user, pass);
+				res = await res.json();
+				let id = await res.user_id;
+				setID(id);
+				localStorage.setItem('userID', id);
+				showToast("success", "t_create_acc_success");
 			} else {
 				res = await res.json();
 				showToast("danger", res.msg);

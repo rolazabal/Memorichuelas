@@ -46,7 +46,6 @@ function Set({ID, sID, close, add, view, api}) {
 				method: 'DELETE'
 			});
 			if (res.status == 200) {
-				res = await res.json();
 				showToast("success", "t_delete_set_success");
 				close();
 			} else {
@@ -66,7 +65,6 @@ function Set({ID, sID, close, add, view, api}) {
 				body: JSON.stringify({name: name})
 			});
 			if (res.status == 200) {
-				res = await res.json();
 				setNameModal(false);
 				showToast("success", "t_change_setname_success");
 				setSet(null);

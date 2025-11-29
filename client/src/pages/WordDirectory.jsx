@@ -10,7 +10,7 @@ import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function WordDirectory({ID, view, api}) {
+function WordDirectory({ID, page, setPage, view, api}) {
 
 	const alph = [
         	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
@@ -21,7 +21,6 @@ function WordDirectory({ID, view, api}) {
 
 	const [table, setTable] = useState([]);
 	const [list, setList] = useState(null);
-	const [page, setPage] = useState(alph[0]);
 
 	function computeTable(columns) {
 		let rows = [];

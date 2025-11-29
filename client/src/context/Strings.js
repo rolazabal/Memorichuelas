@@ -62,6 +62,7 @@ class Tome {
 		t_login_success: ["Logged in!", "Sesion iniciada!"],
 		t_login_fail: ["Log in failed!" , "No se pudo iniciar la session!"],
 		t_logout_success: ["Logged out!", "Sesion cerrada!"],
+		t_create_acc_success: ["Welcome!", "Bienvenido!"],
 		t_create_acc_fail: ["Failed to create account!", "No se pudo crear la cuenta!"],
 		t_change_name_success: ["Username changed!", "Nombre de usuario cambiado!"],
 		t_name_exists: ["Username is already in use!", "Nombre de usuario ya esta en uso!"],
