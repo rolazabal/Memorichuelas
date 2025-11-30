@@ -1,6 +1,6 @@
 # Memorichuelas
 
-`Memorichuelas` is an interactive vocabulary-learning app for Puerto Rican spanish. 
+`Memorichuelas` is an interactive vocabulary-learning web app for Puerto Rican spanish. 
 
 ## Inspiration and Purpose
 
@@ -15,19 +15,19 @@ Our national dialect of Spanish is one such practice and very few online resourc
 
 ## Implementation
 
-Version 0.1.8 of `Memorichuelas` aims to implement all functionality except some set management, and quiz games, meaning that ~1/2 of the app's overall functionality is implemented.
+Version 0.1.9 of `Memorichuelas` implements all functionality except for quiz games --which once codified, represents the end of the alpha stage for the app.
 
-`Memorichuelas` uses a layered architecture with 3 layers:
+`Memorichuelas` uses a full-stack layered architecture:
 
 ### Frontend
-`React`, and `Vite`.
+`React` and `Vite` for a dynamic web interface.
 
 ### Backend
-`Node.js`, and `express.js`.
+`Node.js` and `express.js` for APIs and business logic.
 
 ### Database
-`PostgreSQL`.
+`PostgreSQL` to store accounts, sets, heuristics, and the dictionary.
 
-See the [0.1.3 release page][prot] for more info on that specific implementation, a new design is currently in the works.
+See the [0.1.3 prototype release page][prot] for more info on that specific implementation.
 
 [prot]: https://github.com/rolazabal/Memorichuelas/releases/tag/v1.3
