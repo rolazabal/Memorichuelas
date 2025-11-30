@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-
 import Word from './Word.jsx';
 import WordDirectory from './WordDirectory.jsx';
 

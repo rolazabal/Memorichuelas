@@ -25,16 +25,24 @@ function App() {
 		DICTIONARY: 1,
 		SETS: 2,
 		SETTINGS: 3,
-		GAME: 4
 	};
 
 	const [page, setPage] = useState(pages.HOME);
 	const [userID, setUserID] = useState(-1);
 
+	const { strings, setStrings } = useContext(LocContext);
+	const { showToast } = useContext(ToastContext);
+
+	const setLang = (option) => {
+		setStrings(new Tome(option));
+		localStorage.setItem('language', option);
+	}
+
 	const loadLocal = () => {
 		console.log("reload");
 		let id = localStorage.getItem('userID');
 		let page = localStorage.getItem('page');
+		let lang = localStorage.getItem('language');
 		if (id != null) {
 			id = parseInt(id);
 			setUserID(id);
@@ -43,12 +51,12 @@ function App() {
 			page = parseInt(page);
 			setPage(page);
 		}
+		if (lang != null) {
+			setLang(lang);
+		}
 	}
 
 	window.onload = function() { loadLocal() };
-
-	const { strings, setStrings } = useContext(LocContext);
-	const { showToast } = useContext(ToastContext);
 	
 	const accAPI = 'http://localhost:5050/api/account';
 
@@ -100,10 +108,10 @@ function App() {
 								<FontAwesomeIcon icon="fa-solid fa-earth-americas" />	
 							</Dropdown.Toggle>
 							<Dropdown.Menu>
-								<Dropdown.Item onClick={(e) => setStrings(new Tome('spanish'))}>
+								<Dropdown.Item onClick={(e) => setLang('spanish')}>
 									Espanol
 								</Dropdown.Item>
-								<Dropdown.Item onClick={(e) => setStrings(new Tome('english'))}>
+								<Dropdown.Item onClick={(e) => setLang('english')}>
 									English
 								</Dropdown.Item>
 							</Dropdown.Menu>

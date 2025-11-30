@@ -52,6 +52,7 @@ function Home({ID, setID, logIn, createAccount}) {
 				let id = await res.user_id;
 				setID(id);
 				localStorage.setItem('userID', id);
+				setCreateModal(false);
 				showToast("success", "t_create_acc_success");
 			} else {
 				res = await res.json();
@@ -72,7 +73,6 @@ function Home({ID, setID, logIn, createAccount}) {
         let username = data.get("create_user");
         let passkey = data.get("create_pass");
         createAccount(username, passkey);
-        setCreateModal(false);
     }
 
     return (

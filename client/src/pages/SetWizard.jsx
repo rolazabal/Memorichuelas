@@ -1,9 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
-
 import SetList from './SetList.jsx';
 import Set from './Set.jsx';
 import WordDirectory from './WordDirectory.jsx';
 import Word from './Word.jsx';
+import QuizWizard from './QuizWizard.jsx';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
@@ -13,7 +13,8 @@ function SetWizard({ID}) {
 		LIST: 0,
 		SET: 1,
 		WORD: 2,
-		PICKER: 3
+		PICKER: 3,
+		GAME: 4
 	};
 
     const listModes = {
@@ -85,6 +86,7 @@ function SetWizard({ID}) {
 		{mode == modes.PICKER &&
 			<WordDirectory ID={ID} page={page} setPage={setPage} view={(wID) => setWordID(wID)} api={dictAPI} />
 		}
+		{mode == modes.GAME && <QuizWizard sID={setID} view={(wID) => setWordID(wID)} quit={() => setSetID(null)} />}
 	</>);
 }
 

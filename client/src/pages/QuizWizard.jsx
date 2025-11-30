@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from 'react';
-
 import Quiz from './Quiz.jsx';
 import Word from './Word.jsx';
 
@@ -7,7 +6,7 @@ function timer() {
     ;
 }
 
-function SetWizard({ID}) {
+function QuizWizard({sID, view, quit}) {
 
     const modes = {
         DEF: 0,
@@ -16,7 +15,7 @@ function SetWizard({ID}) {
         Q_EX: 3
     };
 
-    const [mode, setMode] = useState(modes.LIST);
+    const [mode, setMode] = useState(modes.DEF);
     const [wordScores, setWordScores] = useState(null);
     const [wordID, setWordID] = useState(null);
 
@@ -27,4 +26,4 @@ function SetWizard({ID}) {
     </>);
 }
 
-export default SetWizard
+export default QuizWizard

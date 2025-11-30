@@ -57,11 +57,9 @@ function Account({ID, logOut, del}) {
 		}
 	}
 
-	const handleChange = async (e) => {
-		e.preventDefault();
-		const data = new FormData(e.target);
+	const handleChange = (data) => {
 		let username = data.get("change_name");
-		await changeName(username);
+		changeName(username);
 	}
 
 	useEffect(() => {
@@ -76,12 +74,12 @@ function Account({ID, logOut, del}) {
 			<ListGroup style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
 				<ListGroup.Item>
 					<Card.Text>{strings.get('change_name')}</Card.Text>
-						<form onSubmit={handleChange}>
+						<Form action={handleChange}>
 							<Stack direction="horizontal" gap={3}>
 								<Form.Control name="change_name" type="username" placeholder={strings.get('change_name_text')} />
 								<Button type="submit">{strings.get('update')}</Button>
 							</Stack>
-						</form>
+						</Form>
 				</ListGroup.Item>
 				<ListGroup.Item>
 					<Card.Text>{strings.get('user_information')}</Card.Text>
