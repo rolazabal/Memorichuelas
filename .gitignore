@@ -25,3 +25,6 @@ dist-ssr
 
 # database and server port
 server/.env
+
+# scraped webpages
+scraping/pages/*

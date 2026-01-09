@@ -108,7 +108,7 @@ function WordDirectory({ID, page, setPage, view, api}) {
 						</Pagination.Item>)}
 					</Pagination>
 				</Row>
-			<Container style={{maxHeight: "90%", overflowY: "auto", overflowX: "hidden"}}>
+			<Container style={{maxHeight: "80%", overflowY: "auto", overflowX: "hidden"}}>
 				{table.map((row) => <Row>
 					{row.map((entry) => <Col name={entry.word_id} onClick={() => view(entry.word_id)}>
 						{entry.name}

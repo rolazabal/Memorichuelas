@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Container } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
@@ -126,6 +126,7 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 				</Stack>
 			</Form>
 		</Row>}
+		<Container style={{padding: "0%", margin: "0%", maxHeight: "80%", overflowY: "auto", overflowX: "hidden"}}>
 		{sets != null && sets.map((set, index) => 
 			<Row key={index}>
 				<Stack direction="horizontal">
@@ -145,6 +146,7 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 				</Stack>
 			</Row>
 		)}
+</Container>
 		<Modal
 			size="lg"
 			aria-labelledby="contained-modal-title-vcenter"
