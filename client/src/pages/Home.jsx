@@ -105,8 +105,8 @@ function Home({ID, setID, logIn, createAccount}) {
                     </ListGroup>
                 }
 	    	{ID != -1 && <>
-			<Card.Text>Visit the sets page and start learning with our official sets, or make your own!</Card.Text>
-		</>}
+				<Card.Text>Visit the sets page and start learning with our official sets, or make your own!</Card.Text>
+			</>}
             </Container>
             <Modal
                 size="lg"

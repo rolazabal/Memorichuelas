@@ -6,6 +6,7 @@ function timer() {
     ;
 }
 
+// state machine for quiz game
 function QuizWizard({sID, view, quit}) {
 
     const modes = {

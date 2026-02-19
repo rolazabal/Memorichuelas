@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Word from './Word.jsx';
 import WordDirectory from './WordDirectory.jsx';
 
+// state machine for dictionary page
 function DictionaryWizard({ID}) {
 	
 	const modes = {

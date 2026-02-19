@@ -136,10 +136,10 @@ function SetList({ID, view, api, modes, mode, setMode}) {
 						style={{width: "100%"}}
 						onClick={() => {view(set.set_id)}}
 					>
-						<h4 style={{float: "left"}}>
+						<h4 style={{float: "left", width: "50%"}}>
 							{set.name}
 						</h4>
-						<h4 className="ms-auto">
+						<h4 className="ms-auto" style={{width: "50%"}}>
 							{strings.get("score")}: {set.score}
 						</h4>
 					</Button>

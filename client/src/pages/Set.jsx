@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
-function Set({ID, sID, close, add, view, api}) {
+function Set({ID, sID, close, add, view, play, api}) {
 	
 	const [set, setSet] = useState(null);
 	const [deleteModal, setDeleteModal] = useState(false);
@@ -140,7 +140,7 @@ function Set({ID, sID, close, add, view, api}) {
                         {strings.get("delete")}
                     </Button>}
 					<p style={{width: "33%", fontSize: "1.3em"}}>{strings.get("score")}: {set.score}</p>
-					<Button variant="success" style={{width: "33%"}}>{strings.get("play")}</Button>
+					<Button variant="success" style={{width: "33%"}} onClick={() => play}>{strings.get("play")}</Button>
 				</Stack>
 			</Row>
 		</>}

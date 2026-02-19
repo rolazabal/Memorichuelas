@@ -7,14 +7,14 @@ import QuizWizard from './QuizWizard.jsx';
 import { LocContext } from './../context/LocContext.jsx';
 import { ToastContext } from './../context/ToastContext.jsx';
 
-function SetWizard({ID}) {
+// state machine for sets page
+function SetWizard({ID, play}) {
 
 	const modes = {
 		LIST: 0,
 		SET: 1,
 		WORD: 2,
 		PICKER: 3,
-		GAME: 4
 	};
 
     const listModes = {
@@ -78,7 +78,7 @@ function SetWizard({ID}) {
 			<SetList ID={ID} view={(id) => setSetID(id)} api={setAPI} modes={listModes} mode={listMode} setMode={setListMode} />
 		}
 		{mode == modes.SET &&
-			<Set ID={ID} sID={setID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} api={setAPI} />
+			<Set ID={ID} sID={setID} close={() => setSetID(null)} add={() => setMode(modes.PICKER)} view={(wID) => setWordID(wID)} play={() => play} api={setAPI} />
 		}
 		{mode == modes.WORD &&
 			<Word uID={ID} wID={wordID} close={() => setWordID(null)} api={dictAPI} />
@@ -86,7 +86,6 @@ function SetWizard({ID}) {
 		{mode == modes.PICKER &&
 			<WordDirectory ID={ID} page={page} setPage={setPage} view={(wID) => setWordID(wID)} api={dictAPI} />
 		}
-		{mode == modes.GAME && <QuizWizard sID={setID} view={(wID) => setWordID(wID)} quit={() => setSetID(null)} />}
 	</>);
 }
 

@@ -39,7 +39,7 @@ class Tome {
 		passkey_text: ["Enter a numeric passkey 4-8 digits long.", "Entra contrasena numerica de 4-8 digitos."],
 		change_name: ["Change username", "Cambiar nombre de usuario"],
 		change_name_text: ["Enter new username", "Entra nombre de usuario nuevo"],
-		user_information: ["Account info", "Informacion sobre la cuenta"],
+		user_information: ["Info", "Informacion"],
 		user_date: ["Date created", "Fecha creada"],
 		user_delete: ["Delete account", "Borrar cuenta"],
 		update: ["Update", "Actualizar"],

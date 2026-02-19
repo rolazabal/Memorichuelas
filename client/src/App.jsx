@@ -15,6 +15,8 @@ import DictionaryWizard from './pages/DictionaryWizard.jsx';
 import SetWizard from './pages/SetWizard.jsx';
 import { LocContext } from './context/LocContext.jsx';
 import { ToastContext } from './context/ToastContext.jsx';
+import Button from 'react-bootstrap/Button';
+import QuizWizard from './pages/QuizWizard.jsx';
 
 function App() {
 
@@ -25,6 +27,7 @@ function App() {
 		DICTIONARY: 1,
 		SETS: 2,
 		SETTINGS: 3,
+		QUIZ: 4,
 	};
 
 	const [page, setPage] = useState(pages.HOME);
@@ -117,17 +120,21 @@ function App() {
 							</Dropdown.Menu>
 						</Dropdown>
 					</Stack>
-					<Navbar.Toggle aria-controls="responsive-navbar-nav" />
-					<Navbar.Collapse id="responsive-navbar-nav">
-						<Nav className="me-auto" activeKey={page}>
-							<Nav.Link eventKey={pages.HOME} onClick={() => changePage(pages.HOME)}>{strings.get('about_title')}</Nav.Link>
-							<Nav.Link eventKey={pages.DICTIONARY} onClick={() => changePage(pages.DICTIONARY)}>{strings.get('dictionary_title')}</Nav.Link>
-							{userID != -1 && <>
-								<Nav.Link eventKey={pages.SETS} onClick={() => changePage(pages.SETS)}>{strings.get('sets_title')}</Nav.Link>
-								<Nav.Link eventKey={pages.SETTINGS} onClick={() => changePage(pages.SETTINGS)}>{strings.get('user_title')}</Nav.Link>
-							</>}
-						</Nav>
-					</Navbar.Collapse>
+					{page != pages.QUIZ ? <>
+						<Navbar.Toggle aria-controls="responsive-navbar-nav" />
+						<Navbar.Collapse id="responsive-navbar-nav">
+							<Nav className="me-auto" activeKey={page}>
+								<Nav.Link eventKey={pages.HOME} onClick={() => changePage(pages.HOME)}>{strings.get('about_title')}</Nav.Link>
+								<Nav.Link eventKey={pages.DICTIONARY} onClick={() => changePage(pages.DICTIONARY)}>{strings.get('dictionary_title')}</Nav.Link>
+								{userID != -1 && <>
+									<Nav.Link eventKey={pages.SETS} onClick={() => changePage(pages.SETS)}>{strings.get('sets_title')}</Nav.Link>
+									<Nav.Link eventKey={pages.SETTINGS} onClick={() => changePage(pages.SETTINGS)}>{strings.get('user_title')}</Nav.Link>
+								</>}
+							</Nav>
+						</Navbar.Collapse>
+					</> : 
+						<Button onClick={() => changePage(pages.SETS)}>Quit</Button>
+					}
 				</Navbar>
 			</Row>
 			<Row style={{height: "80vh", backgroundColor: "#7cd4e2"}}>
@@ -144,11 +151,15 @@ function App() {
 						/>}
 						{page == pages.SETS && <SetWizard
 							ID={userID}
+							play={() => changePage(pages.QUIZ)}
 						/>}
 						{page == pages.SETTINGS && <Account
 							ID={userID}
 							logOut={logOut}
 							del={deleteUser}
+						/>}
+						{page == pages.QUIZ && <QuizWizard
+
 						/>}
 					</Card.Body>
 				</Card>
